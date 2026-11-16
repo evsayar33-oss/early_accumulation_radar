@@ -25,7 +25,7 @@ class Trade:
 
 def url_for(venue,asset):
     if asset not in SYMBOLS:raise ValueError("asset")
-    if venue=="binance":return "https://api.binance.com/api/v3/aggTrades?"+urlencode({"symbol":SYMBOLS[asset],"limit":500})
+    if venue=="binance":return "https://data-api.binance.vision/api/v3/aggTrades?"+urlencode({"symbol":SYMBOLS[asset],"limit":500})
     if venue=="bybit":return "https://api.bybit.com/v5/market/recent-trade?"+urlencode({"category":"spot","symbol":SYMBOLS[asset],"limit":60})
     if venue=="okx":return "https://www.okx.com/api/v5/market/trades?"+urlencode({"instId":asset+"-USDT","limit":100})
     raise ValueError("venue")
@@ -67,7 +67,15 @@ def summarize(venue,asset,trades,now_ms):
             "coverage":"RECENT_SAMPLE_NOT_CONTINUOUS","sampling_limit":500 if venue=="binance" else 60 if venue=="bybit" else 100}
 
 def fetch(venue,asset,get=http,clock=lambda:int(time.time()*1000)):
-    raw=get(url_for(venue,asset))
+    url=url_for(venue,asset)
+    try:
+        raw=get(url)
+    except FeedError:
+        if venue!="binance":raise
+        url=url.replace("https://data-api.binance.vision","https://api.binance.com")
+        raw=get(url)
     now_ms=clock()
     trades=parse(venue,asset,raw,now_ms)
-    return summarize(venue,asset,trades,now_ms)
+    report=summarize(venue,asset,trades,now_ms)
+    report["source_url"]=url
+    return report
