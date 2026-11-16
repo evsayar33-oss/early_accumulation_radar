@@ -55,7 +55,7 @@ def metrics(trades,navs):
             "net_return_pct":round((navs[-1]/navs[0]-1)*100,4) if len(navs)>1 else 0.,
             "last_nav":round(navs[-1],4)}
 
-def simulate(bars,entry_mode="acc",scenario="base",start=0,end=None):
+def simulate(bars,entry_mode="acc",scenario="base",start=0,end=None,signals=None):
     if entry_mode not in ("acc","breakout"):raise ValueError("mode")
     cfg=SCENARIOS[scenario]
     end=len(bars) if end is None else min(end,len(bars))
@@ -67,7 +67,7 @@ def simulate(bars,entry_mode="acc",scenario="base",start=0,end=None):
     sell_markdown=buy_markup;fee=cfg["fee_bps"]/10000
     for i in range(start+70,end):
         b=bars[i]
-        signal=conditions(bars,i)
+        signal=signals[i] if signals is not None else conditions(bars,i)
         if pos:
             reason=None; exit_reference=None
             stop=pos["entry_reference"]*(1-STOP_PCT)
