@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from .providers import SYMBOLS,FeedError,http
 import math,time
 
-TRADE_VENUES=("binance","okx","bybit")
+TRADE_VENUES=("binance","okx","bybit","gate")
 MAX_AGE_MS=180000
 @dataclass(frozen=True)
 class Trade:
@@ -28,6 +28,7 @@ def url_for(venue,asset):
     if venue=="binance":return "https://data-api.binance.vision/api/v3/aggTrades?"+urlencode({"symbol":SYMBOLS[asset],"limit":500})
     if venue=="bybit":return "https://api.bybit.com/v5/market/recent-trade?"+urlencode({"category":"spot","symbol":SYMBOLS[asset],"limit":60})
     if venue=="okx":return "https://www.okx.com/api/v5/market/trades?"+urlencode({"instId":asset+"-USDT","limit":100})
+    if venue=="gate":return "https://api.gateio.ws/api/v4/spot/trades?"+urlencode({"currency_pair":asset+"_USDT","limit":100})
     raise ValueError("venue")
 
 def parse(venue,asset,raw,now_ms):
@@ -43,6 +44,11 @@ def parse(venue,asset,raw,now_ms):
             if str(raw["code"])!="0":raise ValueError("code")
             rows=[Trade(venue,asset,str(x["tradeId"]),int(x["ts"]),float(x["px"]),float(x["sz"]),str(x["side"]).lower())
                   for x in raw["data"] if x.get("instId")==asset+"-USDT"]
+        elif venue=="gate":
+            if not isinstance(raw,list):raise ValueError("not list")
+            rows=[Trade(venue,asset,str(x["id"]),int(float(x["create_time_ms"])),
+                        float(x["price"]),float(x["amount"]),str(x["side"]).lower())
+                  for x in raw if x.get("currency_pair")==asset+"_USDT"]
         else:raise ValueError("venue")
     except (ValueError,TypeError,KeyError,IndexError) as exc:
         raise FeedError("TAPE_SCHEMA:"+str(exc)[:100]) from exc

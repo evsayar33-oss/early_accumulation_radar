@@ -46,6 +46,19 @@ jobs:
           git -C "$ROOT" add observations/scan.jsonl
           git -C "$ROOT" commit -m "data: append independently observed research tick"
           git -C "$ROOT" push origin "HEAD:refs/heads/$B"
+      - name: Independent integrity and freshness verification
+        run: python -m radar.audit --ledger "$RUNNER_TEMP/early-radar-state/observations/scan.jsonl" --max-age-minutes 120
+      - name: Validate Telegram configuration without sending messages
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m radar.telegram_health
+      - name: Send one Telegram delivery test on main push only
+        if: github.event_name == 'push'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m radar.telegram_health --send-test
       - name: Telegram advisory alerts (never real trades)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

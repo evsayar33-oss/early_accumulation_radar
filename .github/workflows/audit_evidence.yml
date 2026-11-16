@@ -1,0 +1,29 @@
+name: Independent V2 evidence and freshness audit
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '26 * * * *'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test validators offline
+        run: python -m unittest discover -s tests -v
+      - name: Fetch independent state branch without modifying it
+        run: |
+          set -euo pipefail
+          git fetch origin refs/heads/paper/early-radar-v2:refs/remotes/origin/paper/early-radar-v2
+          git show origin/paper/early-radar-v2:observations/scan.jsonl > "$RUNNER_TEMP/scan.jsonl"
+          python -m radar.audit --ledger "$RUNNER_TEMP/scan.jsonl" --max-age-minutes 120
+      - name: Check Telegram bot/chat availability (no unsolicited message)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m radar.telegram_health

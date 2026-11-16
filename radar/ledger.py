@@ -32,6 +32,8 @@ def compact(report):
         "tape":[{k:x.get(k) for k in ("venue","asset","status","count","sample_span_s","taker_buy_fraction","coverage")} for x in report["sampled_tape"]],
         "candle_diagnostics":report["candle_diagnostics"],
         "failed_source_count":len(report["errors"])+len(report["quotes"]["failed_sources"]),
+        "failed_flow_sources":report["errors"],
+        "failed_quote_sources":report["quotes"]["failed_sources"],
         "zero_valid_candle_sources":report["zero_valid_candle_sources"],
         "trade_allowed":False}
 
@@ -40,6 +42,7 @@ def append(report,path):
     item=compact(report)
     if old and item["scan_utc_ms"]<=old[-1]["scan_utc_ms"]:
         raise ValueError("STALE_OR_DUPLICATE_SCAN")
+    item["observation_gap_minutes"]=round((item["scan_utc_ms"]-int(old[-1]["scan_utc_ms"]))/60000,2) if old else None
     item["prev_sha256"]=old[-1]["sha256"] if old else "GENESIS"
     item["sha256"]=digest(item)
     p.parent.mkdir(parents=True,exist_ok=True)
