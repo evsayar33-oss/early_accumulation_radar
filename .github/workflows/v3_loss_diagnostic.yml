@@ -1,0 +1,46 @@
+name: V3 loss attribution diagnostic only
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v3_loss_diagnostic.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  loss-attribution:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Fetch completed historical evidence without rerunning or changing it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN="$(gh run list --workflow v3_historical.yml --branch main --status success --json databaseId --limit 1 --jq '.[0].databaseId')"
+          test -n "$RUN"
+          test "$RUN" != null
+          mkdir -p out/v3_historical
+          gh run download "$RUN" --name "v3-historical-$RUN" --dir out/v3_historical
+          test -s out/v3_historical/summary.json
+          test -s out/v3_historical/trades.csv
+      - name: Analyze trade-level exits, expectancy and model comparability
+        run: python -m research_v3.loss_diagnostic --summary out/v3_historical/summary.json --trades out/v3_historical/trades.csv --out out/v3_diagnostic
+      - name: Show diagnostic summary
+        shell: bash
+        run: cat out/v3_diagnostic/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-loss-diagnostic-${{ github.run_id }}
+          path: out/v3_diagnostic/
+          retention-days: 90
+          if-no-files-found: warn
