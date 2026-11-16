@@ -28,3 +28,13 @@ The V2 module adds independently timestamped public Binance/OKX/Bybit recent-tra
 Once merged, the new `Research V2 sampled tape and immutable evidence` Action runs on first main push, on demand and twice per hour (scheduled UTC :11/:41). Forward evidence is hash chained into `paper/early-radar-v2`; failure to push causes a red workflow. No missing intervals are backfilled. Optional advisory messages to Telegram require `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` already configured in Actions Secrets. See [V2 technical notes](docs/V2_RESEARCH_TR.md).
 
 **Not yet implemented:** simulated fills/PAPER NAV, predictive win rates, US stocks/BIST/DEX execution-ready feeds, historical statistically independent validation. Real trading remains disabled.
+
+## V4 original-target research tracks (separate from legacy large-cap crypto V3)
+
+V3's BTC/ETH/SOL-led historical study failed its performance screen and **does not** establish profitability for the originally intended low-float / concentrated ownership / shallow-liquidity universe.
+
+* DEX public discovery: `.github/workflows/v4_original_universe.yml` — a non-trading token-pair candidate and data-health sampler.
+* **BIST + US small-cap free input diagnostics**: `.github/workflows/v4_equities.yml` — KAP/Yahoo, Nasdaq/Yahoo, optional SEC/optional free DataCedar. First-seen price and volume evidence is SHA-linked on independent `research/v4-equity-evidence` branch. A non-executable forward event outcome study runs only on observed future sessions, never on synthetic fills.
+* Neither BIST nor US **float percentage, ownership concentration, depth, point-in-time historical universe or splits/dividends** is verified by this free-source sampler. PIT historical profitability, new PAPER NAV and real trading remain explicitly **blocked**. The existing large-cap crypto research/PAPER state remains unchanged.
+
+Free source setup, transparent coverage limits and gate details: [V4 BIST/US research guide](docs/V4_EQUITIES_FREE_SOURCES_TR.md).

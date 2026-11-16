@@ -1,0 +1,91 @@
+name: V4 BIST US free data and PIT gate (no trades)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v4_equities.yml']
+  schedule:
+    - cron: '19 23 * * 1-5'
+permissions:
+  contents: write
+concurrency:
+  group: early-radar-v4-equities-evidence
+  cancel-in-progress: false
+jobs:
+  separate-equity-probes:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check all regression and point-in-time blocking contracts
+        run: python -m unittest discover -s tests -v
+      - name: Probe independently documented/free BIST and US equity inputs
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          DATACEDAR_API_KEY: ${{ secrets.DATACEDAR_API_KEY }}
+        run: python -m research_v4.equity_sources --out out/v4_equities
+      - name: Fetch independent first-seen evidence ledger; do not alter PAPER
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='research/v4-equity-evidence'
+          ROOT="$RUNNER_TEMP/v4-equity-evidence"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch origin "$B"
+            git worktree add --detach "$ROOT" FETCH_HEAD
+          else
+            git worktree add --detach "$ROOT" HEAD
+          fi
+          mkdir -p "$ROOT/observations/v4_equities"
+          echo "EQUITY_EVIDENCE_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Persist and verify hash-linked equity observations (separate branch)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from research_v4.equity_evidence import append
+          root=Path(os.environ['EQUITY_EVIDENCE_ROOT'])
+          b=json.loads(Path('out/v4_equities/bist.json').read_text(encoding='utf8'))
+          u=json.loads(Path('out/v4_equities/us.json').read_text(encoding='utf8'))
+          record=append(b,u,root/'observations/v4_equities/ledger.jsonl')
+          print('V4_EQUITY_FIRSTSEEN_SHA',record['sha256'])
+          PY
+          git -C "$EQUITY_EVIDENCE_ROOT" config user.name 'github-actions[bot]'
+          git -C "$EQUITY_EVIDENCE_ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$EQUITY_EVIDENCE_ROOT" add observations/v4_equities/ledger.jsonl
+          git -C "$EQUITY_EVIDENCE_ROOT" commit -m 'research(v4): append first-seen BIST and US source diagnostics'
+          git -C "$EQUITY_EVIDENCE_ROOT" push origin 'HEAD:refs/heads/research/v4-equity-evidence'
+          git fetch origin 'research/v4-equity-evidence'
+          python - <<'PY'
+          import subprocess,tempfile
+          from pathlib import Path
+          from radar.ledger import read_verify
+          with tempfile.TemporaryDirectory() as directory:
+              path=Path(directory)/'ledger.jsonl'
+              path.write_bytes(subprocess.check_output(['git','show','FETCH_HEAD:observations/v4_equities/ledger.jsonl']))
+              records=read_verify(path)
+              print('VERIFIED_V4_EQUITY_TICKS',len(records),'SHA',records[-1]['sha256'])
+          PY
+      - name: Evaluate separate market data health, forward gaps and blocked PIT/PAPER gates
+        run: |
+          python -m research_v4.equity_evidence --input-dir out/v4_equities --ledger "$EQUITY_EVIDENCE_ROOT/observations/v4_equities/ledger.jsonl" --out out/v4_equity_audit
+          python -m research_v4.forward_study --ledger "$EQUITY_EVIDENCE_ROOT/observations/v4_equities/ledger.jsonl" --out out/v4_equity_audit
+          cat out/v4_equity_audit/report.md >> "$GITHUB_STEP_SUMMARY"
+          cat out/v4_equity_audit/forward_report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v4-equity-health-${{ github.run_id }}
+          path: |
+            out/v4_equities/
+            out/v4_equity_audit/
+          retention-days: 90
+          if-no-files-found: warn
