@@ -21,7 +21,11 @@ def audit(path, now_ms=None, max_age_ms=7_200_000):
     candles={x.get("asset"):(x.get("status"),x.get("last_closed_bar_ms")) for x in last.get("candle_diagnostics",[])}
     tapes={asset:sorted(x.get("venue") for x in last.get("tape",[]) if x.get("asset")==asset and x.get("status")=="SAMPLED")
            for asset in ("BTC","ETH","SOL")}
-    missing_candles=[a for a in ("BTC","ETH","SOL") if a not in candles]
+    missing_candles=[a for a in ("BTC","ETH","SOL")
+                     if a not in candles or candles[a][0] not in ("HYPOTHESIS_ONLY","VOLUME_CONTEXT_ONLY")
+                     or not isinstance(candles[a][1],int)
+                     or int(candles[a][1])>last_ms
+                     or last_ms-int(candles[a][1])>5*60000]
     healthy= age<=max_age_ms and not missing_candles and not last.get("zero_valid_candle_sources",True)
     return {"status":"HEALTHY" if healthy else "DATA_HEALTH_DEGRADED",
             "ok":healthy,"entries":len(rows),"latest_scan_utc_ms":last_ms,
