@@ -5,7 +5,7 @@ from radar.accumulation import parse_candles,features
 from radar.ledger import append,read_verify
 from radar.providers import FeedError
 
-T=1780000400000
+T=(1780000400000//60000)*60000
 def candle(i,buy=.60,vol=100):
     t=T-120*60000+i*60000
     p=100+i*.001
