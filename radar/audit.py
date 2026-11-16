@@ -26,12 +26,14 @@ def audit(path, now_ms=None, max_age_ms=7_200_000):
                      or not isinstance(candles[a][1],int)
                      or int(candles[a][1])>last_ms
                      or last_ms-int(candles[a][1])>5*60000]
-    healthy= age<=max_age_ms and not missing_candles and not last.get("zero_valid_candle_sources",True)
+    quote_health={x.get("asset"):x.get("status") for x in last.get("quote_health",[])}
+    weak_quotes=[a for a in ("BTC","ETH","SOL") if quote_health.get(a)!="WATCH_ONLY"]
+    healthy= age<=max_age_ms and not missing_candles and not weak_quotes and not last.get("zero_valid_candle_sources",True)
     return {"status":"HEALTHY" if healthy else "DATA_HEALTH_DEGRADED",
             "ok":healthy,"entries":len(rows),"latest_scan_utc_ms":last_ms,
             "latest_age_minutes":round(age/60000,2),"chain_valid":True,
             "prior_gaps":gaps[-10:],"prior_gap_count":len(gaps),
-            "latest_venue_tape":tapes,"missing_candle_assets":missing_candles,
+            "latest_venue_tape":tapes,"missing_candle_assets":missing_candles,"unhealthy_quote_assets":weak_quotes,
             "latest_failed_source_count":last.get("failed_source_count"),
             "trade_allowed":False}
 
