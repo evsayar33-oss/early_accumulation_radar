@@ -1,6 +1,7 @@
 """Unauthenticated public spot venue snapshots, with explicit provenance."""
 from __future__ import annotations
 import json, math, time
+from dataclasses import replace
 from dataclasses import dataclass
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
@@ -106,8 +107,7 @@ def fetch_quote(venue,asset,get=http,clock=lambda:int(time.time()*1000)):
     if venue=="gate":
         # Gate order_book response uses array levels, never ticker quantity heuristics.
         try:
-            if raw["currency_pair"]!=asset+"_USDT": raise ValueError("symbol")
             b,a=raw["bids"][0],raw["asks"][0]
             raw={"highest_bid":b[0],"highest_size":b[1],"lowest_ask":a[0],"lowest_size":a[1]}
         except (KeyError,IndexError,TypeError,ValueError) as exc:raise FeedError("BAD_GATE_BOOK") from exc
-    return _parse(venue,asset,raw,recv)
+    return replace(_parse(venue,asset,raw,recv),source=url)
