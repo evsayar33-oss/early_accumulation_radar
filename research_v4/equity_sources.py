@@ -243,7 +243,12 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
                                    "rows_total_unverified":total,
                                    "complete_universe":False})
             sample.extend(matches)
-        sample.sort(key=lambda row:(row["market_cap_usd_screen"],row["symbol"]))
+        # The public screener may repeat a ticker across exchange responses.
+        # Deduplicate by ticker before ranking; no false extra observations.
+        unique={}
+        for item in sample:
+            unique.setdefault(item["symbol"],item)
+        sample=sorted(unique.values(),key=lambda row:(row["market_cap_usd_screen"],row["symbol"]))
         out["observations"]=sample[:MAX_US_SAMPLE]
         if sec_agent:
             sec_headers={"User-Agent":sec_agent,"Accept-Encoding":"identity"}
