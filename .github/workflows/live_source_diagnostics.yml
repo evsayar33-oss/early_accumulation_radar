@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/v2-flow-prospective-evidence
+      - fix/v2-source-integrity-and-alert-audit
   workflow_dispatch:
 permissions:
   contents: read
