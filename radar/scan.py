@@ -18,7 +18,7 @@ def scan(assets=("BTC","ETH","SOL"),venues=VENUES,worker=fetch_quote):
             except Exception as exc:
                 failures.append({"venue":v,"asset":a,"error":type(exc).__name__+":"+str(exc)[:130]})
     from .providers import Quote
-    qq=[Quote(**{k:s[k] for k in ("venue","symbol","bid","ask","bid_qty","ask_qty","observed_ms","retrieved_ms","source","market_type")}) for s in snapshots]
+    qq=[Quote(**{k:s[k] for k in ("venue","symbol","bid","ask","bid_qty","ask_qty","observed_ms","retrieved_ms","source","market_type","quote_currency")}) for s in snapshots]
     report={"schema":"EAR.v1","scan_utc_ms":int(time.time()*1000),
             "scope":"PUBLIC_SPOT_TOP_OF_BOOK_ONLY_NOT_FULL_CVD","real_orders":False,
             "assets":[analyze(a,[q for q in qq if q.symbol==a]) for a in assets],
