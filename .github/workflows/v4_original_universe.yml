@@ -1,0 +1,42 @@
+name: V4 original-universe DEX discovery (research only)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v4_original_universe.yml'
+  schedule:
+    - cron: '29 4,16 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: early-radar-v4-original-universe
+  cancel-in-progress: false
+jobs:
+  public-discovery:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Discover DEX tokens without trading authorization
+        run: python -m research_v4.original_universe --out out/v4_original_universe
+      - name: Publish research-only status
+        if: always()
+        shell: bash
+        run: |
+          if test -f out/v4_original_universe/report.md; then
+            cat out/v4_original_universe/report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v4-original-universe-${{ github.run_id }}
+          path: out/v4_original_universe/
+          retention-days: 90
+          if-no-files-found: warn
