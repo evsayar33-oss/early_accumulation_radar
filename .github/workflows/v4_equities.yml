@@ -77,7 +77,9 @@ jobs:
       - name: Evaluate separate market data health, forward gaps and blocked PIT/PAPER gates
         run: |
           python -m research_v4.equity_evidence --input-dir out/v4_equities --ledger "$EQUITY_EVIDENCE_ROOT/observations/v4_equities/ledger.jsonl" --out out/v4_equity_audit
+          python -m research_v4.forward_study --ledger "$EQUITY_EVIDENCE_ROOT/observations/v4_equities/ledger.jsonl" --out out/v4_equity_audit
           cat out/v4_equity_audit/report.md >> "$GITHUB_STEP_SUMMARY"
+          cat out/v4_equity_audit/forward_report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
