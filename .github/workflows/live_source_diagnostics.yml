@@ -4,6 +4,7 @@ on:
     branches:
       - feature/v2-flow-prospective-evidence
       - fix/v2-source-integrity-and-alert-audit
+      - fix/binance-quote-public-host
   workflow_dispatch:
 permissions:
   contents: read
