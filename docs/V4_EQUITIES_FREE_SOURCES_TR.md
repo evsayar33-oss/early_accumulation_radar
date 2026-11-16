@@ -55,3 +55,9 @@ GitHub repo Settings → Secrets and variables → Actions içinden:
 - `DATACEDAR_API_KEY`: varsa ücretsiz Explorer anahtarın. Yoksa DataCedar atlanır, diğer kaynaklara dokunulmaz.
 
 Hassas değerler loglara yazılmaz. Özellikle ücretli API, premium plan veya yeni sunucu kurulumu şartı yoktur.
+
+### 20 + 5 seanslık ileriye dönük olay etüdü
+
+`research_v4.forward_study` bağımsız SHA zincirinde ilk defa gözlenen **20 önceki seans** üzerinden medyan hacmi hesaplar. Son kapanışta 2x göreli hacim ve önceki 5 seans mutlak fiyat değişimi <%8 olduğunda yalnız **araştırma olayı** işaretler. Başarı ölçümü, olaydan sonraki ilk seans **açılışı** ile beşinci sonraki seans **kapanışı** arasındaki ham farktır; olay günü işlem gerçekleştirilmiş sayılmaz. 5 sonraki seans ve kapalı SHA kanıtları oluşmadan sonuç eklenmez. Her piyasa için olay sayısı ve medyan/ortalama ham fiyat hareketi yayınlanır. BIST varsayımsal %2 ve ABD %1 gidiş-dönüş stres maliyeti yalnız araştırma duyarlılık bilgisi olarak belirtilir, emir gerçekleştiği iddia edilmez.
+
+**Bu ileriye dönük olay etüdü kârlılık backtest'i/PAPER değildir.** 30 bağımsız olay bile tek başına gerçek piyasa etkisini veya halka açıklık kanıtını yerine koyamaz. Çıktı: `out/v4_equity_audit/forward_event_study.json`, `forward_report.md`.
