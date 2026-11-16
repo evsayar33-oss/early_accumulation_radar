@@ -135,7 +135,7 @@ def run(out_dir="out/v3_historical",get=download,universe=UNIVERSE,months=HIST_M
             "decision":"EXPLORATORY_BACKTEST_NOT_ALPHA_APPROVAL"}
     (out/"summary.json").write_text(json.dumps({"manifest":manifest,"matrix":matrix},indent=2,sort_keys=True)+"\n",encoding="utf8")
     with (out/"matrix.csv").open("w",newline="",encoding="utf8") as fh:
-        cols=["symbol","cohort","model","scenario","start_ts","end_ts","trades",
+        cols=["symbol","cohort","model","scenario","entry_mode","start_ts","end_ts","trades",
               "wins","win_rate","profit_factor","max_drawdown_pct","net_return_pct",
               "last_nav","bars_evaluated","buyhold_return_pct","excess_vs_buyhold_pct_points"]
         w=csv.DictWriter(fh,fieldnames=cols);w.writeheader();w.writerows(matrix)
