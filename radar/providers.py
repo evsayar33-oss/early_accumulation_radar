@@ -21,6 +21,7 @@ class Quote:
     retrieved_ms: int
     source: str
     market_type: str = "SPOT"
+    quote_currency: str = "USDT"
     def __post_init__(self):
         vals = (self.bid, self.ask, self.bid_qty, self.ask_qty)
         if not all(math.isfinite(x) for x in vals) or self.bid <= 0 or self.ask <= self.bid or self.bid_qty < 0 or self.ask_qty < 0:
@@ -84,7 +85,7 @@ def _parse(venue, asset, obj, recv_ms):
             bid,ask,bq,aq=obj["bids"][0][0],obj["asks"][0][0],obj["bids"][0][1],obj["asks"][0][1]
             event=recv_ms
         else: raise ValueError("venue")
-        return Quote(venue,asset,as_float(bid),as_float(ask),as_float(bq),as_float(aq),event,recv_ms,venue)
+        return Quote(venue,asset,as_float(bid),as_float(ask),as_float(bq),as_float(aq),event,recv_ms,venue,"SPOT","USD" if venue in ("kraken","coinbase") else "USDT")
     except (KeyError,IndexError,TypeError,ValueError,StopIteration) as exc:
         raise FeedError("BAD_SCHEMA:"+str(exc)[:100]) from exc
 
