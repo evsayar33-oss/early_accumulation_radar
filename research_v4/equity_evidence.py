@@ -91,11 +91,13 @@ def evaluate(bist,us,ledger=None):
     docs=(bist,us)
     checks={doc["market"]:quality(doc) for doc in docs}
     ticks=read_verify(ledger) if ledger else []
-    sessions={m:{(rec["sample"][i].get("last_bar") or {}).get("session_utc",
-                    str((rec["sample"][i].get("last_bar") or {}).get("ts_ms", ""))[:10])
-                  for rec in ticks for i in range(len(rec.get("markets",{}).get(m,{}).get("sample",[])))
-                  if rec.get("markets",{}).get(m,{}).get("sample",[])[i].get("last_bar")}
-              for m in REQUIRED_MARKETS}
+    sessions={m:set() for m in REQUIRED_MARKETS}
+    for rec in ticks:
+        for market in REQUIRED_MARKETS:
+            for sample in rec.get("markets",{}).get(market,{}).get("sample",[]):
+                bar=sample.get("last_bar")
+                if bar and bar.get("session_utc"):
+                    sessions[market].add(bar["session_utc"])
     # No historical profitability, annualized returns, win rate or backfilled universe.
     return {"schema":"EAR.V4.equity.integrity_gate.v1","markets":checks,
             "forward_observation_ticks":len(ticks),
