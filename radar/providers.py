@@ -37,7 +37,11 @@ class Quote:
     @property
     def top_ask_usd(self): return self.ask*self.ask_qty
 
-SYMBOLS = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT"}
+SYMBOLS = {
+    "BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT",
+    "XRP":"XRPUSDT","DOGE":"DOGEUSDT","ADA":"ADAUSDT",
+    "LINK":"LINKUSDT","SUI":"SUIUSDT",
+}
 VENUES = ("binance","okx","bybit","bitget","gate","kraken","coinbase")
 def http(url, timeout=9):
     req=Request(url,headers={"User-Agent":"early-accumulation-radar/0.1 research","Accept":"application/json"})
