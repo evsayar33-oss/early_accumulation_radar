@@ -92,7 +92,7 @@ def _parse(venue, asset, obj, recv_ms):
 def url_for(venue, asset):
     if asset not in SYMBOLS: raise ValueError("unsupported asset")
     sym=SYMBOLS[asset]
-    if venue=="binance": return "https://api.binance.com/api/v3/ticker/bookTicker?"+urlencode({"symbol":sym})
+    if venue=="binance": return "https://data-api.binance.vision/api/v3/ticker/bookTicker?"+urlencode({"symbol":sym})
     if venue=="okx": return "https://www.okx.com/api/v5/market/ticker?"+urlencode({"instId":asset+"-USDT"})
     if venue=="bybit": return "https://api.bybit.com/v5/market/tickers?"+urlencode({"category":"spot","symbol":sym})
     if venue=="bitget": return "https://api.bitget.com/api/v2/spot/market/tickers?"+urlencode({"symbol":sym})
@@ -103,7 +103,12 @@ def url_for(venue, asset):
 
 def fetch_quote(venue,asset,get=http,clock=lambda:int(time.time()*1000)):
     url=url_for(venue,asset)
-    raw=get(url)
+    try:
+        raw=get(url)
+    except FeedError:
+        if venue!="binance": raise
+        url=url.replace("https://data-api.binance.vision","https://api.binance.com")
+        raw=get(url)
     recv=clock()
     if venue=="gate":
         # Gate order_book response uses array levels, never ticker quantity heuristics.
