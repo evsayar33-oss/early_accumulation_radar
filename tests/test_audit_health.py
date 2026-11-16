@@ -12,7 +12,7 @@ def sample(ts=T):
     return {"schema":"EAR.research.v2","scan_utc_ms":ts,
       "quotes":{"assets":[{"asset":a,"status":"WATCH_ONLY","trade_allowed":False} for a in ("BTC","ETH","SOL")],
                 "failed_sources":[]},"sampled_tape":[],
-      "candle_diagnostics":[{"asset":a,"status":"HYPOTHESIS_ONLY"} for a in ("BTC","ETH","SOL")],
+      "candle_diagnostics":[{"asset":a,"status":"HYPOTHESIS_ONLY","last_closed_bar_ms":ts-60000} for a in ("BTC","ETH","SOL")],
       "errors":[],"zero_valid_candle_sources":False}
 class Integrity(unittest.TestCase):
     def test_two_entries_full_chain_and_gap(self):
