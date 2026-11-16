@@ -1,5 +1,7 @@
 name: Research V2 sampled tape and immutable evidence
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '11,41 * * * *'
@@ -44,14 +46,19 @@ jobs:
           git -C "$ROOT" add observations/scan.jsonl
           git -C "$ROOT" commit -m "data: append independently observed research tick"
           git -C "$ROOT" push origin "HEAD:refs/heads/$B"
-      - name: Fail closed if all Binance 1m candle sources unavailable
+      - name: Telegram advisory alerts (never real trades)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m radar.notify --input out/research.json
+      - name: Fail closed if all valid candle sources unavailable
         run: |
           python - <<'PY'
           import json
           r=json.load(open('out/research.json',encoding='utf8'))
           if r['zero_valid_candle_sources']:
-              raise SystemExit('NO_VALID_CANDLES: data outage persisted; do not infer signals')
-          print('At least one Binance candle diagnostics payload available; no trading authorized')
+              raise SystemExit('NO_VALID_CANDLES: outage persisted; do not infer signals')
+          print('At least one spot candle diagnostics payload available; no trading authorized')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
