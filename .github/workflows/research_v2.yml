@@ -1,0 +1,69 @@
+name: Research V2 sampled tape and immutable evidence
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '11,41 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: early-radar-forward-ledger
+  cancel-in-progress: false
+jobs:
+  observe:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline tests
+        run: python -m unittest discover -s tests -v
+      - name: Capture independent public source observations
+        run: python -m radar.research --output out/research.json
+      - name: Append permanent forward state to independent branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          B="paper/early-radar-v2"
+          ROOT="$RUNNER_TEMP/early-radar-state"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch origin "$B"
+            git worktree add -b obs-state-snapshot "$ROOT" FETCH_HEAD
+          else
+            git worktree add -b obs-state-snapshot "$ROOT" HEAD
+          fi
+          python -m radar.ledger --input out/research.json --ledger "$ROOT/observations/scan.jsonl"
+          git -C "$ROOT" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$ROOT" config user.name "github-actions[bot]"
+          git -C "$ROOT" add observations/scan.jsonl
+          git -C "$ROOT" commit -m "data: append independently observed research tick"
+          git -C "$ROOT" push origin "HEAD:refs/heads/$B"
+      - name: Telegram advisory alerts (never real trades)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m radar.notify --input out/research.json
+      - name: Fail closed if all valid candle sources unavailable
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('out/research.json',encoding='utf8'))
+          if r['zero_valid_candle_sources']:
+              raise SystemExit('NO_VALID_CANDLES: outage persisted; do not infer signals')
+          print('At least one spot candle diagnostics payload available; no trading authorized')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: research-v2-${{ github.run_id }}
+          path: out/research.json
+          retention-days: 30
+          if-no-files-found: warn

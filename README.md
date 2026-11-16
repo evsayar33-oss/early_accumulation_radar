@@ -20,3 +20,11 @@ V2: true trade tape + event timestamps + historical snapshots + immutable forwar
 V3: freeze and independently test accumulation/distribution signal families versus controls; paper fills and prospective NAV; DEX/security and US stocks/BIST added only after provider verification.
 
 Setup/API documentation: [docs/API_KEYS_TR.md](docs/API_KEYS_TR.md). Secrets listed there are **reserved only**, not used by V1.
+
+## V2 research extension (proposed in PR #2)
+
+The V2 module adds independently timestamped public Binance/OKX/Bybit recent-trade *samples*, completed Binance 1m quote-volume and taker-buy-volume features, and strictly labeled OKX volume-only fallback. All accumulation and distribution flags remain **HYPOTHESIS_ONLY**, not actionable BUY/SELL signals. The branch smoke diagnostic executes real public API calls and writes JSON workflow artifacts.
+
+Once merged, the new `Research V2 sampled tape and immutable evidence` Action runs on first main push, on demand and twice per hour (scheduled UTC :11/:41). Forward evidence is hash chained into `paper/early-radar-v2`; failure to push causes a red workflow. No missing intervals are backfilled. Optional advisory messages to Telegram require `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` already configured in Actions Secrets. See [V2 technical notes](docs/V2_RESEARCH_TR.md).
+
+**Not yet implemented:** simulated fills/PAPER NAV, predictive win rates, US stocks/BIST/DEX execution-ready feeds, historical statistically independent validation. Real trading remains disabled.
