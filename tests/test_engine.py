@@ -1,5 +1,5 @@
 import unittest
-from radar.providers import Quote,FeedError,url_for,_parse
+from radar.providers import Quote,FeedError,url_for,_parse,fetch_quote
 from radar.engine import analyze
 from radar.scan import scan
 
@@ -31,6 +31,25 @@ class TestEngine(unittest.TestCase):
     def test_parse_okx(self):
         obj={"data":[{"instId":"BTC-USDT","bidPx":"100","askPx":"101","bidSz":"20","askSz":"20","ts":str(NOW)}]}
         self.assertEqual(_parse("okx","BTC",obj,NOW).venue,"okx")
+    def test_binance_official_marketdata_host(self):
+        self.assertIn("data-api.binance.vision",url_for("binance","BTC"))
+        hits=[]
+        def fake(url):
+            hits.append(url)
+            return {"bidPrice":"100","askPrice":"100.1","bidQty":"20","askQty":"20"}
+        q=fetch_quote("binance","BTC",get=fake,clock=lambda:NOW)
+        self.assertEqual(q.venue,"binance")
+        self.assertIn("data-api.binance.vision",q.source)
+        self.assertEqual(len(hits),1)
+    def test_binance_secondary_host_if_public_unavailable(self):
+        hits=[]
+        def fake(url):
+            hits.append(url)
+            if "binance.vision" in url:raise FeedError("public host unavailable")
+            return {"bidPrice":"100","askPrice":"100.1","bidQty":"20","askQty":"20"}
+        q=fetch_quote("binance","BTC",get=fake,clock=lambda:NOW)
+        self.assertIn("api.binance.com",q.source)
+        self.assertEqual(len(hits),2)
     def test_no_fake_fallback(self):
         def worker(v,a):raise FeedError("blocked")
         report=scan(assets=("BTC",),venues=("binance","okx"),worker=worker)
