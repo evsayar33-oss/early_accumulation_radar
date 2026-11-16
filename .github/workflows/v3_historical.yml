@@ -1,0 +1,39 @@
+name: V3 historical cost-stressed profitability research
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v3_historical.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: early-radar-v3-historical
+  cancel-in-progress: false
+jobs:
+  historical-research:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify and process official spot 1m monthly archives
+        run: python -u -m research_v3.historical --out out/v3_historical
+      - name: Publish historical research summary
+        if: always()
+        shell: bash
+        run: |
+          if test -f out/v3_historical/report.md; then
+            cat out/v3_historical/report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-historical-${{ github.run_id }}
+          path: out/v3_historical/
+          retention-days: 90
+          if-no-files-found: warn
