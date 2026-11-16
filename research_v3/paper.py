@@ -121,7 +121,7 @@ def process(state,snapshot,fp):
                                   "accumulation_watch":f.get("accumulation_watch"),
                                   "distribution_watch":f.get("distribution_watch")}
                               for a in ASSETS if (f:=fresh_signal(a,snapshot)) is not None}}
-    if any(a not in selected for a in positions):
+    if not selected or any(a not in selected for a in positions):
         state["outages"]+=1;state["last_status"]="UNMARKED_OUTAGE"
         result["status"]="UNMARKED_OUTAGE"
         result["nav"]=None  # never carry forward last NAV as a new mark
