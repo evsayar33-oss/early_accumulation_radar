@@ -1,0 +1,79 @@
+name: V3 prospective PAPER NAV and SHA evidence
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v3_paper.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: early-radar-v3-paper-state
+  cancel-in-progress: false
+jobs:
+  prospective-paper:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Load prior state without modifying V2
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='paper/early-radar-nav'
+          ROOT="$RUNNER_TEMP/v3-paper-state"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch origin "$B"
+            git worktree add --detach "$ROOT" FETCH_HEAD
+          else
+            git worktree add --detach "$ROOT" HEAD
+          fi
+          mkdir -p "$ROOT/paper_state"
+          echo "V3_PAPER_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Collect first-seen quotes and advance PAPER only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v3.paper --state "$V3_PAPER_ROOT/paper_state/state.json" --ledger "$V3_PAPER_ROOT/paper_state/events.jsonl" --out out/v3_paper/latest.json
+      - name: Persist state and hash-linked evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='paper/early-radar-nav'
+          git -C "$V3_PAPER_ROOT" config user.name 'github-actions[bot]'
+          git -C "$V3_PAPER_ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$V3_PAPER_ROOT" add paper_state/state.json paper_state/events.jsonl
+          git -C "$V3_PAPER_ROOT" commit -m 'paper: append prospective V3 NAV tick'
+          git -C "$V3_PAPER_ROOT" push origin "HEAD:refs/heads/$B"
+      - name: Verify persisted remote state and chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin paper/early-radar-nav
+          python - <<'PY'
+          import json,subprocess,tempfile
+          from pathlib import Path
+          from research_v3.paper import validate_state,fingerprint
+          with tempfile.TemporaryDirectory() as d:
+              p=Path(d)/'events.jsonl'
+              p.write_bytes(subprocess.check_output(['git','show','FETCH_HEAD:paper_state/events.jsonl']))
+              state=json.loads(subprocess.check_output(['git','show','FETCH_HEAD:paper_state/state.json']))
+              rows=validate_state(state,p,fingerprint())
+              print('VERIFIED_PAPER_TICKS',len(rows),'LATEST_SHA256',rows[-1]['sha256'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-paper-${{ github.run_id }}
+          path: out/v3_paper/latest.json
+          retention-days: 90
+          if-no-files-found: warn
