@@ -1,7 +1,7 @@
 import json,tempfile,unittest
 from pathlib import Path
 from radar.tape import parse as parse_tape,summarize
-from radar.accumulation import parse_candles,features
+from radar.accumulation import parse_candles,features,fetch as fetch_candle
 from radar.ledger import append,read_verify
 from radar.providers import FeedError
 
@@ -38,6 +38,25 @@ class V2Test(unittest.TestCase):
         v=features("BTC",parse_candles(raw,T))
         self.assertTrue(v["accumulation_watch"])
         self.assertFalse(v["trade_allowed"])
+    def test_okx_volume_only_no_fake_taker(self):
+        raw={"code":"0","data":[[str(candle(i)[0]),"100","101","99","100","1","100","100","1"] for i in range(120)]}
+        bars=parse_candles(raw,T,venue="okx")
+        v=features("BTC",bars,"okx")
+        self.assertEqual(v["status"],"VOLUME_CONTEXT_ONLY")
+        self.assertIsNone(v["taker_buy_quote_fraction_10m"])
+        self.assertFalse(v["accumulation_watch"])
+        self.assertFalse(v["trade_allowed"])
+    def test_binance_block_falls_back_to_okx(self):
+        raw={"code":"0","data":[[str(candle(i)[0]),"100","101","99","100","1","100","100","1"] for i in range(120)]}
+        called=[]
+        def fake_get(url):
+            called.append(url)
+            if "okx.com" in url:return raw
+            raise FeedError("HTTP_451")
+        result=fetch_candle("BTC",get=fake_get,clock=lambda:T)
+        self.assertEqual(result["source_venue"],"okx")
+        self.assertEqual(len(called),3)
+        self.assertEqual(len(result["attempted_source_failures"]),2)
     def test_ledger_tamper_and_duplicate(self):
         report={"schema":"EAR.research.v2","scan_utc_ms":T,
                 "quotes":{"assets":[],"failed_sources":[]},"sampled_tape":[],"candle_diagnostics":[],"errors":[],"zero_valid_candle_sources":True}
