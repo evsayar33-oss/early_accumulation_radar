@@ -1,0 +1,71 @@
+name: V3 independent performance auditor
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v3_performance_audit.yml'
+  schedule:
+    - cron: '23 5 * * *'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: early-radar-v3-performance-audit
+  cancel-in-progress: false
+jobs:
+  independent-audit:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run offline auditor and existing regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Retrieve last successful V3 historical evidence artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN="$(gh run list --workflow v3_historical.yml --branch main --status success --json databaseId --limit 1 --jq '.[0].databaseId')"
+          if [[ -z "$RUN" || "$RUN" == "null" ]]; then
+            echo 'NO_SUCCESSFUL_V3_HISTORICAL_EVIDENCE' >&2
+            exit 1
+          fi
+          mkdir -p out/v3_historical
+          gh run download "$RUN" --name "v3-historical-$RUN" --dir out/v3_historical
+          test -s out/v3_historical/summary.json
+          echo "HISTORICAL_SOURCE_RUN=$RUN" >> "$GITHUB_ENV"
+      - name: Read independent PAPER branch without changing its contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/v3_paper_state
+          if git ls-remote --exit-code --heads origin paper/early-radar-nav >/dev/null 2>&1; then
+            git fetch origin paper/early-radar-nav
+            git show FETCH_HEAD:paper_state/events.jsonl > out/v3_paper_state/events.jsonl
+            git show FETCH_HEAD:paper_state/state.json > out/v3_paper_state/state.json
+            echo 'PAPER_AVAILABLE=1' >> "$GITHUB_ENV"
+          else
+            echo 'PAPER_AVAILABLE=0' >> "$GITHUB_ENV"
+          fi
+      - name: Apply precommitted profitability, stress, drawdown and independent PAPER gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$PAPER_AVAILABLE" == "1" ]]; then
+            python -m research_v3.auditor --historical out/v3_historical/summary.json --paper-ledger out/v3_paper_state/events.jsonl --paper-state out/v3_paper_state/state.json --out out/v3_audit
+          else
+            python -m research_v3.auditor --historical out/v3_historical/summary.json --out out/v3_audit
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v3-audit-${{ github.run_id }}
+          path: out/v3_audit/
+          retention-days: 90
+          if-no-files-found: warn
