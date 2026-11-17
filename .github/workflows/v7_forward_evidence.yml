@@ -1,0 +1,89 @@
+name: V7 isolated forward validation from completed V5 research (NO TRADING)
+on:
+  workflow_run:
+    workflows:
+      - V5 Autonomous three-market research and prospective evidence (NO TRADING)
+    types: [completed]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: early-radar-v7-isolated-forward
+  cancel-in-progress: false
+jobs:
+  first-seen-research:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout trusted main-only research code
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Offline integrity regressions
+        run: python -m unittest discover -s tests -v
+      - name: Download exactly this completed V5 run's historical evidence artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          name: v5-autonomous-research-${{ github.event.workflow_run.id }}
+          path: .
+      - name: Load isolated V7 registry, fail if a previous ledger disappeared
+        shell: bash
+        run: |
+          set -euo pipefail
+          B="research/v7-forward-evidence"
+          ROOT="$RUNNER_TEMP/ear-v7-firstseen"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch origin "$B"
+            git worktree add -b v7-forward-local "$ROOT" FETCH_HEAD
+            for file in signals.jsonl settlements.jsonl; do
+              test -f "$ROOT/research_archive/v7_forward/$file" || {
+                echo "::error::V7_LEDGER_MISSING_IN_EXISTING_BRANCH"; exit 1;
+              }
+            done
+          else
+            git worktree add -b v7-forward-local "$ROOT" HEAD
+          fi
+          mkdir -p "$ROOT/research_archive/v7_forward"
+          echo "V7_FIRSTSEEN_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Freeze current daily-bar V7 signals and mature only future CLOSED sessions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.v7_forward \
+            --csv out/data_quality/screened_prices.csv \
+            --old-signals "$V7_FIRSTSEEN_ROOT/research_archive/v7_forward/signals.jsonl" \
+            --old-settlements "$V7_FIRSTSEEN_ROOT/research_archive/v7_forward/settlements.jsonl" \
+            --out out/v7_forward
+          cat out/v7_forward/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Archive report, even when publishing evidence later fails
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: v7-forward-research-${{ github.event.workflow_run.id }}
+          path: out/v7_forward/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Append SHA-sealed V7 evidence on its own research branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$V7_FIRSTSEEN_ROOT"
+          cp out/v7_forward/signals.jsonl "$ROOT/research_archive/v7_forward/signals.jsonl"
+          cp out/v7_forward/settlements.jsonl "$ROOT/research_archive/v7_forward/settlements.jsonl"
+          cp out/v7_forward/report.json "$ROOT/research_archive/v7_forward/latest.json"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add research_archive/v7_forward/
+          if git -C "$ROOT" diff --cached --quiet; then
+            echo "V7 evidence unchanged."
+          else
+            git -C "$ROOT" commit -m "research(v7): preserve first-seen early-stage hypothesis outcomes [skip ci]"
+            git -C "$ROOT" push origin HEAD:refs/heads/research/v7-forward-evidence
+          fi
