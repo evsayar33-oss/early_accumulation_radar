@@ -148,6 +148,29 @@ def produce(series):
     return events,{"rejected_due_to_price_discontinuity_windows":dict(suspects),
                     "unusable_feature_windows":dict(no_features)}
 
+def latest_watchlist(series):
+    """Signals from most recent available closed daily bar. No future returns."""
+    latest={m:max((bars[-1]["date"] for (mm,_),bars in series.items()
+                   if mm==m and bars),default=None) for m in COST}
+    output=[]
+    for (market,symbol),bars in sorted(series.items()):
+        if len(bars)<MIN_BARS+1 or bars[-1]["date"]!=latest[market]:
+            continue
+        i=len(bars)-1
+        if any(j in structural_gaps(bars) for j in range(max(1,i-60),i+1)):
+            continue
+        z=features(bars,i)
+        if z is None:continue
+        for family,present in signals(z).items():
+            if not present:continue
+            output.append({"market":market,"symbol":symbol,
+                "family":family,"signal_date":bars[-1]["date"].isoformat(),
+                "direction":"LONG_HYPOTHESIS" if family in LONG_FAMILIES else "RISK_ONLY",
+                "signal_close_unfilled":bars[-1]["close"],
+                "paper_approved":False,"trade_authorized":False,
+                "original_target_verified":False})
+    return output
+
 def stats(records,hold):
     records=[e for e in records if e["horizons"][str(hold)]["status"]=="MEASURED"]
     x=[e["horizons"][str(hold)] for e in records]
@@ -171,6 +194,7 @@ def stats(records,hold):
 def evaluate(series,manifest):
     align=universe_fit(manifest)
     events,exclusions=produce(series)
+    watch=latest_watchlist(series)
     report={"schema":"EAR.v7_target_fit_research.v1","paper_approved":False,
       "trade_authorized":False,"profitability_confirmed":False,
       "original_target_universe_verified":False,
@@ -181,6 +205,7 @@ def evaluate(series,manifest):
       "parameters":"rolling prior-60 quantiles; relative ATR, volume and 10-day base; frozen 2/5/10-bar horizons",
       "missing_original_target_inputs":["BIST_FLOAT_CAP","US_ASOF_FLOAT","DEX_TOKEN_HOLDER_DISTRIBUTION",
                                         "VERIFIED_DEPTH_AND_LIQUIDITY","HISTORICAL_PIT_DELISTED_UNIVERSE"],
+      "latest_closed_daily_watchlist":watch,
       "selection":{"manifest_count":len(align),"states":dict(Counter(x["state"] for x in align)),
                    "full_original_target_verified":0,
                    "rows":align},
@@ -238,7 +263,9 @@ def main():
         fmt=lambda n:f"{r[n]['n']} / {r[n]['mean_net_pct']}"
         lines.append("| "+" | ".join((r["market"],r["family"],str(r["hold_bars"]),
             fmt("train"),fmt("validation"),fmt("previously_exposed_holdout")))+" |")
-    lines+=["","## Capital-aware 5-bar diagnostics","","| Market | Long family | Validation NAV % | Exposed NAV % |",
+    lines+=["",f"## Latest daily closed-bar hypotheses (not entry alerts): {len(result['latest_closed_daily_watchlist'])}","",
+            "These are from current survivor proxies, NOT real-time DEX orderflow or executable fills.",
+            "", "## Capital-aware 5-bar diagnostics","","| Market | Long family | Validation NAV % | Exposed NAV % |",
           "|---|---|---:|---:|"]
     for r in result["portfolio_results"]:
         h=r["simulated_5bar"]
