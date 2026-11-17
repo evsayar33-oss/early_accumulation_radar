@@ -18,6 +18,7 @@ from research_v4.multimarket_exploratory import load
 BYBIT="https://api.bybit.com/v5/market/kline"
 STOOQ="https://stooq.com/q/d/l/"
 MAX_PER_MARKET=12
+OKX="https://www.okx.com/api/v5/market/history-candles"
 
 def bybit_spot(symbol,get=get_json):
     url=BYBIT+"?"+urlencode({"category":"spot","symbol":symbol,"interval":"D","limit":200})
@@ -35,6 +36,27 @@ def bybit_spot(symbol,get=get_json):
         price=float(row[4])
         if not math.isfinite(price) or price<=0:raise ValueError("BYBIT_BAD_PRICE")
         result[day]=price
+    return result
+
+
+def okx_spot(symbol,get=get_json):
+    if not symbol.endswith("USDT") or len(symbol)<=4:
+        raise ValueError("OKX_INVALID_SPOT_PAIR")
+    inst=symbol[:-4]+"-USDT"
+    url=OKX+"?"+urlencode({"instId":inst,"bar":"1Dutc","limit":100})
+    obj=get(url)
+    if not isinstance(obj,dict) or str(obj.get("code"))!="0":
+        raise ValueError("OKX_NOT_AVAILABLE")
+    rows=obj.get("data")
+    if not isinstance(rows,list):raise ValueError("OKX_BAD_SCHEMA")
+    from datetime import datetime,timezone
+    result={}
+    for row in rows:
+        if not isinstance(row,list) or len(row)<5:raise ValueError("OKX_BAD_BAR")
+        day=datetime.fromtimestamp(int(row[0])/1000,timezone.utc).date().isoformat()
+        px=float(row[4])
+        if not math.isfinite(px) or px<=0:raise ValueError("OKX_BAD_PRICE")
+        result[day]=px
     return result
 
 def stooq_us(symbol,get_text):
@@ -71,7 +93,7 @@ def compare(primary,other,last_n=90):
             "median_abs_pct":round(median(diffs),4),
             "max_abs_pct":round(max(diffs),4)}
 
-def audit(series, *, get_bybit=bybit_spot, get_stooq=None, limit=MAX_PER_MARKET):
+def audit(series, *, get_bybit=bybit_spot, get_okx=okx_spot, get_stooq=None, limit=MAX_PER_MARKET):
     if get_stooq is None:get_stooq=lambda s:stooq_us(s,text_get)
     result={"schema":"EAR.secondary_market_audit.v1","paper_approved":False,
             "trade_authorized":False,"pit_verified":False,
@@ -89,12 +111,23 @@ def audit(series, *, get_bybit=bybit_spot, get_stooq=None, limit=MAX_PER_MARKET)
                 result["comparisons"].append(row)
                 continue
             baseline={b["date"].isoformat():b["close"] for b in seq}
-            try:
-                secondary=get_bybit(symbol) if market=="CRYPTO" else get_stooq(symbol)
-                row.update(compare(baseline,secondary))
-                row["provider"]="BYBIT_SPOT" if market=="CRYPTO" else "STOOQ_US"
-            except (ValueError,OSError,TypeError,KeyError,IndexError) as e:
-                row.update({"state":"SECONDARY_SOURCE_UNAVAILABLE","error_type":type(e).__name__})
+            attempts=[]
+            providers=(("BYBIT_SPOT",get_bybit),("OKX_SPOT",get_okx)) if market=="CRYPTO" else (("STOOQ_US",get_stooq),)
+            for provider,fetch in providers:
+                try:
+                    secondary=fetch(symbol)
+                    check=compare(baseline,secondary)
+                    attempts.append({"provider":provider,"state":check["state"],"overlap_days":check["overlap_days"]})
+                    if check["state"]=="COMPARED_NOT_PIT_VERIFIED":
+                        row.update(check)
+                        row["provider"]=provider
+                        break
+                except (ValueError,OSError,TypeError,KeyError,IndexError) as e:
+                    attempts.append({"provider":provider,"state":"UNAVAILABLE","error_type":type(e).__name__,
+                                     "error_detail":str(e)[:160]})
+            if "state" not in row:
+                row["state"]="SECONDARY_SOURCE_UNAVAILABLE_OR_INSUFFICIENT_OVERLAP"
+            row["attempts"]=attempts
             result["comparisons"].append(row)
     return result
 
@@ -111,7 +144,7 @@ def main():
     states=defaultdict(int)
     for r in report["comparisons"]:states[r["state"]]+=1
     text=["# Secondary price source audit (not a strategy signal)","",
-          "Bybit vs Binance spot may differ by venue; Stooq vs Yahoo may differ by adjustment convention.",
+          "Bybit/OKX vs Binance spot may differ by venue and UTC day cut; Stooq vs Yahoo may differ by adjustment convention.",
           "BIST independent 2nd OHLC source NOT verified. Failed providers never silently pass.","",
           "| State | Count |","|---|---:|"]
     text.extend(f"| {k} | {v} |" for k,v in sorted(states.items()))
