@@ -6,7 +6,7 @@ import json
 from unittest import TestCase
 from unittest.mock import patch
 from research_v4.historical_real_data import (
-    validate,yahoo_bars,binance_bars,fetch_all,DAY_MS,YAHOO,BINANCE
+    validate,yahoo_bars,binance_bars,fetch_all,discover_current_altcoins,DAY_MS,YAHOO,BINANCE,COINGECKO,BINANCE_INFO
 )
 
 NOW=int(datetime(2026,11,17,tzinfo=timezone.utc).timestamp()*1000)
@@ -40,6 +40,17 @@ class RealDataSourceTests(TestCase):
                 with self.assertRaises(ValueError):
                     fetch_all("ledger",tmp,download=blocked,now_ms=NOW)
                 self.assertFalse((Path(tmp)/"prices.csv").exists())
+    def test_current_altcoin_cap_and_binance_spot_filter(self):
+        def fake(url):
+            if url==BINANCE_INFO:
+                return {"symbols":[{"symbol":"SMALLUSDT","status":"TRADING","quoteAsset":"USDT"},
+                                   {"symbol":"BTCUSDT","status":"TRADING","quoteAsset":"USDT"}]}
+            if url.startswith(COINGECKO):
+                return [{"id":"small-token","symbol":"small","market_cap":40000000},
+                        {"id":"bitcoin","symbol":"btc","market_cap":1000000000000}]
+            raise AssertionError(url)
+        selected=discover_current_altcoins(download=fake)
+        self.assertEqual([x["symbol"] for x in selected],["SMALLUSDT"])
     def test_data_never_marks_pit_or_adjustments_verified(self):
         rows=[("2025-01-01",10,11,9,10,100)]
         item=validate(rows,"ABCD","US",min_bars=1)[0]
