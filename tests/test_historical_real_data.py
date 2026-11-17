@@ -34,7 +34,10 @@ class RealDataSourceTests(TestCase):
             validate([("2025-01-01",10,9,8,10,500)],"TEST","US",min_bars=1)
     def test_no_fictitious_history_when_provider_fails(self):
         with patch("research_v4.historical_real_data.current_equity_symbols",
-                   return_value=({"BIST":["TEST","FOO"],"US":["ABCD","WXYZ"]},"sha")):
+                   return_value=({"BIST":["TEST","FOO"],"US":["ABCD","WXYZ"]},"sha")), patch(
+                   "research_v4.historical_real_data.discover_current_altcoins",
+                   return_value=[{"symbol":"SMALLUSDT","coingecko_id":"small","snapshot_market_cap_usd":40000000},
+                                 {"symbol":"OTHERUSDT","coingecko_id":"other","snapshot_market_cap_usd":60000000}]):
             with tempfile.TemporaryDirectory() as tmp:
                 def blocked(url):raise OSError("blocked")
                 with self.assertRaises(ValueError):
@@ -49,8 +52,8 @@ class RealDataSourceTests(TestCase):
                 return [{"id":"small-token","symbol":"small","market_cap":40000000},
                         {"id":"bitcoin","symbol":"btc","market_cap":1000000000000}]
             raise AssertionError(url)
-        selected=discover_current_altcoins(download=fake)
-        self.assertEqual([x["symbol"] for x in selected],["SMALLUSDT"])
+        with self.assertRaisesRegex(ValueError,"INSUFFICIENT_CURRENT_ALTCOIN_CANDIDATES"):
+            discover_current_altcoins(download=fake)
     def test_data_never_marks_pit_or_adjustments_verified(self):
         rows=[("2025-01-01",10,11,9,10,100)]
         item=validate(rows,"ABCD","US",min_bars=1)[0]
