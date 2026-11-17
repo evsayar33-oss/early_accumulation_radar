@@ -221,7 +221,7 @@ def safe_call(errors, stage, call):
         return None
 
 def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=None,
-                 sleep=time.sleep, monotonic=time.monotonic):
+                 sleep=time.sleep, monotonic=time.monotonic, tv_primary=False):
     if market not in MARKETS:
         raise ValueError("UNKNOWN_MARKET")
     now_ms = int(time.time()*1000) if now_ms is None else int(now_ms)
@@ -253,30 +253,42 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
             return get(url,{"X-API-Key":cedar_key})
     if market=="US":
         sample=[]
-        for exchange in ("NASDAQ","AMEX","NYSE"):
-            url=NASDAQ+"?"+urlencode({"tableonly":"true","limit":1000,"offset":0,"exchange":exchange})
-            raw=safe_call(errors,"nasdaq_"+exchange,lambda u=url:get(u))
-            if raw is None:
-                continue
-            # Nasdaq sometimes returns HTTP 200 with data=null, an error
-            # envelope, or no rows. These are provider-unavailable outcomes,
-            # not usable screener responses. Never interpret them as zero
-            # qualifying securities or a complete universe.
-            data=raw.get("data") if isinstance(raw,dict) else None
-            if not isinstance(data,dict) or not isinstance(data.get("rows"),list):
-                errors.append({"stage":"nasdaq_"+exchange,
-                               "error":"UNUSABLE_RESPONSE_SCHEMA",
-                               "http_status":None})
-                continue
-            parsed=safe_call(errors,"nasdaq_parse_"+exchange,lambda:parse_nasdaq(raw,exchange))
-            if parsed is None:
-                continue
-            matches, scanned,total=parsed
-            out["sources"].append({"provider":"NASDAQ_PUBLIC_WEB_SCREENER_UNDOCUMENTED",
-                                   "exchange":exchange,"rows_scanned":scanned,
-                                   "rows_total_unverified":total,
-                                   "complete_universe":False})
-            sample.extend(matches)
+        # Production discovery: prefer the working independent market-cap
+        # screener. Keep Nasdaq as a fallback only if TV fails to return
+        # candidates; do not poll a known-invalid provider every run.
+        if tv_primary:
+            tv=safe_call(errors,"tradingview_scan",lambda:get(TV_URL,payload=tv_payload()))
+            if tv is not None:
+                observed=safe_call(errors,"tradingview_parse",lambda:parse_tv(tv))
+                if observed is not None:
+                    sample.extend(observed)
+                    out["sources"].append({"provider":"TRADINGVIEW_PUBLIC_SCANNER_UNOFFICIAL",
+                                           "rows_returned":len(tv["data"]),"complete_universe":False})
+        if not sample:
+          for exchange in ("NASDAQ","AMEX","NYSE"):
+              url=NASDAQ+"?"+urlencode({"tableonly":"true","limit":1000,"offset":0,"exchange":exchange})
+              raw=safe_call(errors,"nasdaq_"+exchange,lambda u=url:get(u))
+              if raw is None:
+                  continue
+              # Nasdaq sometimes returns HTTP 200 with data=null, an error
+              # envelope, or no rows. These are provider-unavailable outcomes,
+              # not usable screener responses. Never interpret them as zero
+              # qualifying securities or a complete universe.
+              data=raw.get("data") if isinstance(raw,dict) else None
+              if not isinstance(data,dict) or not isinstance(data.get("rows"),list):
+                  errors.append({"stage":"nasdaq_"+exchange,
+                                 "error":"UNUSABLE_RESPONSE_SCHEMA",
+                                 "http_status":None})
+                  continue
+              parsed=safe_call(errors,"nasdaq_parse_"+exchange,lambda:parse_nasdaq(raw,exchange))
+              if parsed is None:
+                  continue
+              matches, scanned,total=parsed
+              out["sources"].append({"provider":"NASDAQ_PUBLIC_WEB_SCREENER_UNDOCUMENTED",
+                                     "exchange":exchange,"rows_scanned":scanned,
+                                     "rows_total_unverified":total,
+                                     "complete_universe":False})
+              sample.extend(matches)
         # Fail over Nasdaq outage to independent current-cap discovery.
         if not sample:
             tv=safe_call(errors,"tradingview_scan",lambda:get(TV_URL,payload=tv_payload()))
@@ -401,7 +413,8 @@ def main():
     directory=Path(args.out);directory.mkdir(parents=True,exist_ok=True)
     for market in MARKETS:
         doc=probe_market(market,sec_agent=os.environ.get("SEC_USER_AGENT"),
-                         cedar_key=os.environ.get("DATACEDAR_API_KEY"))
+                         cedar_key=os.environ.get("DATACEDAR_API_KEY"),
+                         tv_primary=(market=="US"))
         (directory/(market.lower()+".json")).write_text(json.dumps(doc,indent=2,sort_keys=True,ensure_ascii=False)+"\n",encoding="utf8")
         print("V4_EQUITY_SOURCE",market,doc["status"],"tickers",doc["coverage"]["observed_tickers"],
               "price_series",doc["coverage"]["recent_price_series"],"errors",len(doc["errors"]),flush=True)
