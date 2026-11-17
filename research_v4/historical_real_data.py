@@ -29,8 +29,10 @@ MIN_MARKET_CAP_USD=10000000
 MAX_MARKET_CAP_USD=500000000
 MAX_ALTCOINS=20
 
-def discover_current_altcoins(download=get_json):
+def discover_current_altcoins(download=None):
     """Current-cap discovery only. Never assert historical cap or delisted coverage."""
+    if download is None:
+        download=get_json
     listed=download(BINANCE_INFO)
     if not isinstance(listed,dict) or not isinstance(listed.get("symbols"),list):
         raise ValueError("BINANCE_EXCHANGEINFO_SCHEMA")
