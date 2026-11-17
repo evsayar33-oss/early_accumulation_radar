@@ -1,22 +1,47 @@
 {
-  "cash": 10000.0,
+  "cash": 7000.0,
   "closed_trades": 0,
   "first_seen_ms": 1794855908001,
   "gross_losses": 0.0,
   "gross_wins": 0.0,
-  "last_event_sha256": "b026e5146cc3f135ea0844596862dbe088e7e97134e978999e0dc8afff80d5c7",
+  "last_event_sha256": "abd05eed1768dd6f4c3fe65d9ec75bf3c3ec78ebf37dee6623a43748df1376e6",
   "last_exit_ms": {},
-  "last_liquidation_nav": 10000.0,
-  "last_observed_ms": 1794910260359,
+  "last_liquidation_nav": 9989.407061668935,
+  "last_observed_ms": 1794914063627,
   "last_status": "MARKED",
-  "last_valid_mark_ms": 1794910260359,
-  "max_drawdown_pct": 0.0,
+  "last_valid_mark_ms": 1794914063627,
+  "max_drawdown_pct": 0.10592938331064942,
   "model_sha256": "239ac5299ce742d49e7fcb5e16c4e3fa5eaffff2c2fb199775bcfaf121d5cbe2",
   "model_version": "EAR-V3-FIXED-20261116",
   "outages": 0,
   "paper_start_ms": 1794855908001,
   "peak_liquidation_nav": 10000.0,
-  "positions": {},
+  "positions": {
+    "DOGE": {
+      "cost_usdt": 1000.0,
+      "entry_effective": 0.05880113199999999,
+      "entry_ms": 1794914063627,
+      "entry_reference": 0.05876,
+      "entry_venue": "binance",
+      "qty": 16989.485831684317
+    },
+    "SUI": {
+      "cost_usdt": 1000.0,
+      "entry_effective": 0.72710862,
+      "entry_ms": 1794914063627,
+      "entry_reference": 0.7266,
+      "entry_venue": "binance",
+      "qty": 1373.9363989399535
+    },
+    "XRP": {
+      "cost_usdt": 1000.0,
+      "entry_effective": 0.9636740999999999,
+      "entry_ms": 1794914063627,
+      "entry_reference": 0.963,
+      "entry_venue": "binance",
+      "qty": 1036.658553966532
+    }
+  },
   "realized_pnl": 0.0,
   "schema": "EAR.paper.v1",
   "winning_trades": 0
