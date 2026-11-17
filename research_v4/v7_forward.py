@@ -7,11 +7,12 @@ Daily snapshots must be CLOSED before first observation and settlements.
 from __future__ import annotations
 import argparse,hashlib,json
 from collections import Counter,defaultdict
-from datetime import datetime,timezone
+from datetime import datetime,timezone,date
 from pathlib import Path
 from statistics import mean
 from research_v4.multimarket_exploratory import load,COST
 from research_v4.v7_target_fit import latest_watchlist,HORIZONS
+from research_v4.v6_bidirectional import structural_gaps
 from research_v4.prospective_evidence import seal,digest,read_ledger,write_ledger
 
 def closed_history(series,asof):
@@ -54,6 +55,13 @@ def settle(signal,series):
         return None,"AWAITING_FUTURE_CLOSED_SESSIONS"
     entryidx=eligible[0]
     exitidx=entryidx+hold-1
+    first_gap=(rows[entryidx]["date"]-date.fromisoformat(signal["entry_strictly_after_utc_date"])).days
+    if first_gap>(3 if signal["market"]=="CRYPTO" else 7):
+        return None,"FIRST_ENTRY_TOO_DELAYED_OR_MISSING"
+    signalidx=next(i for i,b in enumerate(rows) if b["date"].isoformat()==signal["signal_date"])
+    flags=structural_gaps(rows)
+    if any(j in flags for j in range(signalidx+1,exitidx+1)):
+        return None,"SUSPECTED_PRICE_SCALE_CHANGE_IN_FORWARD"
     op=rows[entryidx]["open"]
     close=rows[exitidx]["close"]
     gross=100*(close/op-1)
