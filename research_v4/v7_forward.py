@@ -20,7 +20,16 @@ def closed_history(series,asof):
     return {key:[b for b in seq if b["date"]<today] for key,seq in series.items()}
 
 def source_version():
-    return hashlib.sha256(Path("research_v4/v7_target_fit.py").read_bytes()).hexdigest()
+    h=hashlib.sha256()
+    # Include upstream feature/structural-gap definitions in the frozen
+    # methodology identity so an external helper change cannot silently
+    # reuse a previous signal-version hash.
+    for name in ("research_v4/v7_target_fit.py",
+                 "research_v4/v6_bidirectional.py",
+                 "research_v4/multimarket_exploratory.py"):
+        h.update(name.encode())
+        h.update(Path(name).read_bytes())
+    return h.hexdigest()
 
 def signals_from_closed(series,observed_at,code_sha,source_sha):
     t=datetime.fromisoformat(observed_at.replace("Z","+00:00"))
