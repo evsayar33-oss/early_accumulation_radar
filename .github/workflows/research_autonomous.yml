@@ -58,6 +58,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m research_v4.matched_benchmark --csv out/data_quality/screened_prices.csv --out out/matched_benchmark
+          python -m research_v4.matched_benchmark --csv out/expanded_history/prices.csv --out out/matched_benchmark_raw
           cat out/matched_benchmark/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Independent price source cascades and BIST/US quote snapshots
         run: |
@@ -102,6 +103,7 @@ jobs:
             --quality out/data_quality/report.json \
             --sources out/secondary_source_audit/report.json \
             --matched out/matched_benchmark/report.json \
+            --matched-raw out/matched_benchmark_raw/report.json \
             --prospective out/prospective_evidence/report.json \
             --out out/research_governance
           cat out/research_governance/report.md >> "$GITHUB_STEP_SUMMARY"
@@ -120,6 +122,7 @@ jobs:
             out/new_hypotheses_bias/
             out/regime_events/
             out/matched_benchmark/
+            out/matched_benchmark_raw/
             out/secondary_source_audit/
             out/prospective_evidence/
             out/research_governance/
