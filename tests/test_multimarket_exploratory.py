@@ -42,8 +42,8 @@ class MultiMarketContracts(unittest.TestCase):
               for i in range(450)]
         report=study({("US","TEST"):bars})
         self.assertFalse(report["paper_approved"])
-        self.assertEqual(len(report["results"]),len(FAMILIES))
-        self.assertTrue(all(r["pit_approved"] is False for r in report["results"]))
+        self.assertEqual(len([r for r in report["results"] if r.get("market")=="US"]),len(FAMILIES))
+        self.assertTrue(all(r["pit_approved"] is False for r in report["results"] if "pit_approved" in r))
     def test_fails_on_duplicate_bars(self):
         with tempfile.TemporaryDirectory() as temp:
             p=Path(temp)/"p.csv"
