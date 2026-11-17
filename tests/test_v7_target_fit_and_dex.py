@@ -59,7 +59,7 @@ class V7Fit(unittest.TestCase):
         z=features(s,i)
         self.assertTrue(z["near_unbroken_high"])
         self.assertTrue(signals(z)["prebreakout_pressure"])
-        self.assertFalse(z["price"]>z["prior_high"] if "price" in z else False)
+        self.assertLessEqual(s[i]["close"],max(b["high"] for b in s[i-20:i]))
     def test_future_rebase_censors_outcome_not_prior_signal(self):
         s=bars()
         i=110
