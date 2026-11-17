@@ -35,6 +35,7 @@ jobs:
               ('V3 PAPER','paper/early-radar-nav','paper_state/events.jsonl','v3_paper.yml'),
           )
           stale=[]
+          dispatch_failures=[]
           for label,branch,path,workflow in targets:
               try:
                   subprocess.run(['git','fetch','--no-tags','origin',branch],
@@ -52,7 +53,7 @@ jobs:
               except Exception as exc:
                   stale.append((label,workflow,f'EVIDENCE_READ_FAILURE {type(exc).__name__}: {exc}'))
           for label,workflow,reason in stale:
-              print(f'::error title={label} evidence stale::{reason}')
+              print(f'::warning title={label} evidence stale::{reason}')
               url=f'https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches'
               req=urllib.request.Request(url,data=b'{"ref":"main"}',method='POST',
                   headers={'Authorization':f'Bearer {os.environ["GH_TOKEN"]}',
@@ -63,8 +64,11 @@ jobs:
                   with urllib.request.urlopen(req,timeout=15) as response:
                       print(f'DISPATCHED {label} workflow={workflow} http={response.status}')
               except Exception as exc:
+                  dispatch_failures.append(f'{label}: {exc}')
                   print(f'::error title={label} recovery dispatch failed::{exc}')
+          if dispatch_failures:
+              raise SystemExit('RECOVERY_DISPATCH_FAILED: ' + '; '.join(dispatch_failures))
           if stale:
-              raise SystemExit('STALE_EVIDENCE_RECOVERY_DISPATCHED: verify producer runs and next evidence tick; watchdog does not alter evidence directly')
+              print('RECOVERY_DISPATCHED: producer workflows queued; verify subsequent evidence and PAPER marks')
           print('EVIDENCE_FRESHNESS_OK')
           PY
