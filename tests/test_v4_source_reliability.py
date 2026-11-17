@@ -10,8 +10,9 @@ NOW=1794850000000
 ST=1794760000000
 def candle(sym):
     return {"chart":{"result":[{"meta":{"symbol":sym,"currency":"TRY" if sym.endswith(".IS") else "USD"},
-        "timestamp":[ST//1000],"indicators":{"quote":[{"open":[1],"high":[1.1],
-        "low":[.9],"close":[1],"volume":[50000]}]}}],"error":None}
+        "timestamp":[ST//1000],
+        "indicators":{"quote":[{"open":[1],"high":[1.1],
+        "low":[.9],"close":[1],"volume":[50000]}]}}],"error":None}}
 def cedar(sym):
     return {"data":[{"sid":sym,"ts_ms":str(ST),"open":1,"high":1.1,"low":.9,
                      "close":1,"volume":"50000"}],"meta":{"currency":"TRY"}}
