@@ -76,6 +76,7 @@ jobs:
           python -m research_v4.v6_bidirectional --csv out/data_quality/screened_prices.csv --out out/v6_bidirectional
           cat out/v6_bidirectional/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: V7 original target fit, rolling-relative early accumulation and capital screen (RESEARCH ONLY)
+        continue-on-error: true # V7 diagnostics must never block frozen V5 prospective evidence
         run: |
           set -euo pipefail
           python -m research_v4.v7_target_fit \
