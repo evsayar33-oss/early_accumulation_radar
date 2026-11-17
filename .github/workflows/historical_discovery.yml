@@ -1,40 +1,41 @@
-name: Historical strategy discovery (research only)
+name: Historical strategy discovery (real data, research only)
 on:
   workflow_dispatch:
-    inputs:
-      csv_path:
-        description: "Repository-relative historical OHLCV CSV (must already exist on main)"
-        required: true
-        default: "data/historical/prices.csv"
 permissions:
   contents: read
 jobs:
   historical-discovery:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Validate discovery contracts
+      - name: Validate research contracts (offline tests)
         run: python -m unittest discover -s tests -v
-      - name: Require real supplied historical data
-        env:
-          INPUT_CSV: ${{ inputs.csv_path }}
+      - name: Read hash-verified original first-seen symbol sample
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$INPUT_CSV" == /* || "$INPUT_CSV" == *..* || ! -f "$INPUT_CSV" ]]; then
-            echo "::error::Historical CSV missing or unsafe path: $INPUT_CSV. No synthetic history is generated."
-            exit 1
-          fi
-          python -m research_v4.historical_discovery --csv "$INPUT_CSV" --out out/historical_discovery
+          git fetch origin refs/heads/research/v4-equity-evidence
+          git show FETCH_HEAD:observations/v4_equities/ledger.jsonl > "$RUNNER_TEMP/equity-ledger.jsonl"
+          echo "EQUITY_LEDGER=$RUNNER_TEMP/equity-ledger.jsonl" >> "$GITHUB_ENV"
+      - name: Fetch real historical 5y OHLCV (no synthetic data)
+        run: |
+          python -m research_v4.historical_real_data --ledger "$EQUITY_LEDGER" --out out/historical_real_data
+      - name: Historical train-validation-holdout discovery (blocked PAPER)
+        run: |
+          python -m research_v4.historical_discovery --csv out/historical_real_data/prices.csv --out out/historical_discovery
           cat out/historical_discovery/report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Data source manifest: historical-real-data artifact; current-survivor sample, not PIT historical membership." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: historical-discovery-${{ github.run_id }}
-          path: out/historical_discovery/
+          path: |
+            out/historical_real_data/
+            out/historical_discovery/
           retention-days: 90
           if-no-files-found: warn
