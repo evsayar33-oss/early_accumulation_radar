@@ -8,7 +8,7 @@ import argparse,json
 from collections import Counter
 from pathlib import Path
 
-def summarize(base,quality,sources,matched,prospective):
+def summarize(base,quality,sources,matched,prospective,matched_raw=None):
     counts=base["coverage"]
     historical=sum(x["usable"] for x in counts.values())
     original=sum(x["requested"] for x in counts.values())
@@ -26,6 +26,10 @@ def summarize(base,quality,sources,matched,prospective):
     healthy=(all(x["screened"]>=2 for x in quality["coverage"].values()) and
              historical>=10)
     robust=[x for x in matched["results"] if x["status"]=="EXPLORATORY_ROBUST_NOT_PIT"]
+    raw_robust=[x for x in (matched_raw or {}).get("results",[])
+                if x["status"]=="EXPLORATORY_ROBUST_NOT_PIT"]
+    raw_keys={(r["market"],r["family"]) for r in raw_robust}
+    shared_keys={(r["market"],r["family"]) for r in robust} & raw_keys
     status="RESEARCH_OK_UNVERIFIED" if healthy else "BLOCKED_DATA_COVERAGE"
     if source_attempts and independently_compared==0:status="RESEARCH_DEGRADED_SECONDARY_SOURCES"
     return {"schema":"EAR.unattended_research_governance.v1",
@@ -38,6 +42,9 @@ def summarize(base,quality,sources,matched,prospective):
         "secondary_comparison_states":{m+"|"+s:v for (m,s),v in sorted(audit_states.items())},
         "historical_family_market_trials":len(matched["results"]),
         "exploratory_robust_not_verified":len(robust),
+        "raw_unfiltered_robust_not_verified":len(raw_robust),
+        "robust_in_both_raw_and_screened_unverified":len(shared_keys),
+        "quarantine_sensitivity_may_introduce_selection_bias":True,
         "new_prospective_signals":prospective["new_signals"],
         "cumulative_prospective_signals":prospective["all_signals"],
         "new_settled_forward_observations":prospective["new_settlements"],
@@ -53,12 +60,13 @@ def main():
     p.add_argument("--quality",required=True)
     p.add_argument("--sources",required=True)
     p.add_argument("--matched",required=True)
+    p.add_argument("--matched-raw",required=True)
     p.add_argument("--prospective",required=True)
     p.add_argument("--out",default="out/research_governance")
     a=p.parse_args()
     obj=lambda x:json.loads(Path(x).read_text(encoding="utf8"))
     report=summarize(obj(a.history),obj(a.quality),obj(a.sources),
-                     obj(a.matched),obj(a.prospective))
+                     obj(a.matched),obj(a.prospective),obj(a.matched_raw))
     out=Path(a.out);out.mkdir(parents=True,exist_ok=True)
     (out/"report.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
     lines=["# Autonomous BIST / US / altcoin research — simulation only","",
@@ -68,7 +76,9 @@ def main():
         f'| Quarantined anomaly series | {report["quality_quarantine_count"]} |',
         f'| Independent historical price comparisons | {report["source_history_comparisons"]} / {report["source_history_audit_attempts"]} US/crypto attempts |',
         f'| Existing research hypothesis cells | {report["historical_family_market_trials"]} |',
-        f'| Historically robust-looking (unverified) | {report["exploratory_robust_not_verified"]} |',
+        f'| Historically robust-looking SCREENED (unverified) | {report["exploratory_robust_not_verified"]} |',
+        f'| Historically robust-looking RAW (unverified) | {report["raw_unfiltered_robust_not_verified"]} |',
+        f'| Robust-looking in BOTH raw/screened (still unverified) | {report["robust_in_both_raw_and_screened_unverified"]} |',
         f'| New forward signals | {report["new_prospective_signals"]} |',
         f'| Forward settlements, total | {report["total_settled_forward_observations"]} |',
         "","**NO confirmed profitability, PAPER approval, or live trading.**",
