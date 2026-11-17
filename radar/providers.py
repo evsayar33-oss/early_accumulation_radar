@@ -107,17 +107,30 @@ def url_for(venue, asset):
 
 def fetch_quote(venue,asset,get=http,clock=lambda:int(time.time()*1000)):
     url=url_for(venue,asset)
-    try:
-        raw=get(url)
-    except FeedError:
-        if venue!="binance": raise
-        url=url.replace("https://data-api.binance.vision","https://api.binance.com")
-        raw=get(url)
-    recv=clock()
-    if venue=="gate":
-        # Gate order_book response uses array levels, never ticker quantity heuristics.
+    # A transient HTTP error or empty order-book level must not silently
+    # remove a venue. Retry once; never synthesize price, size or provenance.
+    for attempt in range(2):
+        candidate=url
         try:
-            b,a=raw["bids"][0],raw["asks"][0]
-            raw={"highest_bid":b[0],"highest_size":b[1],"lowest_ask":a[0],"lowest_size":a[1]}
-        except (KeyError,IndexError,TypeError,ValueError) as exc:raise FeedError("BAD_GATE_BOOK") from exc
-    return replace(_parse(venue,asset,raw,recv),source=url)
+            try:
+                raw=get(candidate)
+            except FeedError:
+                if venue!="binance":
+                    raise
+                candidate=url.replace("https://data-api.binance.vision","https://api.binance.com")
+                raw=get(candidate)
+            recv=clock()
+            if venue=="gate":
+                # Gate order_book returns actual level sizes, not ticker proxies.
+                try:
+                    b,a=raw["bids"][0],raw["asks"][0]
+                    raw={"highest_bid":b[0],"highest_size":b[1],
+                         "lowest_ask":a[0],"lowest_size":a[1]}
+                except (KeyError,IndexError,TypeError,ValueError) as exc:
+                    raise FeedError("BAD_GATE_BOOK") from exc
+            return replace(_parse(venue,asset,raw,recv),source=candidate)
+        except FeedError:
+            if attempt:
+                raise
+            time.sleep(0.25)
+
