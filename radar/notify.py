@@ -18,7 +18,9 @@ def format_message(report):
         if x.get("source_venue")!="binance":continue  # Fallback volume-only must not alert.
         kind="BİRİKİM ADAYI" if x["accumulation_watch"] else "DAĞITIM RİSKİ"
         buy=x.get("taker_buy_quote_fraction_10m")
-        matches.append(f"{kind} | {asset} | fiyat {x['price']:.6g} | hacim oranı {x['relative_median_volume_10m_vs_60m']:.2f}x | taker alış %{buy*100:.1f} | {q.get('venues',0)} borsa")
+        note=(" | DİKKAT: kısa işlem örneklemi ters yönde (zaman pencereleri farklı)"
+              if x.get("flow_quality_warnings") and any("OPPOSES" in w for w in x["flow_quality_warnings"]) else "")
+        matches.append(f"{kind} | {asset} | fiyat {x['price']:.6g} | hacim oranı {x['relative_median_volume_10m_vs_60m']:.2f}x | Binance 10dk taker alış %{buy*100:.1f} | {q.get('venues',0)} borsa fiyat/likidite kontrolü{note}")
     if not matches:return None
     return ("📡 EAR V2 — ARAŞTIRMA UYARISI\n"+
             "\n".join(matches)+
