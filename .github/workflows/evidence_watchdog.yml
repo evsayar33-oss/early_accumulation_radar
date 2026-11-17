@@ -1,0 +1,70 @@
+name: Evidence freshness watchdog and recovery
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '3,23,43 * * * *'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: early-radar-evidence-watchdog
+  cancel-in-progress: false
+jobs:
+  verify-and-recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check remote evidence and dispatch stale producers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess, time, urllib.request
+          from datetime import datetime, timezone
+          repo=os.environ['GH_REPOSITORY']
+          now=int(time.time()*1000)
+          targets=(
+              ('V2','paper/early-radar-v2','observations/scan.jsonl','research_v2.yml'),
+              ('V3 PAPER','paper/early-radar-nav','paper_state/events.jsonl','v3_paper.yml'),
+          )
+          stale=[]
+          for label,branch,path,workflow in targets:
+              try:
+                  subprocess.run(['git','fetch','--no-tags','origin',branch],
+                                 check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=35)
+                  raw=subprocess.check_output(['git','show',f'FETCH_HEAD:{path}'],timeout=20)
+                  rows=[json.loads(line) for line in raw.splitlines() if line.strip()]
+                  if not rows: raise ValueError('EMPTY_EVIDENCE')
+                  last=rows[-1]
+                  stamp=last.get('scan_utc_ms')
+                  if not isinstance(stamp,int): raise ValueError('MISSING_SCAN_UTC_MS')
+                  age=(now-stamp)/60000
+                  if age < -5: raise ValueError('FUTURE_EVIDENCE_TIMESTAMP')
+                  print(f'{label}: age_minutes={age:.1f}, last_utc={datetime.fromtimestamp(stamp/1000,timezone.utc).isoformat()}, status={last.get("status","n/a")}')
+                  if age>120: stale.append((label,workflow,f'STALE_EVIDENCE age={age:.1f}m'))
+              except Exception as exc:
+                  stale.append((label,workflow,f'EVIDENCE_READ_FAILURE {type(exc).__name__}: {exc}'))
+          for label,workflow,reason in stale:
+              print(f'::error title={label} evidence stale::{reason}')
+              url=f'https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches'
+              req=urllib.request.Request(url,data=b'{"ref":"main"}',method='POST',
+                  headers={'Authorization':f'Bearer {os.environ["GH_TOKEN"]}',
+                           'Accept':'application/vnd.github+json',
+                           'X-GitHub-Api-Version':'2022-11-28',
+                           'Content-Type':'application/json'})
+              try:
+                  with urllib.request.urlopen(req,timeout=15) as response:
+                      print(f'DISPATCHED {label} workflow={workflow} http={response.status}')
+              except Exception as exc:
+                  print(f'::error title={label} recovery dispatch failed::{exc}')
+          if stale:
+              raise SystemExit('STALE_EVIDENCE_RECOVERY_DISPATCHED: verify producer runs and next evidence tick; watchdog does not alter evidence directly')
+          print('EVIDENCE_FRESHNESS_OK')
+          PY
