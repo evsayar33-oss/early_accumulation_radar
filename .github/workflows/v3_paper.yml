@@ -50,6 +50,9 @@ jobs:
           fi
           mkdir -p "$ROOT/paper_state"
           echo "V3_PAPER_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Diagnose independent venue eligibility without changing PAPER model
+        continue-on-error: true
+        run: python -m research_v3.venue_diagnostics
       - name: Collect first-seen quotes and advance PAPER only
         shell: bash
         run: |
@@ -85,6 +88,8 @@ jobs:
         if: always()
         with:
           name: v3-paper-${{ github.run_id }}
-          path: out/v3_paper/latest.json
+          path: |
+            out/v3_paper/latest.json
+            out/v3_paper/venue_diagnostics.json
           retention-days: 90
           if-no-files-found: warn
