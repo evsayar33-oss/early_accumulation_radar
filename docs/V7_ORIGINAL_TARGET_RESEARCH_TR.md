@@ -32,7 +32,7 @@ Volumes are compared against the symbol's **preceding 60 bars**, rather than app
 
 **D. Stop losing the young DEX cohorts** (`research_v4.dex_firstseen`):
 
-- The existing 12-hour `V4 original-universe DEX discovery` now writes observed chain+pair+token identities, timestamp, snapshot price when available, USD liquidity and volume to a **dedicated SHA-linked branch** `research/dex-firstseen`, not main. It does not backfill a token's history at creation.
+- The existing `V4 original-universe DEX discovery` (now every four hours, previously every 12 hours) now writes observed chain+pair+token identities, timestamp, snapshot price when available, USD liquidity and volume to a **dedicated SHA-linked branch** `research/dex-firstseen`, not main. It does not backfill a token's history at creation.
 - Fix base/quote identity: **DexScreener `priceUsd` belongs to the BASE token**. If the scanned token appears only as quote, it must not inherit the other token's price.
 - Follow up to 8 previously radar-observed candidate pairs per run, limited to 14 days after radar's first observation. Evaluate observed 24/72/168-hour snapshot-to-snapshot changes **only if** a later actual snapshot is available. No interpolation, "first launch" claims, trade fills or retrospective new winners.
 - Existing workflow schedule and artifact path preserved; new report is saved as `out/dex_forward_evidence` and the isolated branch retains its hash-linked history. If GitHub token push rights are not allowed, the workflow fails visibly; uploaded artifacts remain separately available on successful discovery. This is a conditional GitHub permission requirement, not a promise of successful persistence before observing a run.
@@ -49,10 +49,10 @@ Volumes are compared against the symbol's **preceding 60 bars**, rather than app
 
 ## What this PR does NOT fix
 
-It cannot conjure missing historical float, shareholder distribution, de-listed instruments, DEX trade history, book depth or independently frozen research periods. Real-time opportunities cannot be verified with twice-daily DEX sampling or five-year daily survivor bars alone. Free-source limitations are explicit, rather than silently substituted with large-cap proxy tests.
+It cannot conjure missing historical float, shareholder distribution, de-listed instruments, DEX trade history, book depth or independently frozen research periods. Real-time opportunities cannot be verified with four-hour DEX sampling or five-year daily survivor bars alone. Free-source limitations are explicit, rather than silently substituted with large-cap proxy tests.
 
 ## Operations
 
-After merge, the V7 diagnostics step is advisory-only, so faults in this new research cannot abort the frozen V5 ledger. The existing `V5 Autonomous three-market research and prospective evidence (NO TRADING)` regularly writes `out/v7_target_fit/report.json` and `report.md` to its existing 90-day artifact, and the already scheduled `V4 original-universe DEX discovery` appends separate first-seen snapshots. No new scheduling service or manual install is required. The current independent V2/V3 PAPER workflows remain frozen.
+After merge, the V7 diagnostics step is advisory-only, so faults in this new research cannot abort the frozen V5 ledger. The existing `V5 Autonomous three-market research and prospective evidence (NO TRADING)` regularly writes `out/v7_target_fit/report.json` and `report.md` to its existing 90-day artifact, and the already scheduled `V4 original-universe DEX discovery` appends separate first-seen snapshots. The DEX workflow's existing schedule is increased from two to six scans per day (same workflow, no new service). No manual install is required. The current independent V2/V3 PAPER workflows remain frozen.
 
 **Decision rule:** No candidate may be called "profitable" from survivor-only, currently sized samples. Publish concrete gaps, signal family × eligible cohort performance, raw-vs-screened sensitivity and eventually enough prospective outcomes before any new PAPER approval.
