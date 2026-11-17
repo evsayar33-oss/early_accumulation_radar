@@ -258,6 +258,16 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
             raw=safe_call(errors,"nasdaq_"+exchange,lambda u=url:get(u))
             if raw is None:
                 continue
+            # Nasdaq sometimes returns HTTP 200 with data=null, an error
+            # envelope, or no rows. These are provider-unavailable outcomes,
+            # not usable screener responses. Never interpret them as zero
+            # qualifying securities or a complete universe.
+            data=raw.get("data") if isinstance(raw,dict) else None
+            if not isinstance(data,dict) or not isinstance(data.get("rows"),list):
+                errors.append({"stage":"nasdaq_"+exchange,
+                               "error":"UNUSABLE_RESPONSE_SCHEMA",
+                               "http_status":None})
+                continue
             parsed=safe_call(errors,"nasdaq_parse_"+exchange,lambda:parse_nasdaq(raw,exchange))
             if parsed is None:
                 continue
