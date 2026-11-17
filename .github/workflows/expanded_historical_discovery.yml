@@ -56,6 +56,14 @@ jobs:
         run: |
           python -m research_v4.new_hypotheses_bias --csv out/expanded_history/prices.csv --out out/new_hypotheses_bias
           cat out/new_hypotheses_bias/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Independent price-source audit (read-only; incomplete sources explicit)
+        run: |
+          python -m research_v4.secondary_source_audit --csv out/expanded_history/prices.csv --out out/secondary_source_audit --limit 12
+          cat out/secondary_source_audit/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Event-driven regime hypotheses, research only
+        run: |
+          python -m research_v4.regime_event_research --csv out/expanded_history/prices.csv --out out/regime_events
+          cat out/regime_events/report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -65,5 +73,7 @@ jobs:
             out/expanded_baseline/
             out/expanded_families/
             out/new_hypotheses_bias/
+            out/secondary_source_audit/
+            out/regime_events/
           retention-days: 90
           if-no-files-found: warn
