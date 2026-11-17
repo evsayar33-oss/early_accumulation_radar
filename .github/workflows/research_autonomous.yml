@@ -1,0 +1,156 @@
+name: V5 Autonomous three-market research and prospective evidence (NO TRADING)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC 03:47 Tuesday-Saturday: prior US/BIST sessions and crypto day closed.
+    - cron: '47 3 * * 2-6'
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/research_autonomous.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: early-radar-autonomous-v5-evidence
+  cancel-in-progress: false
+
+jobs:
+  historical-and-forward-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 58
+    steps:
+      - name: Checkout isolated research code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Preflight offline regression suite and syntax
+        run: |
+          set -euo pipefail
+          python -m compileall -q research_v4 radar
+          python -m unittest discover -s tests -v
+      - name: Collect expanded real historical data (raw immutable run artifact)
+        run: |
+          set -euo pipefail
+          python -m research_v4.expanded_history --out out/expanded_history --bist 36 --us 36 --crypto 48
+      - name: Verify source manifest SHA and quarantine suspect price series
+        run: |
+          set -euo pipefail
+          python -m research_v4.data_quality --csv out/expanded_history/prices.csv --manifest out/expanded_history/manifest.json --out out/data_quality
+          cat out/data_quality/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Original and V2 historical candidates (exploration only)
+        run: |
+          set -euo pipefail
+          python -m research_v4.historical_discovery --csv out/data_quality/screened_prices.csv --out out/historical_baseline
+          python -m research_v4.multimarket_exploratory --csv out/data_quality/screened_prices.csv --out out/multimarket_exploratory
+      - name: New V3/V4 market behaviors and concentration
+        run: |
+          set -euo pipefail
+          python -m research_v4.new_hypotheses_bias --csv out/data_quality/screened_prices.csv --out out/new_hypotheses_bias
+          python -m research_v4.regime_event_research --csv out/data_quality/screened_prices.csv --out out/regime_events
+      - name: All candidate families vs same-date frictionless survivor benchmark
+        run: |
+          set -euo pipefail
+          python -m research_v4.matched_benchmark --csv out/data_quality/screened_prices.csv --out out/matched_benchmark
+          cat out/matched_benchmark/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Independent price source cascades and BIST/US quote snapshots
+        run: |
+          set -euo pipefail
+          python -m research_v4.secondary_source_audit --csv out/expanded_history/prices.csv --out out/secondary_source_audit --limit 12 --with-snapshots
+          cat out/secondary_source_audit/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Read strictly prior, non-main prospective evidence registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ear-prospective-old"
+          reference=refs/heads/research/auto-evidence
+          if git ls-remote --heads origin "$reference" | grep -q "$reference"; then
+            git fetch --no-tags origin "$reference:refs/remotes/origin/research/auto-evidence"
+            for file in signals.jsonl settlements.jsonl; do
+              git cat-file -e "refs/remotes/origin/research/auto-evidence:research_archive/prospective/$file"
+              git show "refs/remotes/origin/research/auto-evidence:research_archive/prospective/$file" > "$RUNNER_TEMP/ear-prospective-old/$file"
+            done
+            echo 'RESEARCH_REGISTRY_EXISTS=true' >> "$GITHUB_ENV"
+          else
+            : > "$RUNNER_TEMP/ear-prospective-old/signals.jsonl"
+            : > "$RUNNER_TEMP/ear-prospective-old/settlements.jsonl"
+            echo 'RESEARCH_REGISTRY_EXISTS=false' >> "$GITHUB_ENV"
+          fi
+      - name: Freeze new pre-entry signals and settle matured forward-only evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.prospective_evidence \
+            --signal-csv out/data_quality/screened_prices.csv \
+            --settlement-csv out/expanded_history/prices.csv \
+            --old-signals "$RUNNER_TEMP/ear-prospective-old/signals.jsonl" \
+            --old-settlements "$RUNNER_TEMP/ear-prospective-old/settlements.jsonl" \
+            --max-recover 10 --out out/prospective_evidence
+          cat out/prospective_evidence/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Governance report (hard no-PAPER/no-trade)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.research_governance \
+            --history out/expanded_history/manifest.json \
+            --quality out/data_quality/report.json \
+            --sources out/secondary_source_audit/report.json \
+            --matched out/matched_benchmark/report.json \
+            --prospective out/prospective_evidence/report.json \
+            --out out/research_governance
+          cat out/research_governance/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload ALL raw/filtered diagnostics and forward evidence (90 days)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: v5-autonomous-research-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            out/expanded_history/
+            out/data_quality/
+            out/historical_baseline/
+            out/multimarket_exploratory/
+            out/new_hypotheses_bias/
+            out/regime_events/
+            out/matched_benchmark/
+            out/secondary_source_audit/
+            out/prospective_evidence/
+            out/research_governance/
+      - name: Persist minimal forward evidence only to isolated research branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ear-v5-commit"
+          cp out/prospective_evidence/signals.jsonl "$RUNNER_TEMP/ear-v5-commit/signals.jsonl"
+          cp out/prospective_evidence/settlements.jsonl "$RUNNER_TEMP/ear-v5-commit/settlements.jsonl"
+          cp out/prospective_evidence/report.json "$RUNNER_TEMP/ear-v5-commit/prospective-summary.json"
+          cp out/research_governance/report.json "$RUNNER_TEMP/ear-v5-commit/governance.json"
+          cp out/research_governance/report.md "$RUNNER_TEMP/ear-v5-commit/latest.md"
+          if [ "$RESEARCH_REGISTRY_EXISTS" = true ]; then
+            git switch -c research-evidence --track origin/research/auto-evidence
+          else
+            git switch -c research-evidence
+          fi
+          mkdir -p research_archive/prospective research_archive/runs
+          cp "$RUNNER_TEMP/ear-v5-commit/signals.jsonl" research_archive/prospective/signals.jsonl
+          cp "$RUNNER_TEMP/ear-v5-commit/settlements.jsonl" research_archive/prospective/settlements.jsonl
+          cp "$RUNNER_TEMP/ear-v5-commit/prospective-summary.json" research_archive/prospective/latest.json
+          cp "$RUNNER_TEMP/ear-v5-commit/governance.json" "research_archive/runs/${GITHUB_RUN_ID}.json"
+          cp "$RUNNER_TEMP/ear-v5-commit/latest.md" research_archive/latest.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research_archive/prospective/signals.jsonl research_archive/prospective/settlements.jsonl research_archive/prospective/latest.json research_archive/runs/"${GITHUB_RUN_ID}".json research_archive/latest.md
+          if git diff --cached --quiet; then
+            echo "Evidence unchanged."
+          else
+            git commit -m "research(v5): append prospective evidence for run ${GITHUB_RUN_ID} [skip ci]"
+            git push origin HEAD:refs/heads/research/auto-evidence
+          fi
+          echo "Evidence persists on research/auto-evidence; main branch remains unchanged." >> "$GITHUB_STEP_SUMMARY"
