@@ -28,6 +28,10 @@ jobs:
         run: |
           python -m research_v4.historical_discovery --csv out/historical_real_data/prices.csv --out out/historical_discovery
           cat out/historical_discovery/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Compare six frozen multi-market exploratory hypotheses; do not approve trading
+        run: |
+          python -m research_v4.multimarket_exploratory --csv out/historical_real_data/prices.csv --out out/multimarket_exploratory
+          cat out/multimarket_exploratory/report.md >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Data source manifest: historical-real-data artifact; current-survivor sample, not PIT historical membership." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
@@ -37,5 +41,6 @@ jobs:
           path: |
             out/historical_real_data/
             out/historical_discovery/
+            out/multimarket_exploratory/
           retention-days: 90
           if-no-files-found: warn
