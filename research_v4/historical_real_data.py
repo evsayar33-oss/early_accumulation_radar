@@ -139,26 +139,43 @@ def fetch_all(ledger,output,download=get_json,now_ms=None):
     now_ms=int(now_ms if now_ms is not None else time.time()*1000)
     selection,ledger_sha=current_equity_symbols(ledger)
     selection["CRYPTO"]=list(CRYPTO_SYMBOLS)
-    # No partial successful artifact: missing source is an explicit failure.
+    # Individual delistings/outages must not fabricate data or suppress
+    # coverage gaps. Demand at least two genuine series per market.
     all_rows=[]
     manifest={"schema":"EAR.historical.real_ohlcv.v1","asof_utc":datetime.fromtimestamp(now_ms/1000,timezone.utc).isoformat(),
               "universe_reference_sha256":ledger_sha,
               "universe_type":"LATEST_CURRENT_SAMPLE_NOT_HISTORICAL_PIT",
               "pit_universe_verified":False,"corporate_actions_verified":False,
-              "sources":[],"trade_authorized":False,"paper_approved":False}
+              "sources":[],"errors":[],"coverage":{},
+              "trade_authorized":False,"paper_approved":False}
     for market,symbols in selection.items():
+        good=0
         for symbol in symbols:
-            if market=="CRYPTO":
-                bars=binance_bars(symbol,now_ms,download=download)
-                provider="BINANCE_SPOT_PUBLIC_KLINES"
-            else:
-                bars,host=yahoo_bars(symbol,market,now_ms,download=download)
-                provider="YAHOO_PUBLIC_CHART_"+("QUERY1" if host==YAHOO[0] else "QUERY2")
-            valid=validate(bars,symbol,market)
+            try:
+                if market=="CRYPTO":
+                    bars=binance_bars(symbol,now_ms,download=download)
+                    provider="BINANCE_SPOT_PUBLIC_KLINES"
+                else:
+                    bars,host=yahoo_bars(symbol,market,now_ms,download=download)
+                    provider="YAHOO_PUBLIC_CHART_"+("QUERY1" if host==YAHOO[0] else "QUERY2")
+                valid=validate(bars,symbol,market)
+            except (ValueError,TypeError,KeyError,IndexError,OSError) as exc:
+                # Do not log the request URL or raw payload.
+                manifest["errors"].append({"market":market,"symbol":symbol,
+                                           "reason":type(exc).__name__})
+                continue
+            good+=1
             all_rows.extend(valid)
             manifest["sources"].append({"market":market,"symbol":symbol,"provider":provider,
                 "bars":len(valid),"first_date":valid[0][2],"last_date":valid[-1][2]})
+        manifest["coverage"][market]={"requested":len(symbols),"usable":good,
+                                     "complete":good==len(symbols)}
     target=Path(output);target.mkdir(parents=True,exist_ok=True)
+    if any(x["usable"]<2 for x in manifest["coverage"].values()):
+        manifest["status"]="FAILED_INSUFFICIENT_REAL_SERIES"
+        (target/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n",encoding="utf8")
+        raise ValueError("INSUFFICIENT_REAL_SERIES_PER_MARKET")
+    manifest["status"]="PARTIAL_COVERAGE" if manifest["errors"] else "COMPLETE_CURRENT_SAMPLE"
     csvpath=target/"prices.csv"
     with csvpath.open("w",newline="",encoding="utf8") as stream:
         writer=csv.writer(stream);writer.writerow(FIELDS);writer.writerows(sorted(all_rows))
