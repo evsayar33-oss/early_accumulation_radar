@@ -10,7 +10,7 @@ class PaperWakeupWorkflow(unittest.TestCase):
         self.assertIn("workflows: ['Research V2 sampled tape and immutable evidence']", workflow)
         self.assertIn("types: [completed]", workflow)
         self.assertIn("branches: [main]", workflow)
-        self.assertIn("github.event.workflow_run.conclusion == 'success'", workflow)
+        # V3 PAPER collects its own quotes; a trusted V2 completion may wake it\n        # even if V2 research itself failed. Do not require V2 success.\n        self.assertNotIn("github.event.workflow_run.conclusion == 'success'", workflow)\n        self.assertIn("github.event_name != 'workflow_run' && github.ref == 'refs/heads/main'", workflow)
         self.assertIn("github.event.workflow_run.head_branch == 'main'", workflow)
         self.assertIn("github.event.workflow_run.head_repository.full_name == github.repository", workflow)
         self.assertIn("cancel-in-progress: false", workflow)
