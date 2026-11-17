@@ -171,7 +171,9 @@ def parse_cedar(raw, symbol):
         o,h,l,c,v = vals
         if min(o,h,l,c)<=0 or l>min(o,c) or h>0 and h<max(o,c):
             continue
-        bars.append({"ts_ms": int(ts), "open":o, "high":h, "low":l, "close":c, "volume":v})
+        bars.append({"ts_ms":int(ts),
+                     "session_utc":datetime.fromtimestamp(int(ts)/1000,timezone.utc).date().isoformat(),
+                     "open":o,"high":h,"low":l,"close":c,"volume":v})
     if not bars:
         raise ValueError("CEDAR_NO_BARS")
     bars.sort(key=lambda x:x["ts_ms"])
@@ -218,7 +220,8 @@ def safe_call(errors, stage, call):
                        "http_status":ex.code if isinstance(ex, HTTPError) else None})
         return None
 
-def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=None):
+def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=None,
+                 sleep=time.sleep, monotonic=time.monotonic):
     if market not in MARKETS:
         raise ValueError("UNKNOWN_MARKET")
     now_ms = int(time.time()*1000) if now_ms is None else int(now_ms)
@@ -231,6 +234,23 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
            "float_ownership_verified":False, "corporate_actions_verified":False,
            "universe_point_in_time_verified":False,
            "audit_explanation":"CURRENT_DISCOVERY_ONLY_NO_PIT_MEMBERSHIP_OR_FLOAT"}
+    cedar_state={"last_at":None}
+    def cedar_get(url):
+        # DataCedar free Explorer tier: 1 request/second.
+        last=cedar_state["last_at"]
+        if last is not None:
+            wait=max(0.0,1.12-(monotonic()-last))
+            if wait:
+                sleep(wait)
+        cedar_state["last_at"]=monotonic()
+        try:
+            return get(url,{"X-API-Key":cedar_key})
+        except HTTPError as exc:
+            if exc.code!=429:
+                raise
+            sleep(2.2)
+            cedar_state["last_at"]=monotonic()
+            return get(url,{"X-API-Key":cedar_key})
     if market=="US":
         sample=[]
         for exchange in ("NASDAQ","AMEX","NYSE"):
@@ -318,20 +338,26 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
             chart=safe_call(errors,"yahoo_parse_"+sym,lambda:parse_yahoo(raw,sym))
             if chart is not None:
                 break
-        if market=="BIST" and cedar_key:
-            sid="bist:"+rec["symbol"].lower()
-            url=CEDAR+quote(sid,safe=":")+"/bars?"+urlencode({"timeframe":"1d","adjustment":"raw","order":"asc","limit":100})
-            raw=safe_call(errors,"cedar_"+rec["symbol"],lambda u=url:get(u,{"X-API-Key":cedar_key}))
+        if cedar_key and (market=="BIST" or chart is None):
+            # Cross-check BIST, or recover US OHLCV when Yahoo fails.
+            prefix=("bist" if market=="BIST" else
+                    "nasdaq" if rec.get("exchange_reported","").upper()=="NASDAQ" else
+                    "nyse" if rec.get("exchange_reported","").upper()=="NYSE" else
+                    "amex")
+            sid=prefix+":"+rec["symbol"]
+            url=CEDAR+quote(sid,safe=":")+"/bars?"+urlencode({
+                "timeframe":"1d","adjustment":"raw","order":"asc","limit":100})
+            raw=safe_call(errors,"cedar_"+rec["symbol"],lambda u=url:cedar_get(u))
             second=safe_call(errors,"cedar_parse_"+rec["symbol"],lambda:parse_cedar(raw,sym)) if raw is not None else None
             if second:
                 out["sources"].append({"provider":"DATACEDAR_OPTIONAL_KEY","symbol":sym})
                 rec["secondary_bars_count"]=len(second["bars"])
                 if chart:
-                    a={x["ts_ms"]//86400000: x["close"] for x in chart["bars"]}
-                    b={x["ts_ms"]//86400000: x["close"] for x in second["bars"]}
+                    a={x["ts_ms"]//86400000:x["close"] for x in chart["bars"]}
+                    b={x["ts_ms"]//86400000:x["close"] for x in second["bars"]}
                     overlap=sorted(set(a)&set(b))
                     rec["price_crosscheck"]={"common_days":len(overlap),
-                        "max_close_deviation_pct": round(max(abs(a[d]/b[d]-1)*100 for d in overlap),4) if overlap else None,
+                        "max_close_deviation_pct":round(max(abs(a[d]/b[d]-1)*100 for d in overlap),4) if overlap else None,
                         "consistent_under_2pct":bool(overlap) and all(abs(a[d]/b[d]-1)*100<=2 for d in overlap)}
                 else:
                     chart=second
@@ -369,6 +395,9 @@ def main():
         (directory/(market.lower()+".json")).write_text(json.dumps(doc,indent=2,sort_keys=True,ensure_ascii=False)+"\n",encoding="utf8")
         print("V4_EQUITY_SOURCE",market,doc["status"],"tickers",doc["coverage"]["observed_tickers"],
               "price_series",doc["coverage"]["recent_price_series"],"errors",len(doc["errors"]),flush=True)
+        for e in doc["errors"]:
+            print("V4_EQUITY_SOURCE_ERROR",market,e["stage"],e["error"],
+                  e.get("http_status"),flush=True)
 
 if __name__=="__main__":
     main()
