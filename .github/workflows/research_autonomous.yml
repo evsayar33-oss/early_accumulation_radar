@@ -60,6 +60,16 @@ jobs:
           python -m research_v4.matched_benchmark --csv out/data_quality/screened_prices.csv --out out/matched_benchmark
           python -m research_v4.matched_benchmark --csv out/expanded_history/prices.csv --out out/matched_benchmark_raw
           cat out/matched_benchmark/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: V6 capital-aware portfolio and execution screen (NOT PAPER)
+        run: |
+          set -euo pipefail
+          python -m research_v4.v6_portfolio --csv out/data_quality/screened_prices.csv --out out/v6_portfolio
+          cat out/v6_portfolio/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: V6 train-only strategy candidate selection (NO PAPER promotion)
+        run: |
+          set -euo pipefail
+          python -m research_v4.v6_selection --portfolio out/v6_portfolio/report.json --out out/v6_selection
+          cat out/v6_selection/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Independent price source cascades and BIST/US quote snapshots
         run: |
           set -euo pipefail
@@ -122,6 +132,8 @@ jobs:
             out/multimarket_exploratory/
             out/new_hypotheses_bias/
             out/regime_events/
+            out/v6_portfolio/
+            out/v6_selection/
             out/matched_benchmark/
             out/matched_benchmark_raw/
             out/secondary_source_audit/
