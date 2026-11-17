@@ -202,7 +202,7 @@ def fetch_all(ledger,output,download=get_json,now_ms=None):
                 else:
                     bars,host=yahoo_bars(symbol,market,now_ms,download=download)
                     provider="YAHOO_PUBLIC_CHART_"+("QUERY1" if host==YAHOO[0] else "QUERY2")
-                valid=validate(bars,symbol,market)
+                valid=validate(bars,symbol,market,min_bars=180 if market=="CRYPTO" else 300)
             except (ValueError,TypeError,KeyError,IndexError,OSError) as exc:
                 # Do not log the request URL or raw payload.
                 manifest["errors"].append({"market":market,"symbol":symbol,
