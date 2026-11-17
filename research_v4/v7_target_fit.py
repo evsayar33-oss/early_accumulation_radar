@@ -104,7 +104,9 @@ def produce(series):
         flags=structural_gaps(bars)
         last_signal={name:-999 for name in FAMILIES}
         for i in range(MIN_BARS,len(bars)-max(HORIZONS)):
-            if any(j in flags for j in range(max(1,i-60),i+max(HORIZONS)+1)):
+            # Signal eligibility is decided with past and present only.
+            # Future scale changes censor an outcome, never a signal.
+            if any(j in flags for j in range(max(1,i-60),i+1)):
                 suspects[market]+=1
                 continue
             z=features(bars,i)
@@ -118,12 +120,17 @@ def produce(series):
                 if not math.isfinite(start) or start<=0:continue
                 hdata={}
                 for hold in HORIZONS:
+                    if any(j in flags for j in range(i+1,i+hold+1)):
+                        hdata[str(hold)]={"status":"CENSORED_FUTURE_PRICE_DISCONTINUITY",
+                            "outcome":bars[i+hold]["date"].isoformat()}
+                        continue
                     final=bars[i+hold]["close"]
                     delayed=bars[i+2]["open"]
                     gross=100*(final/start-1)
                     # All historical performance is long-underlying-only.
                     # Bearish family is risk research, not a synthetic short.
-                    hdata[str(hold)]={"outcome":bars[i+hold]["date"].isoformat(),
+                    hdata[str(hold)]={"status":"MEASURED",
+                        "outcome":bars[i+hold]["date"].isoformat(),
                         "gross_underlying_pct":round(gross,5),
                         "long_net_pct":round(gross-COST[market],5),
                         "double_cost_long_net_pct":round(gross-2*COST[market],5),
@@ -142,6 +149,7 @@ def produce(series):
                     "unusable_feature_windows":dict(no_features)}
 
 def stats(records,hold):
+    records=[e for e in records if e["horizons"][str(hold)]["status"]=="MEASURED"]
     x=[e["horizons"][str(hold)] for e in records]
     if not x:return {"n":0,"symbols":0,"mean_net_pct":None,
                       "median_net_pct":None,"positive_fraction":None,
@@ -198,7 +206,8 @@ def evaluate(series,manifest):
             # event means. Five-bar horizon is one fixed predeclared comparison.
             executable_candidates=[{"market":e["market"],"symbol":e["symbol"],"family":family,
                   "signal":e["signal"],"entry_date":e["entry_date"],
-                  "outcome":e["horizons"]["5"]["outcome"]} for e in subset]
+                  "outcome":e["horizons"]["5"]["outcome"]} for e in subset
+                  if e["horizons"]["5"]["status"]=="MEASURED"]
             sims={name:simulate(series,executable_candidates,market,family,dates)
                   for name,dates in partitions}
             report["portfolio_results"].append({"market":market,"family":family,
