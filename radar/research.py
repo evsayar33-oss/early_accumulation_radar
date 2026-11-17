@@ -7,6 +7,7 @@ from .scan import scan
 from .tape import TRADE_VENUES,fetch as fetch_tape
 from .accumulation import fetch as fetch_candles
 from .providers import SYMBOLS
+from .flow_coherence import annotate
 
 def collect(assets=("BTC","ETH","SOL"),tape=fetch_tape,candles=fetch_candles,quotes=scan):
     quotes_report=quotes(assets=assets)
@@ -21,6 +22,7 @@ def collect(assets=("BTC","ETH","SOL"),tape=fetch_tape,candles=fetch_candles,quo
                 (flow if typ=="tape" else candle_features).append(value)
             except Exception as exc:
                 errors.append({"type":typ,"venue":venue,"asset":asset,"error":type(exc).__name__+":"+str(exc)[:120]})
+    annotate(candle_features,flow)
     features={f["asset"]:f for f in candle_features}
     # Preserve independent quote health as gate; never turn candle diagnostics into order signals.
     for q in quotes_report["assets"]:
