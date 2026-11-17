@@ -190,7 +190,11 @@ def fetch_all(ledger,output,download=get_json,now_ms=None):
               "universe_reference_sha256":ledger_sha,
               "universe_type":"LATEST_CURRENT_SAMPLE_NOT_HISTORICAL_PIT",
               "pit_universe_verified":False,"corporate_actions_verified":False,
-              "sources":[],"errors":[],"coverage":{},\n              "crypto_selection":{"method":"CURRENT_COINGECKO_MARKET_CAP_AND_BINANCE_SPOT",\n                 "min_market_cap_usd":MIN_MARKET_CAP_USD,"max_market_cap_usd":MAX_MARKET_CAP_USD,\n                 "historical_market_cap_verified":False,"delisted_included":False,\n                 "benchmark_only":list(CRYPTO_BENCHMARKS)},
+              "sources":[],"errors":[],"coverage":{},
+              "crypto_selection":{"method":"CURRENT_COINGECKO_MARKET_CAP_AND_BINANCE_SPOT",
+                 "min_market_cap_usd":MIN_MARKET_CAP_USD,"max_market_cap_usd":MAX_MARKET_CAP_USD,
+                 "historical_market_cap_verified":False,"delisted_included":False,
+                 "benchmark_only":list(CRYPTO_BENCHMARKS)},
               "trade_authorized":False,"paper_approved":False}
     for market,symbols in selection.items():
         good=0
