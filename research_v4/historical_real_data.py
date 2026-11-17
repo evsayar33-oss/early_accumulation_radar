@@ -70,7 +70,7 @@ def yahoo_bars(symbol,market,now_ms,download=get_json):
             out=[]
             for i,t in enumerate(ts):
                 # Exclude today's incomplete session (UTC conservative).
-                if int(t)//DAY_MS>=now_ms//DAY_MS:
+                if int(t)*1000//DAY_MS>=now_ms//DAY_MS:
                     continue
                 try:
                     vals=[float(ohlcv[k][i]) for k in ("open","high","low","close","volume")]
