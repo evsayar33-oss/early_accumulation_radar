@@ -10,7 +10,7 @@
 | Historically robust-looking SCREENED (unverified) | 0 |
 | Historically robust-looking RAW (unverified) | 0 |
 | Robust-looking in BOTH raw/screened (still unverified) | 0 |
-| New forward signals | 3 |
+| New forward signals | 0 |
 | Forward settlements, total | 0 |
 
 **NO confirmed profitability, PAPER approval, or live trading.**

@@ -1,0 +1,52 @@
+{
+  "coverage": {
+    "BIST": {
+      "requested": 36,
+      "usable": 25
+    },
+    "CRYPTO": {
+      "requested": 48,
+      "usable": 41
+    },
+    "US": {
+      "requested": 36,
+      "usable": 34
+    }
+  },
+  "cumulative_prospective_signals": 3,
+  "exploratory_robust_not_verified": 0,
+  "governance_blockers": [
+    "ALL_BACKTEST_MARKETS_CURRENT_SURVIVORS_NOT_HISTORICAL_PIT",
+    "DELISTED_PRICES_AND_HISTORICAL_CAP_FLOAT_MISSING",
+    "ADJUSTED_OHLCV_AND_REAL_FILLS_UNVERIFIED",
+    "HISTORICAL_HOLDOUT_EXPOSED",
+    "MULTIPLE_HYPOTHESIS_RESEARCH_NOT_INDEPENDENT",
+    "PROSPECTIVE_LEDGER_NOT_LIVE_TRADING"
+  ],
+  "historical_family_market_trials": 45,
+  "historical_symbols_requested": 120,
+  "historical_symbols_usable": 100,
+  "new_prospective_signals": 0,
+  "new_settled_forward_observations": 0,
+  "paper_approved": false,
+  "profitable_strategy_independently_confirmed": false,
+  "quality_quarantine_count": 16,
+  "quarantine_sensitivity_may_introduce_selection_bias": true,
+  "raw_unfiltered_robust_not_verified": 0,
+  "robust_in_both_raw_and_screened_unverified": 0,
+  "schema": "EAR.unattended_research_governance.v1",
+  "secondary_comparison_states": {
+    "BIST|NO_VERIFIED_SECOND_PROVIDER": 12,
+    "CRYPTO|CONSISTENT_REFERENCE_NOT_PIT": 11,
+    "CRYPTO|SECONDARY_HISTORY_UNAVAILABLE": 1,
+    "US|SECONDARY_HISTORY_UNAVAILABLE": 12
+  },
+  "source_history_audit_attempts": 24,
+  "source_history_comparisons": 11,
+  "status": "RESEARCH_OK_UNVERIFIED",
+  "total_settled_forward_observations": 0,
+  "trade_authorized": false,
+  "unsettled_reasons": {
+    "AWAITING_FUTURE_CLOSED_BARS": 3
+  }
+}
