@@ -75,6 +75,15 @@ jobs:
           set -euo pipefail
           python -m research_v4.v6_bidirectional --csv out/data_quality/screened_prices.csv --out out/v6_bidirectional
           cat out/v6_bidirectional/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: V7 original target fit, rolling-relative early accumulation and capital screen (RESEARCH ONLY)
+        continue-on-error: true # V7 diagnostics must never block frozen V5 prospective evidence
+        run: |
+          set -euo pipefail
+          python -m research_v4.v7_target_fit \
+            --csv out/data_quality/screened_prices.csv \
+            --manifest out/expanded_history/manifest.json \
+            --out out/v7_target_fit
+          cat out/v7_target_fit/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Independent price source cascades and BIST/US quote snapshots
         run: |
           set -euo pipefail
@@ -140,6 +149,7 @@ jobs:
             out/v6_portfolio/
             out/v6_selection/
             out/v6_bidirectional/
+            out/v7_target_fit/
             out/matched_benchmark/
             out/matched_benchmark_raw/
             out/secondary_source_audit/

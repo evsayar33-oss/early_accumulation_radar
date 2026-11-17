@@ -6,9 +6,9 @@ on:
     paths:
       - '.github/workflows/v4_original_universe.yml'
   schedule:
-    - cron: '29 4,16 * * *'
+    - cron: '29 */4 * * *' # six research observations/day; not realtime
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: early-radar-v4-original-universe
   cancel-in-progress: false
@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -33,10 +35,45 @@ jobs:
           if test -f out/v4_original_universe/report.md; then
             cat out/v4_original_universe/report.md >> "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Load isolated first-seen DEX evidence branch (never main)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/dex-firstseen-archive"
+          BRANCH="research/dex-firstseen"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH"
+            git worktree add -b dex-firstseen-new-run "$ROOT" FETCH_HEAD
+            test -f "$ROOT/observations/dex/firstseen.jsonl" || {
+              echo "::error::EXISTING_DEX_BRANCH_WITHOUT_LEDGER"; exit 1;
+            }
+          else
+            git worktree add -b dex-firstseen-new-run "$ROOT" HEAD
+          fi
+          echo "DEX_FIRSTSEEN_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Append DEX first-observed pairs and evaluate observable future snapshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.dex_firstseen --discovery out/v4_original_universe/discovery.json \
+            --ledger "$DEX_FIRSTSEEN_ROOT/observations/dex/firstseen.jsonl" \
+            --out out/dex_forward_evidence
+          cat out/dex_forward_evidence/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Persist DEX-only evidence without changing main or PAPER
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C "$DEX_FIRSTSEEN_ROOT" config user.name 'github-actions[bot]'
+          git -C "$DEX_FIRSTSEEN_ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$DEX_FIRSTSEEN_ROOT" add observations/dex/firstseen.jsonl
+          git -C "$DEX_FIRSTSEEN_ROOT" commit -m "research(v7): append DEX first-observed pair snapshots [skip ci]"
+          git -C "$DEX_FIRSTSEEN_ROOT" push origin HEAD:refs/heads/research/dex-firstseen
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: v4-original-universe-${{ github.run_id }}
-          path: out/v4_original_universe/
+          path: |
+            out/v4_original_universe/
+            out/dex_forward_evidence/
           retention-days: 90
           if-no-files-found: warn

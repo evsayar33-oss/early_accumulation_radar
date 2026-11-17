@@ -50,7 +50,9 @@ def classify_pair(p, observed_ms, chain_id, token_address):
         return None
     base = p.get("baseToken") or {}
     quote_token = p.get("quoteToken") or {}
-    if token_address not in (base.get("address"), quote_token.get("address")):
+    # DexScreener priceUsd is the BASE token price. A target that is only
+    # the quote side cannot safely inherit base-token price or liquidity.
+    if token_address != base.get("address"):
         return None
     liq = positive((p.get("liquidity") or {}).get("usd"))
     volume = positive((p.get("volume") or {}).get("h24"))
@@ -69,6 +71,8 @@ def classify_pair(p, observed_ms, chain_id, token_address):
             "quote_symbol": quote_token.get("symbol"),
             "liquidity_usd": liq, "volume_24h_usd": volume,
             "market_cap_usd_unverified": cap, "fdv_usd_unverified": fdv,
+            "price_usd_snapshot_unverified": positive(p.get("priceUsd")),
+            "price_identity": "BASE_TOKEN_ONLY_UNVERIFIED_SNAPSHOT",
             "pair_age_hours": round(age_hours, 2) if age_hours is not None else None,
             "liquidity_to_fdv": round(liq / fdv, 5) if liq is not None and fdv and fdv > 0 else None,
             "source": "DEXSCREENER_PUBLIC_AGGREGATOR",
