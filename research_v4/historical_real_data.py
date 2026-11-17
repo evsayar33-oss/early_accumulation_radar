@@ -24,7 +24,7 @@ YAHOO=("https://query1.finance.yahoo.com/v8/finance/chart/",
        "https://query2.finance.yahoo.com/v8/finance/chart/")
 CRYPTO_BENCHMARKS=("BTCUSDT","ETHUSDT","SOLUSDT")
 COINGECKO="https://api.coingecko.com/api/v3/coins/markets"
-BINANCE_INFO="https://data-api.binance.vision/api/v3/exchangeInfo"
+BINANCE_INFO="https://data-api.binance.vision/api/v3/exchangeInfo?showPermissionSets=false"
 MIN_MARKET_CAP_USD=10000000
 MAX_MARKET_CAP_USD=500000000
 MAX_ALTCOINS=20
@@ -68,7 +68,7 @@ def discover_current_altcoins(download=None):
     return selected
 
 DAY_MS=86400000
-MAX_RESPONSE_BYTES=12000000
+MAX_RESPONSE_BYTES=64000000
 
 def get_json(url):
     req=Request(url,headers={"User-Agent":"Mozilla/5.0 (EAR historical research; no trading)",
