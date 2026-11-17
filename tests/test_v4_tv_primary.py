@@ -2,7 +2,11 @@
 import unittest
 from research_v4.equity_sources import probe_market,NASDAQ
 from research_v4.us_fallback import TV_URL
-from tests.test_v4_us_fallback import bars
+def bars(sym):
+    return {"chart":{"result":[{"meta":{"symbol":sym,"currency":"USD"},
+        "timestamp":[1794760000],
+        "indicators":{"quote":[{"open":[1],"high":[1.1],"low":[.9],
+        "close":[1],"volume":[50000]}]}}],"error":None}}
 
 class TvPrimary(unittest.TestCase):
     def test_primary_success_skips_nasdaq(self):
