@@ -13,6 +13,10 @@ The first V5 workflow succeeded, but its prospective registry contained 3 new si
 - Chronological partitions (60/20/20) are independently reinitialized, with overlapping trades across boundaries excluded. Therefore per-partition performance cannot be compounded into a single continuous investment NAV.
 - Any *positive* screen is only an exploration lead awaiting **independent prospective evidence**. This module never starts PAPER, never trades, and never promotes a strategy.
 
+## Automatic train-only candidate discovery
+
+After portfolio screening, V6 selects at most one family per market **using only training-period** positive NAV, drawdown and sample minima. It then reports untouched-by-this-selection validation and previously-exposed holdout performance. If no training family qualifies, it emits an explicit no-candidate result. This is deterministic hypothesis screening, not automatic creation of novel families or confirmed profitability. Selecting the best of many historical families still incurs multiple-comparisons bias.
+
 ## Still missing
 
 - Survivor-only current symbols, missing delisted instruments, historical PIT market-cap/free-float and split/dividend verification remain unresolved. Quarantine can itself induce selection bias.
@@ -23,6 +27,6 @@ The first V5 workflow succeeded, but its prospective registry contained 3 new si
 
 ## After merge
 
-The existing automatic V5 workflow `V5 Autonomous three-market research and prospective evidence (NO TRADING)` incorporates the V6 portfolio screen in subsequent scheduled runs. It writes `out/v6_portfolio/report.json` and `report.md` to its existing 90-day run artifact, in addition to the normal append-only prospective evidence on the **unchanged** `research/auto-evidence` branch. No new scheduled task or recurring manual trigger required.
+The existing automatic V5 workflow `V5 Autonomous three-market research and prospective evidence (NO TRADING)` incorporates the V6 portfolio screen in subsequent scheduled runs. It writes `out/v6_portfolio/report.json`, `out/v6_selection/report.json` and their Markdown reports to its existing 90-day run artifact, in addition to the normal append-only prospective evidence on the **unchanged** `research/auto-evidence` branch. No new scheduled task or recurring manual trigger required.
 
 To inspect immediately, optionally run the existing workflow on `main` once after merge. This is optional, not a prerequisite for future scheduling.
