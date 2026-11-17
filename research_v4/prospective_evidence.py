@@ -178,8 +178,12 @@ def update(signals_series,settlement_series,signals_old,settled_old,observed_at,
     needed=[r for r in all_signals if r["id"] not in recorded]
     unavailable={key for key in {(x["market"],x["symbol"]) for x in needed} if key not in settlement_series}
     recovery_errors={}
-    if recover:
-        for key in sorted(unavailable)[:max_recover]:
+    if recover and unavailable:
+        # Rotate provider recovery attempts so permanently unavailable delistings
+        # cannot starve other missing symbols across future scheduled runs.
+        missing=sorted(unavailable)
+        offset=date.fromisoformat(observed_at[:10]).toordinal()%len(missing)
+        for key in (missing[offset:]+missing[:offset])[:max_recover]:
             try:
                 value=recover(*key)
                 if value:settlement_series[key]=value
