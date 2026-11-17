@@ -38,12 +38,21 @@ Volumes are compared against the symbol's **preceding 60 bars**, rather than app
 - Existing workflow schedule and artifact path preserved; new report is saved as `out/dex_forward_evidence` and the isolated branch retains its hash-linked history. If GitHub token push rights are not allowed, the workflow fails visibly; uploaded artifacts remain separately available on successful discovery. This is a conditional GitHub permission requirement, not a promise of successful persistence before observing a run.
 - These periodic profile snapshots are **not** a 1-minute trading feed or a survivorship-complete market history. Real early pump/short detection and execution require historical signed trades, L2 depth, holder/contract analysis, exchange-specific metadata, and more frequent timestamped observations.
 
+
+**E. Independently record NEW early-stage candidates BEFORE their future outcomes** (`research_v4.v7_forward`):
+
+- Once a trusted `main` V5 research workflow **finishes successfully**, a separate workflow downloads that exact run's already-collected historical artifact (no duplicate market-data requests and no historical "signal creation" backfill). This V7 job does not affect V5 or PAPER on failure.
+- Take **only truly closed sessions** (daily bar date strictly prior to first observation UTC date). Freeze any latest V7 watchlist signals under their research code SHA + first-seen timestamp and source CSV SHA. The next possible simulated entry is a daily open strictly **after first observation UTC date**, not a historical signal-day close.
+- Independently measure next available 2/5/10 CLOSED sessions with explicit fixed costs, pending/missing-symbol and future-scale-change states. Reject entries delayed beyond 3 calendar days for crypto or 7 for equities. No invented "fill", historical re-signal, or simulated short borrow.
+- The sealed signal/settlement files live on **`research/v7-forward-evidence`**, isolated from both **`research/auto-evidence`** (old V5 hypotheses) and **`paper/early-radar-nav`** (frozen V3). Outcomes are first recorded once, not recomputed/overwritten. This provides a genuine future-only comparator, **but not verified PIT float/holder/depth**.
+- The separate `V7 isolated forward validation from completed V5 research (NO TRADING)` workflow also uploads its own 90-day artifact. GitHub token must allow writing to its own evidence branch; failure is reported explicitly without modifying the original research stream.
+
 ## What this PR does NOT fix
 
 It cannot conjure missing historical float, shareholder distribution, de-listed instruments, DEX trade history, book depth or independently frozen research periods. Real-time opportunities cannot be verified with twice-daily DEX sampling or five-year daily survivor bars alone. Free-source limitations are explicit, rather than silently substituted with large-cap proxy tests.
 
 ## Operations
 
-After merge, the existing `V5 Autonomous three-market research and prospective evidence (NO TRADING)` regularly writes `out/v7_target_fit/report.json` and `report.md` to its existing 90-day artifact, and the already scheduled `V4 original-universe DEX discovery` appends separate first-seen snapshots. No new scheduling service or manual install is required. The current independent V2/V3 PAPER workflows remain frozen.
+After merge, the V7 diagnostics step is advisory-only, so faults in this new research cannot abort the frozen V5 ledger. The existing `V5 Autonomous three-market research and prospective evidence (NO TRADING)` regularly writes `out/v7_target_fit/report.json` and `report.md` to its existing 90-day artifact, and the already scheduled `V4 original-universe DEX discovery` appends separate first-seen snapshots. No new scheduling service or manual install is required. The current independent V2/V3 PAPER workflows remain frozen.
 
 **Decision rule:** No candidate may be called "profitable" from survivor-only, currently sized samples. Publish concrete gaps, signal family × eligible cohort performance, raw-vs-screened sensitivity and eventually enough prospective outcomes before any new PAPER approval.
