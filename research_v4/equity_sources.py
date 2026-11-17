@@ -17,6 +17,7 @@ import time
 from urllib.error import HTTPError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
+from research_v4.us_fallback import TV_URL, tv_payload, parse_tv, sec_universe, sec_sample
 
 NASDAQ = "https://api.nasdaq.com/api/screener/stocks"
 KAP = "https://kap.org.tr/tr/bist-sirketler"
@@ -45,12 +46,15 @@ def number(x):
     except (ValueError, TypeError):
         return None
 
-def download(url, headers=None, *, as_text=False):
+def download(url, headers=None, *, as_text=False, payload=None):
     # Never log credentials or untrusted response bodies.
     h = {"User-Agent": "Mozilla/5.0 (compatible; EAR-V4-nontrading-source-health/1.0)",
          "Accept": "application/json,text/html;q=0.8"}
     h.update(headers or {})
-    with urlopen(Request(url, headers=h), timeout=12) as resp:
+    body=json.dumps(payload).encode("utf8") if payload is not None else None
+    if body is not None:
+        h["Content-Type"]="application/json"
+    with urlopen(Request(url, headers=h, data=body, method="POST" if body else "GET"), timeout=12) as resp:
         if resp.status != 200:
             raise ValueError("HTTP_" + str(resp.status))
         raw = resp.read(MAX_BODY + 1)
@@ -243,34 +247,46 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
                                    "rows_total_unverified":total,
                                    "complete_universe":False})
             sample.extend(matches)
-        # The public screener may repeat a ticker across exchange responses.
-        # Deduplicate by ticker before ranking; no false extra observations.
+        # Fail over Nasdaq outage to independent current-cap discovery.
+        if not sample:
+            tv=safe_call(errors,"tradingview_scan",lambda:get(TV_URL,payload=tv_payload()))
+            if tv is not None:
+                observed=safe_call(errors,"tradingview_parse",lambda:parse_tv(tv))
+                if observed is not None:
+                    sample.extend(observed)
+                    out["sources"].append({"provider":"TRADINGVIEW_PUBLIC_SCANNER_UNOFFICIAL",
+                                           "rows_returned":len(tv["data"]),"complete_universe":False})
         unique={}
         for item in sample:
             unique.setdefault(item["symbol"],item)
-        sample=sorted(unique.values(),key=lambda row:(row["market_cap_usd_screen"],row["symbol"]))
+        sample=sorted(unique.values(),key=lambda x:(x["market_cap_usd_screen"],x["symbol"]))
+        sec_headers={"User-Agent":sec_agent,"Accept-Encoding":"identity"} if sec_agent else None
+        mapping=safe_call(errors,"sec_cik_map",lambda:get(SEC_MAP,sec_headers)) if sec_headers else None
+        cik_map=safe_call(errors,"sec_map_parse",lambda:parse_sec_map(mapping)) if mapping is not None else None
+        if not sample and mapping is not None:
+            rows=safe_call(errors,"sec_universe",lambda:sec_universe(mapping))
+            if rows is not None:
+                sample=sec_sample(rows,now_ms,MAX_US_SAMPLE)
+                out["sources"].append({"provider":"SEC_EDGAR_EXCHANGE_TICKERS_DIAGNOSTIC",
+                                       "available_current_tickers":len(rows),
+                                       "market_cap_screen_verified":False,"complete_universe":False})
+                out["candidate_selection_status"]="UNVERIFIED_CAP_SEC_ONLY"
         out["observations"]=sample[:MAX_US_SAMPLE]
-        if sec_agent:
-            sec_headers={"User-Agent":sec_agent,"Accept-Encoding":"identity"}
-            mapping=safe_call(errors,"sec_cik_map",lambda:get(SEC_MAP,sec_headers))
-            if mapping is not None:
-                cik_map=safe_call(errors,"sec_map_parse",lambda:parse_sec_map(mapping))
-                for rec in out["observations"]:
-                    if cik_map is None:
-                        break
-                    cik=cik_map.get(rec["symbol"])
-                    rec["sec_cik"] = cik
-                    if cik is None:
-                        continue
-                    url=SEC_FACTS+"CIK"+str(cik).zfill(10)+".json"
-                    data=safe_call(errors,"sec_companyfacts_"+rec["symbol"],lambda u=url:get(u,sec_headers))
-                    if isinstance(data,dict):
-                        rec["sec_public_float_usd_filing"] = latest_sec_fact(data,"dei","EntityPublicFloat","USD",today)
-                        rec["sec_shares_outstanding_filing"] = (latest_sec_fact(data,"dei","EntityCommonStockSharesOutstanding","shares",today)
-                             or latest_sec_fact(data,"us-gaap","CommonStockSharesOutstanding","shares",today))
-                        rec["sec_free_float_percentage_verified"]=False
-                out["sources"].append({"provider":"SEC_EDGAR_COMPANYFACTS","api_key_required":False,
-                                       "user_agent_required":True})
+        if sec_headers:
+            for rec in out["observations"]:
+                cik=rec.get("sec_cik") or (cik_map or {}).get(rec["symbol"])
+                rec["sec_cik"]=cik
+                if cik is None:
+                    continue
+                url=SEC_FACTS+"CIK"+str(cik).zfill(10)+".json"
+                data=safe_call(errors,"sec_companyfacts_"+rec["symbol"],lambda u=url:get(u,sec_headers))
+                if isinstance(data,dict):
+                    rec["sec_public_float_usd_filing"]=latest_sec_fact(data,"dei","EntityPublicFloat","USD",today)
+                    rec["sec_shares_outstanding_filing"]=(latest_sec_fact(data,"dei","EntityCommonStockSharesOutstanding","shares",today)
+                        or latest_sec_fact(data,"us-gaap","CommonStockSharesOutstanding","shares",today))
+                    rec["sec_free_float_percentage_verified"]=False
+            out["sources"].append({"provider":"SEC_EDGAR_COMPANYFACTS","api_key_required":False,
+                                   "user_agent_required":True})
         else:
             out["errors"].append({"stage":"sec_companyfacts","error":"SEC_USER_AGENT_NOT_CONFIGURED"})
     else:
@@ -333,9 +349,13 @@ def probe_market(market, get=download, now_ms=None, sec_agent=None, cedar_key=No
             rec["price_status"]="UNAVAILABLE"
     usable=sum("daily_bars_recent" in x for x in out["observations"])
     out["coverage"]={"observed_tickers":len(out["observations"]),"recent_price_series":usable,
-                     "verified_float":0,"verified_depth":0,"pit_universe":0}
+                     "verified_float":0,"verified_depth":0,"pit_universe":0,
+                     "smallcap_screened_tickers":sum(p.get("market_cap_usd_screen") is not None
+                         for p in out["observations"]) if market=="US" else 0}
     out["status"]=("RECENT_DATA_AVAILABLE_NOT_PIT_READY" if usable else
                    "SOURCE_UNAVAILABLE_OR_INCOMPLETE_NO_SIGNAL")
+    if market=="US" and usable and not out["coverage"]["smallcap_screened_tickers"]:
+        out["status"]="SEC_DIAGNOSTIC_PRICE_ONLY_NO_SMALLCAP_VALIDATION"
     return out
 
 def main():
