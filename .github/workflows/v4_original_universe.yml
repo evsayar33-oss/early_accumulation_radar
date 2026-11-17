@@ -44,6 +44,9 @@ jobs:
           if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
             git fetch origin "$BRANCH"
             git worktree add -b dex-firstseen-new-run "$ROOT" FETCH_HEAD
+            test -f "$ROOT/observations/dex/firstseen.jsonl" || {
+              echo "::error::EXISTING_DEX_BRANCH_WITHOUT_LEDGER"; exit 1;
+            }
           else
             git worktree add -b dex-firstseen-new-run "$ROOT" HEAD
           fi
