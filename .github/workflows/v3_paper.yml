@@ -4,6 +4,12 @@ on:
     branches: [main]
     paths: ['.github/workflows/v3_paper.yml']
   workflow_dispatch:
+  # Independent wake-up path when GitHub delays/skips this workflow's cron.
+  # Only trusted main-branch V2 completions may start a PAPER run.
+  workflow_run:
+    workflows: ['Research V2 sampled tape and immutable evidence']
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: '17,47 * * * *'
 permissions:
@@ -13,7 +19,12 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prospective-paper:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.full_name == github.repository))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
