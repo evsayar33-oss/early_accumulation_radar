@@ -32,7 +32,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
           name: v5-autonomous-research-${{ github.event.workflow_run.id }}
-          path: .
+          path: out
       - name: Load isolated V7 registry, fail if a previous ledger disappeared
         shell: bash
         run: |
