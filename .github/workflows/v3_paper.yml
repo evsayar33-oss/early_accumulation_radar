@@ -53,6 +53,9 @@ jobs:
       - name: Diagnose independent venue eligibility without changing PAPER model
         continue-on-error: true
         run: python -m research_v3.venue_diagnostics
+      - name: Inspect multi-level depth without changing frozen PAPER
+        continue-on-error: true
+        run: python -m research_v3.depth_shadow
       - name: Collect first-seen quotes and advance PAPER only
         shell: bash
         run: |
@@ -91,5 +94,6 @@ jobs:
           path: |
             out/v3_paper/latest.json
             out/v3_paper/venue_diagnostics.json
+            out/v3_paper/depth_shadow.json
           retention-days: 90
           if-no-files-found: warn
