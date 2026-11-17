@@ -52,6 +52,10 @@ jobs:
           cat out/expanded_families/report.md >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**LIMITATIONS:** current-survivor symbols only; BIST cap/float not verified; delistings omitted; previous holdout already exposed. No historical profitability or PAPER approval." >> "$GITHUB_STEP_SUMMARY"
+      - name: New independent hypotheses and bias/concentration audit (research only)
+        run: |
+          python -m research_v4.new_hypotheses_bias --csv out/expanded_history/prices.csv --out out/new_hypotheses_bias
+          cat out/new_hypotheses_bias/report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -60,5 +64,6 @@ jobs:
             out/expanded_history/
             out/expanded_baseline/
             out/expanded_families/
+            out/new_hypotheses_bias/
           retention-days: 90
           if-no-files-found: warn
