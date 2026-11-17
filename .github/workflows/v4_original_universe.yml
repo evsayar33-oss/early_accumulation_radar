@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/v4_original_universe.yml'
   schedule:
-    - cron: '29 4,16 * * *'
+    - cron: '29 */4 * * *' # six research observations/day; not realtime
 permissions:
   contents: write
 concurrency:
