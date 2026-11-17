@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
   # Independent wake-up path when GitHub delays/skips this workflow's cron.
   # Only trusted main-branch V2 completions may start a PAPER run.
+  # PAPER independently fetches its own market data; V2 success is not required.
   workflow_run:
     workflows: ['Research V2 sampled tape and immutable evidence']
     types: [completed]
@@ -20,11 +21,10 @@ concurrency:
 jobs:
   prospective-paper:
     if: >-
-      github.ref == 'refs/heads/main' &&
-      (github.event_name != 'workflow_run' ||
-       (github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.head_branch == 'main' &&
-        github.event.workflow_run.head_repository.full_name == github.repository))
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository) ||
+      (github.event_name != 'workflow_run' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
