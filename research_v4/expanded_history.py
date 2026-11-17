@@ -121,8 +121,15 @@ def collect(output, *, get=get_json, get_equity=equity_download,
                     source="YAHOO_CHART_DAILY"
                 valid=validate(bars,symbol,market,min_bars=180 if market=="CRYPTO" else 300)
             except (ValueError,KeyError,IndexError,TypeError,OSError) as exc:
+                # Keep a controlled machine-readable reason, without exposing URLs or credentials.
+                reason=(str(exc).split(":",1)[0] if isinstance(exc,ValueError)
+                        else type(exc).__name__)
+                if not re.fullmatch(r"[A-Za-z0-9_]{2,100}",reason):
+                    reason=type(exc).__name__
                 manifest["errors"].append({"market":market,"symbol":symbol,
-                                           "reason":type(exc).__name__})
+                                           "reason":type(exc).__name__,
+                                           "reason_code":reason,
+                                           "http_status":getattr(exc,"code",None)})
                 continue
             rows.extend(valid)
             complete+=1
