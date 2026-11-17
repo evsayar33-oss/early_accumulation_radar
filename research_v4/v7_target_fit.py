@@ -8,6 +8,7 @@ Future high/low may be used ONLY in outcomes, never to form entry signals.
 from __future__ import annotations
 import argparse,json,math
 from collections import Counter,defaultdict
+from datetime import date
 from pathlib import Path
 from statistics import mean,median
 from research_v4.multimarket_exploratory import COST,load
@@ -246,7 +247,14 @@ def main():
     p.add_argument("--out",default="out/v7_target_fit")
     a=p.parse_args()
     manifest=json.loads(Path(a.manifest).read_text(encoding="utf8"))
-    result=evaluate(load(a.csv),manifest)
+    if "asof_utc" not in manifest:raise ValueError("MISSING_ASOF_IN_UNIVERSE_MANIFEST")
+    asof=date.fromisoformat(manifest["asof_utc"][:10])
+    # Yahoo can include a currently forming session; conservative UTC date
+    # exclusion ensures the research watchlist never claims that an unclosed
+    # current-day candle was already available.
+    source=load(a.csv)
+    closed={key:[b for b in bars if b["date"]<asof] for key,bars in source.items()}
+    result=evaluate(closed,manifest)
     path=Path(a.out);path.mkdir(parents=True,exist_ok=True)
     (path/"report.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n")
     lines=["# V7 original-target fit and early-stage hypothesis diagnostics","",
