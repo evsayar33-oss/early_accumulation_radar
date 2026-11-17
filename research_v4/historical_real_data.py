@@ -22,7 +22,49 @@ FIELDS=("market","symbol","date","open","high","low","close","volume",
 BINANCE="https://data-api.binance.vision/api/v3/klines"
 YAHOO=("https://query1.finance.yahoo.com/v8/finance/chart/",
        "https://query2.finance.yahoo.com/v8/finance/chart/")
-CRYPTO_SYMBOLS=("BTCUSDT","ETHUSDT","SOLUSDT")
+CRYPTO_BENCHMARKS=("BTCUSDT","ETHUSDT","SOLUSDT")
+COINGECKO="https://api.coingecko.com/api/v3/coins/markets"
+BINANCE_INFO="https://data-api.binance.vision/api/v3/exchangeInfo"
+MIN_MARKET_CAP_USD=10000000
+MAX_MARKET_CAP_USD=500000000
+MAX_ALTCOINS=20
+
+def discover_current_altcoins(download=get_json):
+    """Current-cap discovery only. Never assert historical cap or delisted coverage."""
+    listed=download(BINANCE_INFO)
+    if not isinstance(listed,dict) or not isinstance(listed.get("symbols"),list):
+        raise ValueError("BINANCE_EXCHANGEINFO_SCHEMA")
+    tradable={x["symbol"] for x in listed["symbols"]
+              if isinstance(x,dict) and x.get("status")=="TRADING"
+              and x.get("quoteAsset")=="USDT" and x.get("isSpotTradingAllowed",True)
+              and isinstance(x.get("symbol"),str)}
+    selected=[]
+    seen=set()
+    for page in range(1,5):
+        query=urlencode({"vs_currency":"usd","order":"market_cap_desc",
+                         "per_page":250,"page":page,"sparkline":"false"})
+        coins=download(COINGECKO+"?"+query)
+        if not isinstance(coins,list):raise ValueError("COINGECKO_MARKETS_SCHEMA")
+        for coin in coins:
+            if not isinstance(coin,dict):continue
+            cap=coin.get("market_cap")
+            ticker=str(coin.get("symbol") or "").upper()
+            if not isinstance(cap,(int,float)) or not MIN_MARKET_CAP_USD<=cap<=MAX_MARKET_CAP_USD:
+                continue
+            if not re.fullmatch(r"[A-Z0-9]{2,15}",ticker):continue
+            pair=ticker+"USDT"
+            if pair not in tradable or pair in seen:continue
+            # Symbol mapping can be ambiguous: exclude collision candidates.
+            if sum(1 for c in coins if isinstance(c,dict) and str(c.get("symbol") or "").upper()==ticker)>1:
+                continue
+            seen.add(pair)
+            selected.append({"symbol":pair,"coingecko_id":coin.get("id"),
+                             "snapshot_market_cap_usd":cap})
+            if len(selected)>=MAX_ALTCOINS:return selected
+        if len(coins)<250:break
+    if len(selected)<2:raise ValueError("INSUFFICIENT_CURRENT_ALTCOIN_CANDIDATES")
+    return selected
+
 DAY_MS=86400000
 MAX_RESPONSE_BYTES=12000000
 
@@ -138,7 +180,9 @@ def validate(rows,symbol,market,min_bars=300):
 def fetch_all(ledger,output,download=get_json,now_ms=None):
     now_ms=int(now_ms if now_ms is not None else time.time()*1000)
     selection,ledger_sha=current_equity_symbols(ledger)
-    selection["CRYPTO"]=list(CRYPTO_SYMBOLS)
+    altcoin_candidates=discover_current_altcoins(download=download)
+    selection["CRYPTO"]=[c["symbol"] for c in altcoin_candidates]
+    altcoin_meta={c["symbol"]:c for c in altcoin_candidates}
     # Individual delistings/outages must not fabricate data or suppress
     # coverage gaps. Demand at least two genuine series per market.
     all_rows=[]
@@ -146,7 +190,7 @@ def fetch_all(ledger,output,download=get_json,now_ms=None):
               "universe_reference_sha256":ledger_sha,
               "universe_type":"LATEST_CURRENT_SAMPLE_NOT_HISTORICAL_PIT",
               "pit_universe_verified":False,"corporate_actions_verified":False,
-              "sources":[],"errors":[],"coverage":{},
+              "sources":[],"errors":[],"coverage":{},\n              "crypto_selection":{"method":"CURRENT_COINGECKO_MARKET_CAP_AND_BINANCE_SPOT",\n                 "min_market_cap_usd":MIN_MARKET_CAP_USD,"max_market_cap_usd":MAX_MARKET_CAP_USD,\n                 "historical_market_cap_verified":False,"delisted_included":False,\n                 "benchmark_only":list(CRYPTO_BENCHMARKS)},
               "trade_authorized":False,"paper_approved":False}
     for market,symbols in selection.items():
         good=0
