@@ -23,7 +23,7 @@ def aligned_events(series):
     for key,seq in series.items():
         maps[key]={b["date"].isoformat():(i,b) for i,b in enumerate(seq)}
     sources=(
-       ("base",base_events(series)),
+       ("base",base_events({key:[dict(bar,adjusted=bar["actions"]) for bar in bars]\n                             for key,bars in series.items()})),
        ("v2",v2_events(series)),
        ("v3",v3_events(series)),
        ("v4",v4_events(series)))
