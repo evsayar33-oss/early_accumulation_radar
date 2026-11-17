@@ -1,0 +1,64 @@
+name: Expanded BIST US altcoin historical discovery (RESEARCH ONLY)
+on:
+  workflow_dispatch:
+    inputs:
+      bist_limit:
+        description: "Current KAP sample size (2-60, not cap-verified)"
+        type: number
+        required: true
+        default: 36
+      us_limit:
+        description: "Current US micro/smallcap screener sample size (2-60)"
+        type: number
+        required: true
+        default: 36
+      crypto_limit:
+        description: "Current eligible non-pegged altcoin sample size (2-60)"
+        type: number
+        required: true
+        default: 48
+permissions:
+  contents: read
+concurrency:
+  group: early-radar-expanded-history-research
+  cancel-in-progress: false
+jobs:
+  expanded-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline research regressions
+        run: python -m unittest discover -s tests -v
+      - name: Fetch separate actual historical datasets (no synthetic data)
+        env:
+          BIST_LIMIT: ${{ inputs.bist_limit }}
+          US_LIMIT: ${{ inputs.us_limit }}
+          CRYPTO_LIMIT: ${{ inputs.crypto_limit }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.expanded_history --out out/expanded_history --bist "$BIST_LIMIT" --us "$US_LIMIT" --crypto "$CRYPTO_LIMIT"
+      - name: Original baseline on expanded history (not independent holdout)
+        run: |
+          python -m research_v4.historical_discovery --csv out/expanded_history/prices.csv --out out/expanded_baseline
+          cat out/expanded_baseline/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Six families x all markets on expanded history (no promotion)
+        run: |
+          python -m research_v4.multimarket_exploratory --csv out/expanded_history/prices.csv --out out/expanded_families
+          cat out/expanded_families/report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**LIMITATIONS:** current-survivor symbols only; BIST cap/float not verified; delistings omitted; previous holdout already exposed. No historical profitability or PAPER approval." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: expanded-history-research-${{ github.run_id }}
+          path: |
+            out/expanded_history/
+            out/expanded_baseline/
+            out/expanded_families/
+          retention-days: 90
+          if-no-files-found: warn
