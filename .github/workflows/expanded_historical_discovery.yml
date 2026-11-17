@@ -1,5 +1,7 @@
 name: Expanded BIST US altcoin historical discovery (RESEARCH ONLY)
 on:
+  schedule:
+    - cron: '23 6 * * 3'
   workflow_dispatch:
     inputs:
       bist_limit:
@@ -35,9 +37,9 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Fetch separate actual historical datasets (no synthetic data)
         env:
-          BIST_LIMIT: ${{ inputs.bist_limit }}
-          US_LIMIT: ${{ inputs.us_limit }}
-          CRYPTO_LIMIT: ${{ inputs.crypto_limit }}
+          BIST_LIMIT: ${{ inputs.bist_limit || '36' }}
+          US_LIMIT: ${{ inputs.us_limit || '36' }}
+          CRYPTO_LIMIT: ${{ inputs.crypto_limit || '48' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -64,6 +66,10 @@ jobs:
         run: |
           python -m research_v4.regime_event_research --csv out/expanded_history/prices.csv --out out/regime_events
           cat out/regime_events/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Unified evidence triage and source health
+        run: |
+          python -m research_v4.research_triage --root out --out out/research_triage
+          cat out/research_triage/report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -75,5 +81,6 @@ jobs:
             out/new_hypotheses_bias/
             out/secondary_source_audit/
             out/regime_events/
+            out/research_triage/
           retention-days: 90
           if-no-files-found: warn
