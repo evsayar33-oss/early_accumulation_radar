@@ -9,6 +9,8 @@ on:
     paths:
       - '.github/workflows/perp_early_watch.yml'
       - 'research_v4/perp_watch.py'
+      - 'research_v4/perp_anomaly.py'
+      - 'research_v4/preimpulse_study.py'
   workflow_dispatch:
   schedule:
     - cron: '9,39 * * * *' # best effort, NOT realtime
@@ -83,6 +85,15 @@ jobs:
             --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
             --out out/v8_perp
           cat out/v8_perp/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: V10 simultaneous per-coin robust anomaly baselines, FULL cohort (advisory only)
+        continue-on-error: true # V8 immutable ledger persistence is independent.
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.perp_anomaly \
+            --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
+            --out out/v10_anomalies
+          cat out/v10_anomalies/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: V9 exploratory pre-impulse case-control audit, future labels ONLY after observations
         continue-on-error: true # Never risk the V8 append-only registry to add advisory research.
         run: |
@@ -98,6 +109,7 @@ jobs:
           path: |
             out/v8_perp/
             out/v9_preimpulse/
+            out/v10_anomalies/
           retention-days: 30
           if-no-files-found: warn
       - name: Persist V8-only forward evidence on separate research branch
