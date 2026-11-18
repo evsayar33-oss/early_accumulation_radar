@@ -1,4 +1,4 @@
-import unittest,tempfile
+import unittest,tempfile,subprocess,sys,json
 from pathlib import Path
 from radar.ledger import append,read_verify
 from radar.audit import audit
@@ -23,6 +23,28 @@ class Integrity(unittest.TestCase):
             self.assertTrue(result["ok"]);self.assertTrue(result["chain_valid"])
             self.assertEqual(result["entries"],2);self.assertEqual(result["prior_gap_count"],1)
             self.assertFalse(result["trade_allowed"])
+    def test_weak_quote_is_degraded_but_candles_are_good(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/"state.jsonl";row=sample()
+            row["quotes"]["assets"][1]["status"]="INSUFFICIENT_VERIFIED_LIQUIDITY"
+            append(row,p)
+            result=audit(p,now_ms=T+2000)
+            self.assertFalse(result["ok"])
+            self.assertTrue(result["candle_observation_ok"])
+            self.assertFalse(result["quote_quality_ok"])
+            self.assertEqual(result["unhealthy_quote_assets"],["ETH"])
+            self.assertFalse(result["trade_allowed"])
+    def test_cli_allows_only_quote_degradation_not_staleness(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/"state.jsonl";output=Path(d)/"health.json"
+            row=sample();row["quotes"]["assets"][1]["status"]="INSUFFICIENT_VERIFIED_LIQUIDITY"
+            append(row,p)
+            # Historical timestamp is stale relative to today: CLI must refuse to mask it.
+            cmd=[sys.executable,"-m","radar.audit","--ledger",str(p),
+                 "--allow-quote-degraded","--output",str(output)]
+            result=subprocess.run(cmd,capture_output=True,text=True)
+            self.assertEqual(result.returncode,2)
+            self.assertFalse(json.loads(output.read_text())["candle_observation_ok"])
     def test_corrupt_historical_chain_fails(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/"state.jsonl";append(sample(),p)
