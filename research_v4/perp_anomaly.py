@@ -41,6 +41,20 @@ METRICS=(
     "cross_venue_dispersion_bps",
 )
 # Minimum meaningful unit-scale change for a flat historical metric.
+# Metrics derived from one feed (e.g. OI level and OI acceleration)
+# are NOT independent evidence. Count independent measured dimensions too.
+GROUPS={
+    "turnover_24h_level_usdt":"turnover",
+    "turnover_24h_accel_1h_pct":"turnover",
+    "oi_contracts_level":"open_interest",
+    "oi_contracts_accel_1h_pct":"open_interest",
+    "bid_ask_spread_bps":"spread",
+    "day_range_pct":"price_range",
+    "mark_basis_abs_bps":"mark_basis",
+    "funding_abs_pct":"funding",
+    "price_motion_1h_abs_pct":"price_motion",
+    "cross_venue_dispersion_bps":"venue_dispersion",
+}
 FLOORS={
     "turnover_24h_level_usdt":10000.,
     "turnover_24h_accel_1h_pct":0.5,
@@ -192,6 +206,7 @@ def analyze_one(sym,at_ms,venues,history):
         prior.append((t,record))
     scored=metric_sequence(prior,current,at_ms)
     anomalous=[k for k,v in scored.items() if v["status"]=="OUTLIER_ABOVE_OWN_BASELINE"]
+    anomaly_groups=sorted({GROUPS[name] for name in anomalous})
     price=finite(current.get("p"),positive=True)
     two=preceding(prior,at_ms,LAST_TWO_HOUR_TARGET_MS)
     p2=finite(two.get("p"),positive=True) if two else None
@@ -215,6 +230,8 @@ def analyze_one(sym,at_ms,venues,history):
             "available_metrics":len([v for v in scored.values() if v["status"] not in
                                      ("MISSING_VALUE","BASELINE_BUILDING")]),
             "distinct_metric_outliers":len(anomalous),
+            "distinct_information_group_outliers":len(anomaly_groups),
+            "outlier_information_groups":anomaly_groups,
             "baseline_status":("ESTABLISHED" if any(v.get("baseline_maturity")=="ESTABLISHED"
                  for v in scored.values()) else "PROVISIONAL" if any(v.get("baseline_maturity")=="PROVISIONAL"
                  for v in scored.values()) else "BUILDING"),
@@ -238,7 +255,8 @@ def latest_cohort(records):
         if rec:allrows.append(rec)
     anomalies=[x for x in allrows if x["stage"]=="PREMOVE_ANOMALY_OBSERVED_RESEARCH_ONLY"]
     # High count first is descriptive only; explicitly NOT a profitability rank.
-    anomalies.sort(key=lambda x:(-x["distinct_metric_outliers"],x["symbol"]))
+    anomalies.sort(key=lambda x:(-x["distinct_information_group_outliers"],
+                                 -x["distinct_metric_outliers"],x["symbol"]))
     tally=Counter(key for row in allrows for key in row["outlier_metrics"])
     return {"schema":"EAR.v10_asset_relative_multimetric.v1",
        "asof_utc":datetime.fromtimestamp(now/1000,timezone.utc).isoformat(),
