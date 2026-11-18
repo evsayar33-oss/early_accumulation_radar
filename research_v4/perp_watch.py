@@ -52,7 +52,7 @@ def number(v):
     return result
 
 def fresh(ts,now_ms):
-    return isinstance(ts,int) and 0<=now_ms-ts<=MAX_SOURCE_AGE_MS
+    return isinstance(ts,int) and -30000<=now_ms-ts<=MAX_SOURCE_AGE_MS
 
 def parse_binance(info,tickers,now_ms):
     if not isinstance(info,dict) or not isinstance(info.get("symbols"),list) or not isinstance(tickers,list):
@@ -119,7 +119,11 @@ def scan(get=public_json,clock=lambda:int(time.time()*1000)):
         ("binance",BINANCE_INFO,BINANCE_TICKERS,parse_binance),
         ("okx",OKX_INFO,OKX_TICKERS,parse_okx)):
         try:
-            sources[name]=parser(get(first),get(second),now)
+            info=get(first)
+            ticker=get(second)
+            seen_at=clock()  # provider timestamps may follow the scan's start clock
+            sources[name]=parser(info,ticker,seen_at)
+            now=max(now,seen_at)
         except (ValueError,RuntimeError,TypeError,KeyError,IndexError) as exc:
             failed[name]=type(exc).__name__  # No provider text or credentials.
     if not sources:raise RuntimeError("ALL_PERPETUAL_SOURCES_UNAVAILABLE")
