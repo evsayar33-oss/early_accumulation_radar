@@ -214,6 +214,7 @@ def scan(get=public_json,clock=lambda:int(time.time()*1000)):
             oi_coverage=attach_okx_open_interest(assets,get(OKX_OPEN_INTEREST),clock())
         except (ValueError,RuntimeError,TypeError,KeyError,IndexError) as exc:
             failed["okx_open_interest"]=type(exc).__name__
+    now=max(now,clock())  # freeze as-of AFTER all observations
     return {"schema":"EAR.perp_observations.v1",
             "open_interest_instruments_with_fresh_oi":oi_coverage,
             "scan_utc_ms":now,"sources":sorted(sources),
