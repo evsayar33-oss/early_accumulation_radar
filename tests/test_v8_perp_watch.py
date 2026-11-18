@@ -35,7 +35,7 @@ def info_o():
        {"instId":"NOTLIVE-USDT-SWAP","state":"suspend","ctType":"linear","settleCcy":"USDT"}]}
 def tick_o(now=NOW,price=.01091):
     return {"code":"0","data":[{"instId":"PIPPIN-USDT-SWAP","last":str(price),
-        "volCcyQuote24h":"3500000","open24h":"0.0107","ts":str(now-1000)}]}
+        "volCcy24h":"320000000","open24h":"0.0107","ts":str(now-1000)}]}
 def shot(ts,p,delta=5.0):
     return {"schema":"EAR.perp_observations.v1","scan_utc_ms":ts,
         "sources":["binance","okx"],"source_unavailable":{},
@@ -53,7 +53,14 @@ class PerpCoverage(unittest.TestCase):
         self.assertIn("PIPPINUSDT",o)
         self.assertNotIn("DELISTEDUSDT",b)
         self.assertEqual(set(o),{"PIPPINUSDT"})
-        self.assertEqual(o["PIPPINUSDT"]["q"],3500000)
+        self.assertGreater(o["PIPPINUSDT"]["q"],3000000)
+        self.assertTrue(o["PIPPINUSDT"]["q_proxy"])
+    def test_okx_quote_volume_field_when_present_is_not_recalculated(self):
+        t=tick_o()
+        t["data"][0]["volCcyQuote24h"]="2500000"
+        row=parse_okx(info_o(),t,NOW)["PIPPINUSDT"]
+        self.assertEqual(row["q"],2500000)
+        self.assertFalse(row["q_proxy"])
     def test_no_source_backfilled_if_one_is_missing(self):
         def fake(url):
             if url==BINANCE_INFO:raise RuntimeError("403")
