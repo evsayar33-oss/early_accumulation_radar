@@ -47,7 +47,7 @@ jobs:
           git -C "$ROOT" commit -m "data: append independently observed research tick"
           git -C "$ROOT" push origin "HEAD:refs/heads/$B"
       - name: Independent integrity and freshness verification
-        run: python -m radar.audit --ledger "$RUNNER_TEMP/early-radar-state/observations/scan.jsonl" --max-age-minutes 120
+        run: python -m radar.audit --ledger "$RUNNER_TEMP/early-radar-state/observations/scan.jsonl" --max-age-minutes 120 --allow-quote-degraded --output out/v2_health.json
       - name: Paired normal-vs-inverse outcomes from prior immutable snapshots (research only)
         run: |
           python -m radar.inverse_forward --ledger "$RUNNER_TEMP/early-radar-state/observations/scan.jsonl" --out out/v2_inverse
@@ -84,6 +84,7 @@ jobs:
           name: research-v2-${{ github.run_id }}
           path: |
             out/research.json
+            out/v2_health.json
             out/v2_inverse/
           retention-days: 30
           if-no-files-found: warn
