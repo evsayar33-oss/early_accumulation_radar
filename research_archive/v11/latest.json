@@ -1,0 +1,43 @@
+{
+  "active_trials": [],
+  "asof_utc": "2026-11-18T18:18:04.415236+00:00",
+  "claims": {
+    "association_not_causation": true,
+    "matched_controls_not_full_universe_ppv": true,
+    "no_false_short_pnl": true,
+    "not_a_profitable_strategy": true,
+    "paper_approved": false,
+    "symbol_dependence_and_gaps_remain": true,
+    "trade_authorized": false
+  },
+  "completed_decisions_now": [],
+  "decisions_total": 0,
+  "eligible_asof_samples": 0,
+  "evidence_thresholds": {
+    "fdr_q_max": 0.05,
+    "holdout_days": 7,
+    "max_control_false_positive_rate": 0.1,
+    "min_case_days": 3,
+    "min_cases": 30,
+    "min_controls": 200,
+    "min_distinct_case_symbols": 10,
+    "min_exposed_cases": 8,
+    "min_lift_vs_matched_base": 2.0
+  },
+  "families_tested": 23,
+  "familywise_tests_including_directions": 46,
+  "frozen_hypotheses_total": 0,
+  "is_new_lock_checkpoint_now": false,
+  "matured_case_control_samples": 0,
+  "methodology_sha256": "833b33ede9d4edfcc97e17b8b289a55d4b932df4cc4c52b5598491c2dc1c6546",
+  "minimum_days_between_same_direction_locks": 14,
+  "new_hypotheses_frozen": 0,
+  "new_lock_checkpoint_utc_weekday": 0,
+  "new_prospective_rows": 0,
+  "notices": [],
+  "prospective_rows_total": 0,
+  "schema": "EAR.v11_automatic_pattern_discovery.v1",
+  "source_outcome_counts": {},
+  "source_scans_in_window": 3,
+  "source_sha256": "329794d1cdd9b82008c73f236ae4a2c4bafd053c0021f15330ffaf08b9fab47c"
+}
