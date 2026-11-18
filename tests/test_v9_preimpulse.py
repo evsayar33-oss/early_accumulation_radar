@@ -5,6 +5,8 @@ from research_v4.perp_watch import (
     BINANCE_INFO,OKX_INFO,OKX_TICKERS,BITGET_INFO,BITGET_TICKERS,
 )
 from research_v4.preimpulse_study import study,features,forward
+BASE=1795100000000
+
 def info_o():
     return {"code":"0","data":[{"instId":"PIPPIN-USDT-SWAP","state":"live",
              "ctType":"linear","settleCcy":"USDT"}]}
@@ -17,8 +19,6 @@ def info_g():
 def tick_g(now=BASE):
     return {"code":"00000","data":[{"symbol":"PIPPINUSDT","lastPr":".011",
              "open24h":".0109","quoteVolume":"2500000","ts":str(now-1000)}]}
-
-BASE=1795100000000
 
 def snap(i):
     ts=BASE+i*30*60000
