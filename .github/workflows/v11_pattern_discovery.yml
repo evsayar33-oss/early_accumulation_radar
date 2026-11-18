@@ -1,0 +1,117 @@
+name: V11 Autonomous Pattern Discovery and Prospective Validation (RESEARCH)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v11_pattern_discovery.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/v11_pattern_discovery.yml'
+      - 'research_v4/pattern_learner.py'
+      - 'research_v4/pattern_notify.py'
+      - 'research_v4/preimpulse_study.py'
+  workflow_dispatch:
+  schedule:
+    - cron: '23 2 * * *' # Daily UTC, GitHub scheduler may delay/skips
+permissions:
+  contents: write
+concurrency:
+  group: early-radar-v11-pattern-evidence
+  cancel-in-progress: false
+jobs:
+  read-only-pr-evidence-smoke:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test autonomous pattern engine with immutable real V8 archive, NO publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin research/v8-perp-forward
+          git show FETCH_HEAD:observations/perp/snapshots.jsonl > "$RUNNER_TEMP/v11-source.jsonl"
+          python -m research_v4.pattern_learner \
+            --ledger "$RUNNER_TEMP/v11-source.jsonl" \
+            --state "$RUNNER_TEMP/v11-smoke-state" \
+            --out "$RUNNER_TEMP/v11-smoke-report"
+          cat "$RUNNER_TEMP/v11-smoke-report/report.md" >> "$GITHUB_STEP_SUMMARY"
+  automated-daily-learn-and-report:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test statistical and evidence integrity contracts offline
+        run: python -m unittest discover -s tests -v
+      - name: Read latest verified V8 futures snapshots without modifying them
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin research/v8-perp-forward
+          git show FETCH_HEAD:observations/perp/snapshots.jsonl > "$RUNNER_TEMP/v11-v8-input.jsonl"
+      - name: Open isolated V11 immutable research decision registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="research/v11-pattern-evidence"
+          ROOT="$RUNNER_TEMP/v11-evidence-worktree"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH"
+            git worktree add -b v11-evidence-local "$ROOT" FETCH_HEAD
+            test -f "$ROOT/research_archive/v11/latest.json" || {
+              echo "::error::V11_EXISTING_EVIDENCE_BRANCH_MISSING_STATE"; exit 1;
+            }
+          else
+            git worktree add -b v11-evidence-local "$ROOT" HEAD
+          fi
+          mkdir -p "$ROOT/research_archive/v11"
+          echo "V11_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Discover recurring precursors and audit completed seven-day frozen trials
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.pattern_learner \
+            --ledger "$RUNNER_TEMP/v11-v8-input.jsonl" \
+            --state "$V11_ROOT/research_archive/v11" \
+            --out out/v11_pattern_discovery
+          cat out/v11_pattern_discovery/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve dated evidence for every run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v11-pattern-discovery-${{ github.run_id }}
+          path: out/v11_pattern_discovery/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Persist frozen hypotheses, independent future trials and reports before any notice
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$V11_ROOT"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add research_archive/v11/
+          if git -C "$ROOT" diff --cached --quiet; then
+            echo "V11 evidence unchanged."
+          else
+            git -C "$ROOT" commit -m "research(v11): persist autonomous pattern discovery evidence [skip ci]"
+            git -C "$ROOT" push origin HEAD:refs/heads/research/v11-pattern-evidence
+          fi
+      - name: Optional one-off Telegram notice for NEW pattern or closed validation only
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m research_v4.pattern_notify --report out/v11_pattern_discovery/report.json
