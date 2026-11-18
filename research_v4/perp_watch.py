@@ -24,6 +24,8 @@ BINANCE_INFO="https://fapi.binance.com/fapi/v1/exchangeInfo"
 BINANCE_TICKERS="https://fapi.binance.com/fapi/v1/ticker/24hr"
 OKX_INFO="https://www.okx.com/api/v5/public/instruments?instType=SWAP"
 OKX_TICKERS="https://www.okx.com/api/v5/market/tickers?instType=SWAP"
+BITGET_INFO="https://api.bitget.com/api/v2/mix/market/contracts?productType=USDT-FUTURES"
+BITGET_TICKERS="https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES"
 MAX_SOURCE_AGE_MS=300000
 MAX_COMPARISON_GAP_MIN=100
 COOLDOWN_MIN=90
@@ -122,12 +124,46 @@ def parse_okx(info,tickers,now_ms):
     if not rows:raise ValueError("OKX_NO_FRESH_PERP_TICKERS")
     return rows
 
+def parse_bitget(info,tickers,now_ms):
+    """Bitget Classic V2 USDT-FUTURES; quoteVolume is quote USDT, unlike OKX base volume."""
+    if not isinstance(info,dict) or str(info.get("code"))!="00000" or not isinstance(info.get("data"),list):
+        raise ValueError("BITGET_INSTRUMENT_SCHEMA")
+    if not isinstance(tickers,dict) or str(tickers.get("code"))!="00000" or not isinstance(tickers.get("data"),list):
+        raise ValueError("BITGET_TICKER_SCHEMA")
+    active=set()
+    for obj in info["data"]:
+        if not isinstance(obj,dict):continue
+        sym=obj.get("symbol")
+        if (isinstance(sym,str) and PERP_NAME.fullmatch(sym)
+            and obj.get("quoteCoin")=="USDT"
+            and obj.get("symbolType")=="perpetual"
+            and obj.get("symbolStatus")=="normal"):
+            active.add(sym)
+    if not active:raise ValueError("BITGET_NO_ACTIVE_LINEAR_USDT_PERPS")
+    rows={}
+    for t in tickers["data"]:
+        if not isinstance(t,dict) or t.get("symbol") not in active:continue
+        try:
+            price=number(t["lastPr"])
+            opening=number(t["open24h"])  # Do not guess change24h percentage unit.
+            turn=number(t["quoteVolume"])
+            ts=int(t["ts"])
+        except (KeyError,ValueError,TypeError,OverflowError):
+            continue
+        if min(price,opening)<=0 or turn<0 or not fresh(ts,now_ms):continue
+        rows[t["symbol"]]={"p":round(price,12),"q":round(turn,2),
+                            "q_proxy":False,
+                            "d":round(100*(price/opening-1),4),"ts":ts}
+    if not rows:raise ValueError("BITGET_NO_FRESH_PERP_TICKERS")
+    return rows
+
 def scan(get=public_json,clock=lambda:int(time.time()*1000)):
     now=clock()
     sources={};failed={}
     for name,first,second,parser in (
         ("binance",BINANCE_INFO,BINANCE_TICKERS,parse_binance),
-        ("okx",OKX_INFO,OKX_TICKERS,parse_okx)):
+        ("okx",OKX_INFO,OKX_TICKERS,parse_okx),
+        ("bitget",BITGET_INFO,BITGET_TICKERS,parse_bitget)):
         try:
             info=get(first)
             ticker=get(second)
@@ -162,7 +198,7 @@ def unpack(encoded):
     return assets
 
 def common_venue(previous,current):
-    for venue in ("binance","okx"):
+    for venue in ("binance","okx","bitget"):
         if venue in previous and venue in current:
             return venue
     return None
@@ -171,7 +207,7 @@ def cross_venue(current):
     if len(current)<2:return "UNCONFIRMED_SINGLE_VENUE"
     prices=[obj["p"] for obj in current.values()]
     dispersion=max(prices)/min(prices)-1
-    return "CONSISTENT_TWO_VENUES" if dispersion<=.04 else "DIVERGENT_TWO_VENUES"
+    return "CONSISTENT_MULTI_VENUE" if dispersion<=.04 else "DIVERGENT_MULTI_VENUE"
 
 def classify(previous,current,prev_ms,now_ms):
     if prev_ms is None:return []
