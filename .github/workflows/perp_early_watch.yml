@@ -39,6 +39,8 @@ jobs:
           print('UNAVAILABLE',r['source_unavailable'])
           print('VALID_USDT_PERPS',len(r['assets']))
           print('PIPPIN_ACTIVE', 'PIPPINUSDT' in r['assets'])
+          print('FRESH_OKX_OI_CONTRACTS',r['open_interest_instruments_with_fresh_oi'])
+          print('PIPPIN_OKX_OI_CONTRACTS',r['assets'].get('PIPPINUSDT',{}).get('okx',{}).get('oi_contracts'))
           from research_v4.perp_watch import cross_venue
           print('PIPPIN_VENUES', sorted(r['assets'].get('PIPPINUSDT',{})))
           print('PIPPIN_CROSS_VENUE',cross_venue(r['assets'].get('PIPPINUSDT',{})))
@@ -81,12 +83,21 @@ jobs:
             --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
             --out out/v8_perp
           cat out/v8_perp/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: V9 exploratory pre-impulse case-control audit, future labels ONLY after observations
+        continue-on-error: true # Never risk the V8 append-only registry to add advisory research.
+        run: |
+          python -m research_v4.preimpulse_study \
+            --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
+            --out out/v9_preimpulse
+          cat out/v9_preimpulse/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload independent provider/outcome diagnostics
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: v8-perp-${{ github.run_id }}
-          path: out/v8_perp/
+          path: |
+            out/v8_perp/
+            out/v9_preimpulse/
           retention-days: 30
           if-no-files-found: warn
       - name: Persist V8-only forward evidence on separate research branch
