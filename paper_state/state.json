@@ -4,7 +4,7 @@
   "first_seen_ms": 1794855908001,
   "gross_losses": 66.22503476880092,
   "gross_wins": 33.151033974538564,
-  "last_event_sha256": "cc5c30b84391c6366c9977ae48254d380beee995611a59f09c88effa8dc46b22",
+  "last_event_sha256": "9934c4d97cd93857e3c88fbb0aff5473fa2b2940fbe75c398b7f919f2799bf70",
   "last_exit_ms": {
     "ADA": 1794957032030,
     "DOGE": 1794930908312,
@@ -12,10 +12,10 @@
     "SUI": 1794930908312,
     "XRP": 1794930908312
   },
-  "last_liquidation_nav": 9956.544406244844,
-  "last_observed_ms": 1794957032030,
+  "last_liquidation_nav": 9935.3972899538,
+  "last_observed_ms": 1794964644647,
   "last_status": "MARKED",
-  "last_valid_mark_ms": 1794957032030,
+  "last_valid_mark_ms": 1794964644647,
   "max_drawdown_pct": 1.128717680707809,
   "model_sha256": "239ac5299ce742d49e7fcb5e16c4e3fa5eaffff2c2fb199775bcfaf121d5cbe2",
   "model_version": "EAR-V3-FIXED-20261116",
