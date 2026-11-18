@@ -9,6 +9,8 @@ on:
     paths:
       - '.github/workflows/perp_early_watch.yml'
       - 'research_v4/perp_watch.py'
+      - 'research_v4/perp_anomaly.py'
+      - 'research_v4/preimpulse_study.py'
   workflow_dispatch:
   schedule:
     - cron: '9,39 * * * *' # best effort, NOT realtime
@@ -44,6 +46,26 @@ jobs:
           from research_v4.perp_watch import cross_venue
           print('PIPPIN_VENUES', sorted(r['assets'].get('PIPPINUSDT',{})))
           print('PIPPIN_CROSS_VENUE',cross_venue(r['assets'].get('PIPPINUSDT',{})))
+          PY
+      - name: Read-only V10/V9 smoke on existing SHA-verified real V8 observations
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin research/v8-perp-forward
+          git show FETCH_HEAD:observations/perp/snapshots.jsonl > "$RUNNER_TEMP/v8-real-snapshots.jsonl"
+          python -m research_v4.perp_anomaly \
+            --ledger "$RUNNER_TEMP/v8-real-snapshots.jsonl" \
+            --out "$RUNNER_TEMP/v10-smoke"
+          python -m research_v4.preimpulse_study \
+            --ledger "$RUNNER_TEMP/v8-real-snapshots.jsonl" \
+            --out "$RUNNER_TEMP/v9-smoke"
+          python - <<'PY'
+          import json,os
+          p=os.path.join(os.environ['RUNNER_TEMP'],'v10-smoke','report.json')
+          d=json.load(open(p))
+          print('REAL_V8_COHORT',d['coins_in_snapshot'])
+          print('REAL_V8_BASELINE_STATES',d['baseline_states'])
+          print('PIPPIN_MEASURED','PIPPINUSDT' in {x['symbol'] for x in d['full_cohort']})
           PY
   observe-perpetuals:
     if: github.ref == 'refs/heads/main'
@@ -83,6 +105,15 @@ jobs:
             --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
             --out out/v8_perp
           cat out/v8_perp/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: V10 simultaneous per-coin robust anomaly baselines, FULL cohort (advisory only)
+        continue-on-error: true # V8 immutable ledger persistence is independent.
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.perp_anomaly \
+            --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
+            --out out/v10_anomalies
+          cat out/v10_anomalies/report.md >> "$GITHUB_STEP_SUMMARY"
       - name: V9 exploratory pre-impulse case-control audit, future labels ONLY after observations
         continue-on-error: true # Never risk the V8 append-only registry to add advisory research.
         run: |
@@ -98,6 +129,7 @@ jobs:
           path: |
             out/v8_perp/
             out/v9_preimpulse/
+            out/v10_anomalies/
           retention-days: 30
           if-no-files-found: warn
       - name: Persist V8-only forward evidence on separate research branch
