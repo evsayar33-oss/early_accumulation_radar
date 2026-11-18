@@ -238,8 +238,12 @@ def analyze_one(sym,at_ms,venues,history):
     p2=finite(two.get("p"),positive=True) if two else None
     r2=100*(price/p2-1) if price is not None and p2 is not None else None
     day=finite(primary.get("d"))
+    day_range=finite(primary.get("range24h_pct"))
     contrast=cross_venue(venues)
+    # A 24h net change of zero after a giant intraday pump-and-retrace
+    # must NOT be labelled clean pre-breakout from the net close alone.
     precondition=(r2 is not None and abs(r2)<=3 and day is not None and abs(day)<=15
+                  and (day_range is None or 0<=day_range<=25)
                   and contrast!="DIVERGENT_MULTI_VENUE")
     if not anomalous:stage="NO_ANOMALY_OR_BASELINE_BUILDING"
     elif not precondition:stage="OUTLIER_WITH_PRIOR_MOTION_OR_UNVERIFIED_PRICE"
@@ -249,6 +253,7 @@ def analyze_one(sym,at_ms,venues,history):
             "price_at_observation":price,
             "prior_2h_return_pct":round(r2,5) if r2 is not None else None,
             "rolling_24h_change_pct":day,
+            "rolling_24h_range_pct":day_range,
             "venue_consistency":contrast,
             "metric_results":scored,
             "metric_sources":sources,
