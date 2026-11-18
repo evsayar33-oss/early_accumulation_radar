@@ -39,6 +39,9 @@ jobs:
           print('UNAVAILABLE',r['source_unavailable'])
           print('VALID_USDT_PERPS',len(r['assets']))
           print('PIPPIN_ACTIVE', 'PIPPINUSDT' in r['assets'])
+          from research_v4.perp_watch import cross_venue
+          print('PIPPIN_VENUES', sorted(r['assets'].get('PIPPINUSDT',{})))
+          print('PIPPIN_CROSS_VENUE',cross_venue(r['assets'].get('PIPPINUSDT',{})))
           PY
   observe-perpetuals:
     if: github.ref == 'refs/heads/main'
