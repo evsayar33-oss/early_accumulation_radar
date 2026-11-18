@@ -41,6 +41,23 @@ class MetricTests(unittest.TestCase):
         self.assertEqual(data["metric_results"]["oi_contracts_level"]["current_value"],175)
         self.assertEqual(data["prior_2h_return_pct"],0.0)
         self.assertFalse(data["early_prediction_proven"])
+    def test_okx_oi_and_bitget_funding_mark_anomalies_are_both_visible(self):
+        history=series(spike=True)
+        for i,(t,venues) in enumerate(history):
+            venues["bitget"]["mark_basis_bps"]=1 if i<len(history)-1 else 70
+            venues["bitget"]["funding_rate_pct"]=.004 if i<len(history)-1 else .08
+            venues["bitget"]["spread_bps"]=5 if i<len(history)-1 else 50
+        t,current=history[-1]
+        result=analyze_one("PIPPINUSDT",t,current,history)
+        self.assertIn("oi_contracts_level",result["outlier_metrics"])
+        self.assertIn("funding_abs_pct",result["outlier_metrics"])
+        self.assertIn("mark_basis_abs_bps",result["outlier_metrics"])
+        self.assertEqual(result["metric_sources"]["oi_contracts_level"],"okx")
+        self.assertEqual(result["metric_sources"]["funding_abs_pct"],"bitget")
+        self.assertEqual(result["metric_sources"]["mark_basis_abs_bps"],"bitget")
+        v9=features(history,t,"okx")
+        self.assertTrue(v9["motifs"]["relative_funding_outlier"])
+        self.assertTrue(v9["motifs"]["relative_mark_basis_outlier"])
     def test_only_single_metric_abnormal_not_rejected(self):
         history=series()
         t,current=history[-1]
