@@ -5,7 +5,6 @@ from research_v4.perp_anomaly import (
 from research_v4.perp_watch import (
     append, optional_microstructure, parse_okx, parse_bitget)
 from research_v4.preimpulse_study import features
-from tests import __doc__ as _not_used
 
 BASE=1795100000000
 INTERVAL=30*60000
@@ -50,8 +49,22 @@ class MetricTests(unittest.TestCase):
         result=analyze_one("COINUSDT",t,only,history)
         self.assertEqual(result["stage"],"PREMOVE_ANOMALY_OBSERVED_RESEARCH_ONLY")
         self.assertEqual(result["outlier_metrics"],["oi_contracts_level","oi_contracts_accel_1h_pct"])
-        # Two derived stats from same base measurement do NOT mean two
-        # independent information sources.
+        # Two derived stats from one source remain one independent dimension.
+        self.assertEqual(result["distinct_information_group_outliers"],1)
+        v9=features(history,t,"okx")
+        self.assertFalse(v9["motifs"]["relative_multiple_metrics_outlier"])
+    def test_baseline_established_only_after_96_historic_samples(self):
+        history=series(n=100,spike=True)
+        t,current=history[-1]
+        result=analyze_one("MATUREUSDT",t,current,history)
+        self.assertEqual(result["baseline_status"],"ESTABLISHED")
+        self.assertEqual(result["metric_results"]["oi_contracts_level"]["prior_samples"],99)
+    def test_price_range_requires_valid_positive_high_low(self):
+        bad=optional_microstructure({"high24h":"0","low24h":"0",
+            "bidPx":"0.012","askPx":"0.01"},.01,
+            high_key="high24h",low_key="low24h",bid_key="bidPx",ask_key="askPx")
+        self.assertNotIn("range24h_pct",bad)
+        self.assertNotIn("spread_bps",bad)
     def test_fresh_coin_has_no_anomaly_and_no_invented_baseline(self):
         history=series(n=4,spike=True)
         t,current=history[-1]
