@@ -187,36 +187,60 @@ def select_venue(venues):
     return None
 
 def analyze_one(sym,at_ms,venues,history):
+    """One coin, many independent dimensions; EACH metric retains venue provenance."""
     venue=select_venue(venues)
     if not venue:return None
-    current=dict(venues[venue])
-    disp=enrich_consensus(venues)
-    if disp is not None:
-        # Cross-venue consensus is computed only if no suspicious 4%+ spread;
-        # unstable contract identities get an explicit risk state.
-        current["cross_dispersion_bps"]=disp
-    # Historic dispersion uses historic venue consensus only; never cached
-    # using today’s venue availability for old snapshots.
-    prior=[]
-    for t,items in history:
-        if t>=at_ms or venue not in items:continue
-        record=dict(items[venue])
-        d=enrich_consensus(items)
-        if d is not None:record["cross_dispersion_bps"]=d
-        prior.append((t,record))
-    scored=metric_sequence(prior,current,at_ms)
+    by_venue={}
+    prior_by_venue={}
+    for src,obj in venues.items():
+        if src not in ("okx","bitget","binance"):continue
+        current=dict(obj)
+        disp=enrich_consensus(venues)
+        if disp is not None:current["cross_dispersion_bps"]=disp
+        previous=[]
+        for t,items in history:
+            if t>=at_ms or src not in items:continue
+            past=dict(items[src])
+            past_disp=enrich_consensus(items)
+            if past_disp is not None:past["cross_dispersion_bps"]=past_disp
+            previous.append((t,past))
+        prior_by_venue[src]=previous
+        by_venue[src]=metric_sequence(previous,current,at_ms)
+
+    scored={}
+    sources={}
+    for name in METRICS:
+        # Mark basis / funding are often in Bitget tickers, while raw OI
+        # contracts are available from OKX all-instruments snapshots.
+        priority=(("bitget","okx","binance")
+                  if name in ("mark_basis_abs_bps","funding_abs_pct")
+                  else ("okx","bitget","binance"))
+        options=[(src,by_venue[src][name]) for src in priority if src in by_venue]
+        if not options:
+            scored[name]={"status":"MISSING_VALUE"}
+            continue
+        # Favor a mature, observable baseline; never mix observations
+        # from two exchanges to reach a minimum sample count.
+        ready=next(((src,value) for src,value in options
+                    if value["status"] in ("OUTLIER_ABOVE_OWN_BASELINE",
+                                             "WITHIN_OWN_BASELINE")),None)
+        chosen=ready or next(((src,value) for src,value in options
+                 if value["status"]=="BASELINE_BUILDING"),None) or options[0]
+        src,value=chosen
+        scored[name]=value
+        sources[name]=src
+
     anomalous=[k for k,v in scored.items() if v["status"]=="OUTLIER_ABOVE_OWN_BASELINE"]
     anomaly_groups=sorted({GROUPS[name] for name in anomalous})
-    price=finite(current.get("p"),positive=True)
-    two=preceding(prior,at_ms,LAST_TWO_HOUR_TARGET_MS)
+    primary=venues[venue]
+    price=finite(primary.get("p"),positive=True)
+    two=preceding(prior_by_venue[venue],at_ms,LAST_TWO_HOUR_TARGET_MS)
     p2=finite(two.get("p"),positive=True) if two else None
     r2=100*(price/p2-1) if price is not None and p2 is not None else None
-    day=finite(current.get("d"))
+    day=finite(primary.get("d"))
     contrast=cross_venue(venues)
     precondition=(r2 is not None and abs(r2)<=3 and day is not None and abs(day)<=15
                   and contrast!="DIVERGENT_MULTI_VENUE")
-    # Observation, not prediction: a single as-of outlier is interesting even
-    # if all other metrics stay normal. Keep all metric values for ablations.
     if not anomalous:stage="NO_ANOMALY_OR_BASELINE_BUILDING"
     elif not precondition:stage="OUTLIER_WITH_PRIOR_MOTION_OR_UNVERIFIED_PRICE"
     else:stage="PREMOVE_ANOMALY_OBSERVED_RESEARCH_ONLY"
@@ -226,9 +250,12 @@ def analyze_one(sym,at_ms,venues,history):
             "prior_2h_return_pct":round(r2,5) if r2 is not None else None,
             "rolling_24h_change_pct":day,
             "venue_consistency":contrast,
-            "metric_results":scored,"outlier_metrics":anomalous,
-            "available_metrics":len([v for v in scored.values() if v["status"] not in
-                                     ("MISSING_VALUE","BASELINE_BUILDING")]),
+            "metric_results":scored,
+            "metric_sources":sources,
+            "outlier_metrics":anomalous,
+            "available_metrics":sum(value["status"] in
+                ("OUTLIER_ABOVE_OWN_BASELINE","WITHIN_OWN_BASELINE")
+                for value in scored.values()),
             "distinct_metric_outliers":len(anomalous),
             "distinct_information_group_outliers":len(anomaly_groups),
             "outlier_information_groups":anomaly_groups,
