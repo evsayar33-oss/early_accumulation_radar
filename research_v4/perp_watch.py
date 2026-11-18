@@ -54,6 +54,36 @@ def number(v):
     if not math.isfinite(result):raise ValueError("NONFINITE")
     return result
 
+def optional_microstructure(t,price,bid_key=None,ask_key=None,
+                            high_key=None,low_key=None,
+                            mark_key=None,funding_key=None):
+    """Only same-provider public ticker fields; absent values remain missing.
+
+    bid-ask values are indicative top-of-book, not depth or executable fills.
+    FundingRate is a FRACTION, converted to percent. Invalid/suspended book
+    fields do not exclude an otherwise usable price observation.
+    """
+    result={}
+    def maybe(key):
+        if key is None or t.get(key) in (None,""):return None
+        try:return number(t[key])
+        except (ValueError,TypeError,OverflowError):return None
+    bid=maybe(bid_key)
+    ask=maybe(ask_key)
+    if bid is not None and ask is not None and 0<bid<=ask:
+        result["spread_bps"]=round(20000*(ask-bid)/(ask+bid),6)
+    hi=maybe(high_key)
+    lo=maybe(low_key)
+    if hi is not None and lo is not None and 0<lo<=hi:
+        result["range24h_pct"]=round(100*(hi/lo-1),6)
+    mark=maybe(mark_key)
+    if mark is not None and mark>0:
+        result["mark_basis_bps"]=round(10000*(price/mark-1),6)
+    funding=maybe(funding_key)
+    if funding is not None and abs(funding)<=1:
+        result["funding_rate_pct"]=round(100*funding,8)
+    return result
+
 def fresh(ts,now_ms):
     return isinstance(ts,int) and -30000<=now_ms-ts<=MAX_SOURCE_AGE_MS
 
@@ -81,7 +111,9 @@ def parse_binance(info,tickers,now_ms):
             continue
         if p<=0 or turn<0 or not fresh(ts,now_ms):continue
         rows[t["symbol"]]={"p":round(p,12),"q":round(turn,2),
-                            "d":round(change,4),"ts":ts}
+                            "d":round(change,4),"ts":ts,
+                            **optional_microstructure(t,p,
+                                high_key="highPrice",low_key="lowPrice")}
     if not rows:raise ValueError("BINANCE_NO_FRESH_PERP_TICKERS")
     return rows
 
@@ -121,7 +153,10 @@ def parse_okx(info,tickers,now_ms):
         sym=active[t["instId"]]
         rows[sym]={"p":round(p,12),"q":round(turn,2),
                    "q_proxy":proxy,
-                   "d":round(100*(p/opening-1),4),"ts":ts}
+                   "d":round(100*(p/opening-1),4),"ts":ts,
+                   **optional_microstructure(t,p,
+                       bid_key="bidPx",ask_key="askPx",
+                       high_key="high24h",low_key="low24h")}
     if not rows:raise ValueError("OKX_NO_FRESH_PERP_TICKERS")
     return rows
 
@@ -154,7 +189,11 @@ def parse_bitget(info,tickers,now_ms):
         if min(price,opening)<=0 or turn<0 or not fresh(ts,now_ms):continue
         rows[t["symbol"]]={"p":round(price,12),"q":round(turn,2),
                             "q_proxy":False,
-                            "d":round(100*(price/opening-1),4),"ts":ts}
+                            "d":round(100*(price/opening-1),4),"ts":ts,
+                            **optional_microstructure(t,price,
+                               bid_key="bidPr",ask_key="askPr",
+                               high_key="high24h",low_key="low24h",
+                               mark_key="markPrice",funding_key="fundingRate")}
     if not rows:raise ValueError("BITGET_NO_FRESH_PERP_TICKERS")
     return rows
 
