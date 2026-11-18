@@ -13,7 +13,7 @@ from datetime import datetime,timezone
 from pathlib import Path
 from statistics import median
 from research_v4.perp_watch import read,unpack
-from research_v4.perp_anomaly import metric_sequence, METRICS
+from research_v4.perp_anomaly import metric_sequence, METRICS, GROUPS
 
 HORIZON_MS=4*3600000
 EXTREME_MOVE_PCT=12.0
@@ -78,7 +78,9 @@ def features(history,t,venue):
     valid_flags=[v for v in metric_flags.values() if v is not None]
     anomaly_count=sum(x is True for x in valid_flags)
     any_outlier=(anomaly_count>0 if valid_flags else None)
-    multiple_outliers=(anomaly_count>=2 if len(valid_flags)>=2 else None)
+    distinct_outlier_groups=len({GROUPS[name] for name,value in metric_flags.items()
+                                 if value is True})
+    multiple_outliers=(distinct_outlier_groups>=2 if len(valid_flags)>=2 else None)
     return {"price_return_2h_pct":round(r2,5),
         "price_return_1h_pct":round(r1,5),
         "turnover_24h_change_1h_pct":round(100*acceleration,5),
