@@ -148,11 +148,14 @@ def metric_sequence(prior,current,at_ms):
     series=[(t,obj) for t,obj in prior if
             at_ms-LOOKBACK_MS<=t<at_ms]
     metric_hist=defaultdict(list)
-    for index,(t,record) in enumerate(series):
-        past=series[:index]
-        values=metric_values(record,past,t)
+    rolling=deque()
+    for t,record in series:
+        while rolling and rolling[0][0] < t-(LAST_HOUR_TARGET_MS+HOUR_TOLERANCE_MS):
+            rolling.popleft()
+        values=metric_values(record,rolling,t)
         for key,val in values.items():
             if key in METRICS and math.isfinite(val):metric_hist[key].append(val)
+        rolling.append((t,record))
     present=metric_values(current,series,at_ms)
     span=series[-1][0]-series[0][0] if len(series)>=2 else 0
     scored={}
@@ -172,7 +175,6 @@ def select_venue(venues):
 def analyze_one(sym,at_ms,venues,history):
     venue=select_venue(venues)
     if not venue:return None
-    before=[(t,assets[venue]) for t,assets in history if t<at_ms and venue in assets]
     current=dict(venues[venue])
     disp=enrich_consensus(venues)
     if disp is not None:
@@ -189,7 +191,6 @@ def analyze_one(sym,at_ms,venues,history):
         if d is not None:record["cross_dispersion_bps"]=d
         prior.append((t,record))
     scored=metric_sequence(prior,current,at_ms)
-    status_counts=Counter(v["status"] for v in scored.values())
     anomalous=[k for k,v in scored.items() if v["status"]=="OUTLIER_ABOVE_OWN_BASELINE"]
     price=finite(current.get("p"),positive=True)
     two=preceding(prior,at_ms,LAST_TWO_HOUR_TARGET_MS)
