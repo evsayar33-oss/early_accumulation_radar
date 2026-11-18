@@ -13,7 +13,7 @@ from datetime import datetime,timezone
 from pathlib import Path
 from statistics import median
 from research_v4.perp_watch import read,unpack
-from research_v4.perp_anomaly import metric_sequence, METRICS, GROUPS
+from research_v4.perp_anomaly import analyze_one, METRICS, GROUPS
 
 HORIZON_MS=4*3600000
 EXTREME_MOVE_PCT=12.0
@@ -67,8 +67,11 @@ def features(history,t,venue):
            and 0<oi_then and 0<=oi_now and math.isfinite(oi_now) and math.isfinite(oi_then)
         else None)
     acceleration=q/q1-1
-    historical=[(ts,rec) for ts,rec in past if ts<t]
-    anomaly_vector=metric_sequence(historical,cur,t)
+    own_current=next((assets for ts,assets in reversed(history) if ts==t),None)
+    if own_current is None:return None
+    # V10 calculates each metric on its OWN historical venue, e.g. OKX OI
+    # and Bitget funding; never merge raw samples from these two exchanges.
+    anomaly_vector=analyze_one("SAME_SYMBOL",t,own_current,history)["metric_results"]
     def flag(name):
         x=anomaly_vector[name]["status"]
         if x=="OUTLIER_ABOVE_OWN_BASELINE":return True
