@@ -28,9 +28,10 @@ def audit(path, now_ms=None, max_age_ms=7_200_000):
                      or last_ms-int(candles[a][1])>5*60000]
     quote_health={x.get("asset"):x.get("status") for x in last.get("quote_health",[])}
     weak_quotes=[a for a in ("BTC","ETH","SOL") if quote_health.get(a)!="WATCH_ONLY"]
-    healthy= age<=max_age_ms and not missing_candles and not weak_quotes and not last.get("zero_valid_candle_sources",True)
+    candle_ok=age<=max_age_ms and not missing_candles and not last.get("zero_valid_candle_sources",True)
+    healthy=candle_ok and not weak_quotes
     return {"status":"HEALTHY" if healthy else "DATA_HEALTH_DEGRADED",
-            "ok":healthy,"entries":len(rows),"latest_scan_utc_ms":last_ms,
+            "ok":healthy,"candle_observation_ok":candle_ok,"quote_quality_ok":not weak_quotes,"entries":len(rows),"latest_scan_utc_ms":last_ms,
             "latest_age_minutes":round(age/60000,2),"chain_valid":True,
             "prior_gaps":gaps[-10:],"prior_gap_count":len(gaps),
             "latest_venue_tape":tapes,"missing_candle_assets":missing_candles,"unhealthy_quote_assets":weak_quotes,
@@ -41,8 +42,18 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--ledger",required=True)
     ap.add_argument("--max-age-minutes",type=int,default=120)
+    ap.add_argument("--allow-quote-degraded",action="store_true",
+                    help="Only permit fresh, hash-verified candle observations to continue when independent quote liquidity is weak; never permit trading")
+    ap.add_argument("--output",help="Persist machine-readable health verdict outside immutable ledger")
     args=ap.parse_args()
     result=audit(args.ledger,max_age_ms=args.max_age_minutes*60000)
     print(json.dumps(result,ensure_ascii=False,sort_keys=True))
-    if not result["ok"]:raise SystemExit(2)
+    if args.output:
+        target=Path(args.output);target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text(json.dumps(result,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf8")
+    if not result["ok"]:
+        if args.allow_quote_degraded and result.get("candle_observation_ok") and not result.get("quote_quality_ok"):
+            print("::warning title=V2 quote liquidity degraded::Independent quotes failed WATCH_ONLY for "+",".join(result["unhealthy_quote_assets"])+"; SHA and candle evidence valid, research may continue; no trade permission")
+        else:
+            raise SystemExit(2)
 if __name__=="__main__":main()
