@@ -1,0 +1,77 @@
+name: V8 all-symbol perpetual early-motion evidence (RESEARCH ONLY)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/perp_early_watch.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '9,39 * * * *' # best effort, NOT realtime
+permissions:
+  contents: write
+concurrency:
+  group: early-radar-v8-perp-evidence
+  cancel-in-progress: false
+jobs:
+  observe-perpetuals:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline unit tests (NO order routing)
+        run: python -m unittest discover -s tests -v
+      - name: Load the isolated permanent research record
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="research/v8-perp-forward"
+          ROOT="$RUNNER_TEMP/v8-perp-state"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH"
+            git worktree add -b v8-perp-observation-local "$ROOT" FETCH_HEAD
+            test -f "$ROOT/observations/perp/snapshots.jsonl" || {
+              echo "::error::V8_EXISTING_BRANCH_LEDGER_MISSING"; exit 1;
+            }
+          else
+            git worktree add -b v8-perp-observation-local "$ROOT" HEAD
+          fi
+          mkdir -p "$ROOT/observations/perp"
+          echo "V8_PERP_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Observe ALL eligible USDT perpetuals and append SHA-linked evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.perp_watch \
+            --ledger "$V8_PERP_ROOT/observations/perp/snapshots.jsonl" \
+            --out out/v8_perp
+          cat out/v8_perp/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload independent provider/outcome diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v8-perp-\${{ github.run_id }}
+          path: out/v8_perp/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Persist V8-only forward evidence on separate research branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$V8_PERP_ROOT"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add observations/perp/snapshots.jsonl
+          git -C "$ROOT" commit -m "research(v8): append real observed futures snapshot [skip ci]"
+          git -C "$ROOT" push origin HEAD:refs/heads/research/v8-perp-forward
+      - name: Optional capped Telegram movement observations, never orders
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: \${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: \${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m research_v4.perp_notify --report out/v8_perp/report.json
