@@ -83,7 +83,7 @@ class PerpCoverage(unittest.TestCase):
             return {OKX_INFO:info_o(),OKX_TICKERS:tick_o(),
                 BITGET_INFO:info_g(),BITGET_TICKERS:tick_g()}[url]
         r=scan(get=fake,clock=lambda:NOW)
-        self.assertEqual(r["sources"],["okx","bitget"])
+        self.assertEqual(r["sources"],["bitget","okx"])
         self.assertIn("binance",r["source_unavailable"])
         self.assertEqual(len(r["assets"]["PIPPINUSDT"]),2)
     def test_no_source_backfilled_if_one_is_missing(self):
