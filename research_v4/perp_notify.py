@@ -19,7 +19,8 @@ def format_message(report):
     if report.get("schema")!="EAR.perp_forward_summary.v1":
         raise ValueError("WRONG_PERP_REPORT_SCHEMA")
     events=[e for e in report.get("new_events",[])
-            if e.get("stage") in ALERT_STAGES]
+            if e.get("stage") in ALERT_STAGES and
+            e.get("cross_venue")!="DIVERGENT_TWO_VENUES"]
     if not events:return None
     # Prefer still-early intervals and corroborated prices; this is not an
     # alpha ranking and ignores OI, funding, carry, trade depth, and fees.
@@ -30,8 +31,6 @@ def format_message(report):
     selected=events[:MAX_ALERTS]
     lines=["📡 EAR V8 — PERPETUAL PİYASA HAREKETİ (ARAŞTIRMA)"]
     for e in selected:
-        if e["cross_venue"]=="DIVERGENT_TWO_VENUES":
-            continue  # No alert on inconsistent identities.
         mark=("ERKEN HAREKET GÖZLEMİ" if e["stage"].startswith("EARLY_")
               else "HAREKET ZATEN BAŞLAMIŞ")
         sign="+" if e["interval_return_pct"]>=0 else ""
