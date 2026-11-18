@@ -255,7 +255,13 @@ def report(rows):
     if not rows:raise ValueError("EMPTY_PERP_REPORT")
     latest=rows[-1]
     followups=[]
+    total_events=sum(len(r["events"]) for r in rows)
+    # Keep routine reporting bounded as the immutable ledger grows over
+    # months/years. Full historic events remain in the verified ledger and
+    # can be recomputed offline; current report covers the last 48h only.
+    recent_cutoff=latest["scan_utc_ms"]-48*3600000
     for i,r in enumerate(rows):
+        if r["scan_utc_ms"]<recent_cutoff:continue
         for e in r["events"]:
             points={}
             for horizon in HORIZONS_MIN:
@@ -282,8 +288,10 @@ def report(rows):
         "venue_counts":latest["venue_counts"],
         "source_unavailable":latest["source_unavailable"],
         "new_events":latest["events"],
-        "all_event_count":len(followups),
+        "all_event_count":total_events,
+        "recent_event_count":len(followups),
         "forward_observations":followups[-120:],
+        "forward_report_scope":"LAST_48H_ONLY_OLDER_EVENTS_IN_SHA_LEDGER",
         "realtime_guaranteed":False,"historical_early_detection_proven":False,
         "short_fills_verified":False,"trade_authorized":False,
         "paper_approved":False,"profitable_strategy_confirmed":False,
