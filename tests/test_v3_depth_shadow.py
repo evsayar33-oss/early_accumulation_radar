@@ -31,6 +31,14 @@ class DepthShadowTests(unittest.TestCase):
         self.assertEqual(bids[0][1],1000)
         self.assertEqual(asks[0][0],1.01)
 
+    def test_independent_depth_summary_never_approves_paper_mark(self):
+        data={"bids":[["1.0","1000"]],"asks":[["1.01","1000"]]}
+        report=collect(assets=("SUI",),venues=("binance",),getter=lambda url:data)
+        self.assertEqual(report["summary"]["SUI"]["count"],1)
+        self.assertFalse(report["summary"]["SUI"]["two_venue_depth_available"])
+        self.assertIsNone(report["summary"]["SUI"]["paper_mark_eligible"])
+        self.assertTrue(report["not_a_paper_mark"])
+
     def test_failure_does_not_impute_liquidity(self):
         report=collect(assets=("SUI",),venues=("gate",),
                        getter=lambda url: (_ for _ in ()).throw(RuntimeError("offline")))

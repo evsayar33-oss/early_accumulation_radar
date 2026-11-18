@@ -110,9 +110,16 @@ def collect(assets=("SUI", "LINK", "XRP"), venues=VENUES, getter=http):
                              "error": f"{type(exc).__name__}:{str(exc)[:160]}",
                              "both_sides_executable": False})
     rows.sort(key=lambda x: (x["asset"], x["venue"]))
+    summary = {}
+    for asset in assets:
+        good = sorted(r["venue"] for r in rows if r["asset"] == asset and r["both_sides_executable"])
+        summary[asset] = {"executable_venues": good, "count": len(good),
+                          "two_venue_depth_available": len(good) >= 2,
+                          "paper_mark_eligible": None,
+                          "note": "Independent book snapshots only; frozen PAPER still requires 2 qualifying top-of-book USDT venues"}
     return {"schema": "EAR.depth.shadow.v1", "observed_ms": int(time.time()*1000),
             "target_usdt": TARGET_USDT, "diagnostic_only": True,
-            "not_a_paper_mark": True, "rows": rows}
+            "not_a_paper_mark": True, "rows": rows, "summary": summary}
 
 
 if __name__ == "__main__":
