@@ -23,7 +23,7 @@ MIN_CONTROLS=200
 HISTORY_SCANS=1450  # <= ~30 days at 30-minute cadence, no change to ledger
 SOURCE_ORDER=("okx","bitget","binance")
 MOTIFS=("activity_up_20pct","activity_up_flat_3pct","quiet_price_2pct",
-        "funding_oi_UNAVAILABLE")
+        "oi_contracts_up_10pct","oi_contracts_up_flat_3pct")
 
 def near(history,ts,minutes,tolerance):
     options=[x for x in history if abs((ts-x[0])/60000-minutes)<=tolerance]
@@ -53,6 +53,14 @@ def features(history,t,venue):
     # Rolling 24h turnover change is NOT trades executed during the last 1h.
     d24=cur.get("d")
     if not isinstance(d24,(int,float)) or not math.isfinite(d24):return None
+    # OI in raw contracts is less mechanically price-inflated than OI in
+    # USD. Available only on contemporaneous OKX snapshots after V9 deploy.
+    oi_now=cur.get("oi_contracts")
+    oi_then=one[1].get("oi_contracts")
+    oi_change=(oi_now/oi_then-1
+        if isinstance(oi_now,(int,float)) and isinstance(oi_then,(int,float))
+           and 0<oi_then and 0<=oi_now and math.isfinite(oi_now) and math.isfinite(oi_then)
+        else None)
     acceleration=q/q1-1
     return {"price_return_2h_pct":round(r2,5),
         "price_return_1h_pct":round(r1,5),
@@ -60,12 +68,15 @@ def features(history,t,venue):
         "turnover_24h_usdt":q,
         "return_24h_pct":d24,
         "turnover_proxy":bool(cur.get("q_proxy",False)),
+        "oi_contracts_change_1h_pct":round(100*oi_change,5) if oi_change is not None else None,
         "motifs":{
             "activity_up_20pct":acceleration>=.2,
             "activity_up_flat_3pct":acceleration>=.2 and abs(r2)<=3,
             "quiet_price_2pct":abs(r2)<=2,
-            "funding_oi_UNAVAILABLE":None},
-        "funding_observed":False,"open_interest_observed":False,
+            "oi_contracts_up_10pct":oi_change>=.10 if oi_change is not None else None,
+            "oi_contracts_up_flat_3pct":(oi_change>=.10 and abs(r2)<=3)
+                if oi_change is not None else None},
+        "funding_observed":False,"open_interest_observed":oi_change is not None,
         "stratum":zone(q,d24)}
 
 def forward(samples,index,symbol,venue,start_price):
@@ -160,7 +171,7 @@ def study(records):
                 "case_motif_fraction":round(case_frac,5) if case_frac is not None else None,
                 "control_motif_fraction":round(control_frac,5) if control_frac is not None else None,
                 "enrichment_ratio_exploratory":round(case_frac/control_frac,4)
-                  if case_frac is not None and control_frac and motif!="funding_oi_UNAVAILABLE" else None,
+                  if case_frac is not None and control_frac else None,
                 "status":"NO_PRECURSOR_EVIDENCE" if n<MIN_CASES_PER_DIRECTION or m<MIN_CONTROLS
                    else "EXPLORATORY_ONLY_MUST_PREREGISTER_AND_FORWARD_VALIDATE"})
     return {"schema":"EAR.v9_preimpulse_case_control.v1",
@@ -178,7 +189,8 @@ def study(records):
           "zero_backfill_before_first_v8_observation":True,
           "historical_asof_features_only":True,
           "rolling_24h_turnover_changes_not_true_1h_buy_volume":True,
-          "OI_funding_and_signed_taker_flow_NOT_AVAILABLE_in_V8":True,
+          "OI_on_OKX_only_from_FIRST_V9_asof_snapshot_no_historical_backfill":True,
+          "funding_and_signed_taker_flow_NOT_AVAILABLE":True,
           "multiple_hypotheses_not_corrected":True,
           "pristine_holdout":False},
        "significant_common_metric_discovered":False,
