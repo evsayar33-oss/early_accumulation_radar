@@ -138,7 +138,11 @@ def pack(assets):
     return base64.b64encode(zlib.compress(encoded,level=9)).decode("ascii")
 
 def unpack(encoded):
-    raw=zlib.decompress(base64.b64decode(encoded,validate=True),max_length=9000000)
+    decompressor=zlib.decompressobj()
+    raw=decompressor.decompress(base64.b64decode(encoded,validate=True),9000001)
+    if len(raw)>9000000 or not decompressor.eof:raise ValueError("OVERSIZED_OR_INCOMPLETE_SNAPSHOT")
+    raw+=decompressor.flush()
+    if len(raw)>9000000:raise ValueError("OVERSIZED_SNAPSHOT")
     assets=json.loads(raw)
     if not isinstance(assets,dict):raise ValueError("SNAPSHOT_NOT_DICT")
     return assets
@@ -202,8 +206,7 @@ def append(scan_data,prior):
     prior_signal={}
     for row in prior:
         for e in row["events"]:
-            key=(e["symbol"],e["stage"].split("_")[1] if e["stage"].startswith("EARLY_")
-                 else e["stage"].split("_")[0])
+            key=(e["symbol"],"UP" if "UPWARD" in e["stage"] else "DOWN")
             prior_signal[key]=row["scan_utc_ms"]
     recent=[]
     for e in flags:
@@ -211,8 +214,6 @@ def append(scan_data,prior):
         key=(e["symbol"],direction)
         if timestamp-prior_signal.get(key,0)<COOLDOWN_MIN*60000:
             continue
-        # Correct existing historical entries that used a different schema:
-        # All observations made under V8 use one consistent direction key.
         recent.append(e)
     item={"schema":"EAR.perp_forward.v1","scan_utc_ms":timestamp,
         "scope":"FUTURES_RESEARCH_ONLY_NO_ORDERS",
@@ -242,12 +243,13 @@ def report(rows):
         for e in r["events"]:
             points={}
             for horizon in HORIZONS_MIN:
-                after=next((z for z in rows[i+1:]
-                    if horizon<=((z["scan_utc_ms"]-r["scan_utc_ms"])/60000)<=horizon+60),None)
-                if after is not None:
-                    symbol=unpack(after["packed_assets"]).get(e["symbol"],{})
-                    venue=symbol.get(e["observed_venue"])
-                else:venue=None
+                venue=None
+                for z in rows[i+1:]:
+                    minutes=(z["scan_utc_ms"]-r["scan_utc_ms"])/60000
+                    if minutes<horizon:continue
+                    if minutes>horizon+60:break
+                    venue=unpack(z["packed_assets"]).get(e["symbol"],{}).get(e["observed_venue"])
+                    if venue:break
                 if venue:
                     ret=100*(venue["p"]/e["price_at_observation"]-1)
                     points[str(horizon)]={"status":"OBSERVED_SNAPSHOT_PRICE_CHANGE_NOT_EXECUTABLE",
