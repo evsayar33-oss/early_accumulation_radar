@@ -142,7 +142,7 @@ def forward(samples,index,symbol,venue,start_price):
             "forward_4h_min_snapshot_return_pct":round(down,5),
             "future_end_utc":datetime.fromtimestamp(end[0]/1000,timezone.utc).isoformat()}
 
-def study(records):
+def study(records,include_rows=False):
     # A bounded review window is EXPLORATORY. No retrospective re-labelling
     # of a signal. Requires V8 samples *before* each event.
     valid=records[-HISTORY_SCANS:]
@@ -154,7 +154,10 @@ def study(records):
     rows=[];skipped=Counter();last_eligible={}
     for idx,(t,assets) in enumerate(scans):
         for sym,current in sorted(assets.items()):
-            if last_eligible.get(sym,0)+HORIZON_MS>t:continue
+            # UTC 4h buckets make cohort inclusion deterministic even when
+            # a bounded V11 archive window slides forward between runs.
+            bucket=t//HORIZON_MS
+            if last_eligible.get(sym)==bucket:continue
             own=by_asset[sym]
             for venue in SOURCE_ORDER:
                 if venue not in current:continue
@@ -169,7 +172,7 @@ def study(records):
                 if z["turnover_24h_usdt"]<100000:
                     skipped["INSUFFICIENT_ASOF_LIQUIDITY_PROXY"]+=1
                     break
-                last_eligible[sym]=t
+                last_eligible[sym]=bucket
                 outcome=forward(scans,idx,sym,venue,current[venue]["p"])
                 rows.append({"observed_utc":datetime.fromtimestamp(t/1000,timezone.utc).isoformat(),
                     "symbol":sym,"venue":venue,"features":z,"future":outcome,
@@ -212,7 +215,7 @@ def study(records):
                   if case_frac is not None and control_frac else None,
                 "status":"NO_PRECURSOR_EVIDENCE" if n<MIN_CASES_PER_DIRECTION or m<MIN_CONTROLS
                    else "EXPLORATORY_ONLY_MUST_PREREGISTER_AND_FORWARD_VALIDATE"})
-    return {"schema":"EAR.v9_preimpulse_case_control.v1",
+    result={"schema":"EAR.v9_preimpulse_case_control.v1",
        "scans_in_window":len(scans),"eligible_asof_cohort_count":len(rows),
        "matured_full_control_population":len(eligible),
        "future_label_counts":dict(Counter(r["future"].get("label",r["future"]["status"]) for r in rows)),
@@ -234,6 +237,11 @@ def study(records):
        "significant_common_metric_discovered":False,
        "proven_profitable_strategy":False,
        "paper_approved":False,"trade_authorized":False}
+    if include_rows:
+        # Only observed and matured, strictly chronological case and control
+        # rows; never write this large dataset to the regular V9 artifact.
+        result["matured_cohort_rows"]=eligible
+    return result
 
 def main():
     parser=argparse.ArgumentParser()
