@@ -149,7 +149,9 @@ def study(records):
     # Report full-universe denominators and matched contemporaneous controls
     # in frozen as-of liquidity + 24h return bands.
     bystratum=defaultdict(list)
-    for r in eligible:bystratum[r["features"]["stratum"]].append(r)
+    for r in eligible:
+        # Controls must coexist at the exact SAME observation timestamp.
+        bystratum[(r["observed_utc"],r["features"]["stratum"])].append(r)
     stats=[]
     for direction in ("UPSIDE_EXTREME","DOWNSIDE_EXTREME"):
         for motif in MOTIFS:
@@ -159,12 +161,17 @@ def study(records):
                 no=[r for r in cohort if r["future"]["label"]=="NO_EXTREME_MOVE"]
                 if not yes or not no:continue
                 cases.extend(yes);controls.extend(no)
-            observed=lambda items:sum(r["features"]["motifs"][motif] is True for r in items)
-            n=len(cases);m=len(controls)
-            a=observed(cases);b=observed(controls)
+            # Null OI is *missing*, never an absence of the risk motif.
+            available_cases=[r for r in cases if r["features"]["motifs"][motif] is not None]
+            available_controls=[r for r in controls if r["features"]["motifs"][motif] is not None]
+            n=len(available_cases);m=len(available_controls)
+            a=sum(r["features"]["motifs"][motif] is True for r in available_cases)
+            b=sum(r["features"]["motifs"][motif] is True for r in available_controls)
             case_frac=a/n if n else None
             control_frac=b/m if m else None
             stats.append({"target":direction,"motif":motif,
+                "all_cases_in_matching_strata":len(cases),
+                "all_controls_in_matching_strata":len(controls),
                 "cases_with_matched_asof_stratum":n,
                 "matched_nonmover_controls":m,
                 "cases_with_motif":a,"controls_with_motif":b,
@@ -183,7 +190,7 @@ def study(records):
        "constraints":{"decision_timestamp":"BEFORE_SUBSEQUENT_4H_OUTCOME",
           "event_definition":">=12pct observed up/down move within 4h from frozen earlier asof price",
           "prior_motion_screen":"ABS_PREVIOUS_2H_RETURN<=3pct_AND_ABS_24H_RETURN<=15pct",
-          "control_selection":"SAME_ASOF_24H_TURNOVER_AND_PRICE_MOVE_BANDS_NOT_POST_HOC_WINNER_LIST",
+          "control_selection":"EXACT_SAME_ASOF_SCAN_TIME_24H_TURNOVER_AND_PRICE_MOVE_BANDS_NOT_POST_HOC_WINNER_LIST",
           "one_sample_per_symbol_per_4h":True,
           "underlying_future_extrema_are_SAMPLED_not_actual_high_low":True,
           "zero_backfill_before_first_v8_observation":True,
