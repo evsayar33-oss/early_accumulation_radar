@@ -171,17 +171,17 @@ def classify(previous,current,prev_ms,now_ms):
         old=before[venue];new=venues[venue]
         if old["p"]<=0 or new["p"]<=0:continue
         change=100*(new["p"]/old["p"]-1)
-        if abs(change)>75:continue  # Potential redenomination/rebase; no returns inferred.
+        extreme=abs(change)>75  # Retain, but quarantine possible rebase/redenomination.
         if max(x["q"] for x in venues.values())<MIN_OBSERVED_QUOTE_TURNOVER_USDT:
             continue
-        stage=None
-        if 0.8<=change<6 and new["d"]<20:
+        stage="EXTREME_PRICE_MOVE_SCALE_UNVERIFIED" if extreme else None
+        if not extreme and 0.8<=change<6 and new["d"]<20:
             stage="EARLY_UPWARD_MOTION_WATCH"
-        elif change>=6:
+        elif not extreme and change>=6:
             stage="UPWARD_IMPULSE_ALREADY_IN_PROGRESS"
-        elif -6<change<=-.8 and new["d"]>-20:
+        elif not extreme and -6<change<=-.8 and new["d"]>-20:
             stage="EARLY_DOWNWARD_MOTION_WATCH"
-        elif change<=-6:
+        elif not extreme and change<=-6:
             stage="DOWNWARD_IMPULSE_ALREADY_IN_PROGRESS"
         if stage is None:continue
         out.append({"symbol":symbol,"stage":stage,"observed_venue":venue,
@@ -191,6 +191,7 @@ def classify(previous,current,prev_ms,now_ms):
             "rolling_24h_change_pct":new["d"],
             "rolling_24h_turnover_usdt":new["q"],
             "venue_count":len(venues),"cross_venue":cross_venue(venues),
+            "scale_change_verified":False,
             "signal_is_price_motion_observation_not_prediction":True,
             "trade_authorized":False,"paper_approved":False})
     return out
@@ -206,11 +207,11 @@ def append(scan_data,prior):
     prior_signal={}
     for row in prior:
         for e in row["events"]:
-            key=(e["symbol"],"UP" if "UPWARD" in e["stage"] else "DOWN")
+            key=(e["symbol"],"UP" if e["interval_return_pct"]>0 else "DOWN")
             prior_signal[key]=row["scan_utc_ms"]
     recent=[]
     for e in flags:
-        direction="UP" if "UPWARD" in e["stage"] else "DOWN"
+        direction="UP" if e["interval_return_pct"]>0 else "DOWN"
         key=(e["symbol"],direction)
         if timestamp-prior_signal.get(key,0)<COOLDOWN_MIN*60000:
             continue
@@ -250,12 +251,12 @@ def report(rows):
                     if minutes>horizon+60:break
                     venue=unpack(z["packed_assets"]).get(e["symbol"],{}).get(e["observed_venue"])
                     if venue:break
-                if venue:
+                if venue and e["stage"]!="EXTREME_PRICE_MOVE_SCALE_UNVERIFIED":
                     ret=100*(venue["p"]/e["price_at_observation"]-1)
                     points[str(horizon)]={"status":"OBSERVED_SNAPSHOT_PRICE_CHANGE_NOT_EXECUTABLE",
                          "underlying_return_pct":round(ret,4)}
                 else:
-                    points[str(horizon)]={"status":"PENDING_NO_MATCHED_OBSERVATION",
+                    points[str(horizon)]={"status":"SCALE_EVENT_UNVERIFIED" if e["stage"]=="EXTREME_PRICE_MOVE_SCALE_UNVERIFIED" else "PENDING_NO_MATCHED_OBSERVATION",
                          "underlying_return_pct":None}
             followups.append({"scan_utc_ms":r["scan_utc_ms"],
                 "symbol":e["symbol"],"stage":e["stage"],
