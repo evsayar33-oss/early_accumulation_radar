@@ -22,6 +22,20 @@ class PerpNotifyTests(unittest.TestCase):
         self.assertIn("TEYİTSİZ",msg)
     def test_divergent_not_alerted(self):
         self.assertIsNone(format_message(self.report(confirm="DIVERGENT_MULTI_VENUE")))
+    def test_big_pippin_like_impulse_is_not_hidden_by_three_minor_moves(self):
+        r=self.report()
+        r["new_events"]=[dict(r["new_events"][0],symbol=f"MINOR{i}USDT",
+            interval_return_pct=1.1+i*.1) for i in range(7)]
+        r["new_events"].append(dict(r["new_events"][0],symbol="PIPPINUSDT",
+            stage="UPWARD_IMPULSE_ALREADY_IN_PROGRESS",
+            interval_return_pct=67.0,price_at_observation=.01856))
+        msg=format_message(r)
+        self.assertIn("PIPPINUSDT",msg)
+        self.assertLessEqual(msg.count(" | "),20)
+    def test_extreme_price_move_remains_visible_as_unverified(self):
+        r=self.report(stage="EXTREME_PRICE_MOVE_SCALE_UNVERIFIED")
+        r["new_events"][0]["interval_return_pct"]=105.0
+        self.assertIn("DOĞRULANMAMIŞ AŞIRI",format_message(r))
     def test_no_config_or_empty_message_no_send(self):
         self.assertEqual(send(None,"tok","chat"),"NO_ADVISORY")
         self.assertEqual(send("msg","",""),"TELEGRAM_NOT_CONFIGURED")
