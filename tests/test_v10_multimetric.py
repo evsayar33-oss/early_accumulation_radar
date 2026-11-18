@@ -125,6 +125,15 @@ class MetricTests(unittest.TestCase):
         corrupted["bitget"]["p"]=.011
         a=analyze_one("BADUSDT",t,corrupted,history)
         self.assertEqual(a["stage"],"OUTLIER_WITH_PRIOR_MOTION_OR_UNVERIFIED_PRICE")
+    def test_prior_24h_pump_and_retrace_cannot_be_called_clean_premove(self):
+        history=series(spike=True)
+        t,venues=history[-1]
+        modified={k:dict(v) for k,v in venues.items()}
+        modified["okx"]["range24h_pct"]=75
+        result=analyze_one("ROUNDTRIPUSDT",t,modified,history)
+        self.assertGreater(result["distinct_metric_outliers"],0)
+        self.assertEqual(result["stage"],"OUTLIER_WITH_PRIOR_MOTION_OR_UNVERIFIED_PRICE")
+        self.assertEqual(result["rolling_24h_range_pct"],75)
     def test_optional_ticker_fields_calculate_real_units(self):
         r=optional_microstructure({"bidPx":".0099","askPx":".0101",
                 "high24h":".012","low24h":".008","fundingRate":".0005",
