@@ -1,19 +1,20 @@
 {
-  "asof_utc": "2026-11-17T19:33:47.235950+00:00",
+  "asof_utc": "2026-11-18T12:20:00.815978+00:00",
   "by_family": [],
   "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
   "historical_pit_verified": false,
   "new_settlements": 0,
-  "new_signals": 15,
+  "new_signals": 12,
   "notes": "No old signals backfilled; entry day strictly after first observation UTC date, with closed daily bars only. Old V5 ledger untouched.",
   "paper_approved": false,
   "pending": {
-    "AWAITING_FUTURE_CLOSED_SESSIONS": 15
+    "AWAITING_FUTURE_CLOSED_SESSIONS": 24,
+    "SOURCE_SYMBOL_MISSING": 3
   },
   "profitable_strategy_confirmed": false,
   "schema": "EAR.v7_forward_summary.v1",
   "short_execution_model": false,
   "total_settlements": 0,
-  "total_signals": 15,
+  "total_signals": 27,
   "trade_authorized": false
 }
