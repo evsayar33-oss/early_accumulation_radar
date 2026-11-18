@@ -15,6 +15,8 @@ from research_v4.perp_watch import read
 from radar.ledger import canonical,digest,read_verify
 
 TRIAL_DAYS=7
+NEW_LOCK_COOLDOWN_DAYS=14
+LOCK_WEEKDAY_UTC=0  # Monday; bounded multiple looks across calendar time
 RESEARCH_SNAPSHOTS=450
 MIN_CASES=30
 MIN_CONTROLS=200
@@ -214,7 +216,12 @@ def infer_report(v8_records,state_dir,asof,version,root="."):
     # actual V8 historical observations available at or before t.
     research=study(v8_records[-RESEARCH_SNAPSHOTS:],include_rows=True)
     rows=research.pop("matured_cohort_rows",[])
-    compact=[compact_row(row) for row in rows]
+    # A source clock mismatch must never let a future outcome enter today's
+    # exploratory search or a locked prospective trial.
+    compact=[compact_row(row) for row in rows
+             if utc_ms(row["observed_utc"])<=now
+             and row["future"].get("future_end_utc")
+             and utc_ms(row["future"]["future_end_utc"])<=now]
     train_rows=[raw_to_row(x) for x in compact]
     exploration=summarize(train_rows)
 
@@ -223,7 +230,19 @@ def infer_report(v8_records,state_dir,asof,version,root="."):
     # No new rule may be "frozen" by relabeling prior completed outcomes as
     # prospective; all locked trials begin at next UTC midnight.
     next_midnight=((now//86400000)+1)*86400000
+    is_freeze_checkpoint=datetime.fromtimestamp(now/1000,timezone.utc).weekday()==LOCK_WEEKDAY_UTC
+    already_decided={d["hypothesis_id"] for d in decisions}
     for direction in DIRECTIONS:
+        if not is_freeze_checkpoint:continue
+        # One fixed future trial per direction at a time; cool down before
+        # another weekly search to limit optional stopping/data dredging.
+        prior_direction=[x for x in frozen if x["direction"]==direction
+                         and x["methodology_sha256"]==version]
+        if any(x["id"] not in already_decided for x in prior_direction):
+            continue
+        if any(now-utc_ms(x["created_utc"])<NEW_LOCK_COOLDOWN_DAYS*86400000
+               for x in prior_direction):
+            continue
         best=next((x for x in sorted(
                     (x for x in exploration if x["direction"]==direction
                      and x["passes_fixed_research_gates"]),
@@ -310,6 +329,9 @@ def infer_report(v8_records,state_dir,asof,version,root="."):
         "eligible_asof_samples":research["eligible_asof_cohort_count"],
         "matured_case_control_samples":research["matured_full_control_population"],
         "source_outcome_counts":research["future_label_counts"],
+        "new_lock_checkpoint_utc_weekday":LOCK_WEEKDAY_UTC,
+        "is_new_lock_checkpoint_now":is_freeze_checkpoint,
+        "minimum_days_between_same_direction_locks":NEW_LOCK_COOLDOWN_DAYS,
         "families_tested":len(RULES),
         "familywise_tests_including_directions":len(RULES)*len(DIRECTIONS),
         "provisional_leading_associations":[x for x in exploration
