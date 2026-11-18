@@ -6,7 +6,8 @@ from tempfile import TemporaryDirectory
 
 from radar.ledger import canonical
 from research_v4.perp_watch import (
-    BINANCE_INFO,BINANCE_TICKERS,OKX_INFO,OKX_TICKERS,append,
+    BINANCE_INFO,BINANCE_TICKERS,OKX_INFO,OKX_TICKERS,
+    BITGET_INFO,BITGET_TICKERS,parse_bitget,append,
     classify,pack,unpack,parse_binance,parse_okx,read,report,scan)
 
 NOW=1795000000000
@@ -36,6 +37,15 @@ def info_o():
 def tick_o(now=NOW,price=.01091):
     return {"code":"0","data":[{"instId":"PIPPIN-USDT-SWAP","last":str(price),
         "volCcy24h":"320000000","open24h":"0.0107","ts":str(now-1000)}]}
+def info_g():
+    return {"code":"00000","data":[{"symbol":"PIPPINUSDT","quoteCoin":"USDT",
+        "symbolType":"perpetual","symbolStatus":"normal"},
+        {"symbol":"DELUSDT","quoteCoin":"USDT","symbolType":"perpetual","symbolStatus":"off"}]}
+def tick_g(now=NOW,price=.01092):
+    return {"code":"00000","data":[{"symbol":"PIPPINUSDT","lastPr":str(price),
+        "open24h":".0108","quoteVolume":"3700000","ts":str(now-1000)},
+        {"symbol":"DELUSDT","lastPr":"2","open24h":"1","quoteVolume":"2000000",
+        "ts":str(now-1000)}]}
 def shot(ts,p,delta=5.0):
     return {"schema":"EAR.perp_observations.v1","scan_utc_ms":ts,
         "sources":["binance","okx"],"source_unavailable":{},
@@ -61,12 +71,27 @@ class PerpCoverage(unittest.TestCase):
         row=parse_okx(info_o(),t,NOW)["PIPPINUSDT"]
         self.assertEqual(row["q"],2500000)
         self.assertFalse(row["q_proxy"])
+    def test_bitget_usdt_perp_metadata_and_real_quote_turnover(self):
+        out=parse_bitget(info_g(),tick_g(),NOW)
+        self.assertEqual(set(out),{"PIPPINUSDT"})
+        self.assertEqual(out["PIPPINUSDT"]["q"],3700000)
+        self.assertFalse(out["PIPPINUSDT"]["q_proxy"])
+        self.assertAlmostEqual(out["PIPPINUSDT"]["d"],100*(.01092/.0108-1),places=4)
+    def test_two_venues_survive_binance_geoblock(self):
+        def fake(url):
+            if url==BINANCE_INFO:raise RuntimeError("blocked")
+            return {OKX_INFO:info_o(),OKX_TICKERS:tick_o(),
+                BITGET_INFO:info_g(),BITGET_TICKERS:tick_g()}[url]
+        r=scan(get=fake,clock=lambda:NOW)
+        self.assertEqual(r["sources"],["okx","bitget"])
+        self.assertIn("binance",r["source_unavailable"])
+        self.assertEqual(len(r["assets"]["PIPPINUSDT"]),2)
     def test_no_source_backfilled_if_one_is_missing(self):
         def fake(url):
             if url==BINANCE_INFO:raise RuntimeError("403")
             if url==OKX_INFO:return info_o()
             if url==OKX_TICKERS:return tick_o()
-            raise AssertionError(url)
+            raise RuntimeError("Bitget unavailable")
         s=scan(get=fake,clock=lambda:NOW)
         self.assertEqual(s["sources"],["okx"])
         self.assertIn("binance",s["source_unavailable"])
@@ -88,7 +113,7 @@ class PerpCoverage(unittest.TestCase):
         e=second["events"][0]
         self.assertEqual(e["symbol"],"PIPPINUSDT")
         self.assertEqual(e["stage"],"EARLY_UPWARD_MOTION_WATCH")
-        self.assertEqual(e["cross_venue"],"CONSISTENT_TWO_VENUES")
+        self.assertEqual(e["cross_venue"],"CONSISTENT_MULTI_VENUE")
         self.assertTrue(e["signal_is_price_motion_observation_not_prediction"])
         self.assertFalse(e["trade_authorized"])
     def test_late_impulse_is_not_mislabelled_early(self):
