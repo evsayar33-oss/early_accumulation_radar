@@ -24,6 +24,7 @@ BINANCE_INFO="https://fapi.binance.com/fapi/v1/exchangeInfo"
 BINANCE_TICKERS="https://fapi.binance.com/fapi/v1/ticker/24hr"
 OKX_INFO="https://www.okx.com/api/v5/public/instruments?instType=SWAP"
 OKX_TICKERS="https://www.okx.com/api/v5/market/tickers?instType=SWAP"
+OKX_OPEN_INTEREST="https://www.okx.com/api/v5/public/open-interest?instType=SWAP"
 BITGET_INFO="https://api.bitget.com/api/v2/mix/market/contracts?productType=USDT-FUTURES"
 BITGET_TICKERS="https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES"
 MAX_SOURCE_AGE_MS=300000
@@ -157,6 +158,34 @@ def parse_bitget(info,tickers,now_ms):
     if not rows:raise ValueError("BITGET_NO_FRESH_PERP_TICKERS")
     return rows
 
+def attach_okx_open_interest(assets,raw,now_ms):
+    """Save independent as-of OI in CONTRACTS and USD. Never equate USD OI
+    inflation due to price rises with genuine new contracts."""
+    if (not isinstance(raw,dict) or str(raw.get("code"))!="0"
+        or not isinstance(raw.get("data"),list)):
+        raise ValueError("OKX_OPEN_INTEREST_SCHEMA")
+    count=0
+    for entry in raw["data"]:
+        if not isinstance(entry,dict):continue
+        m=OKX_NAME.fullmatch(str(entry.get("instId") or ""))
+        if not m:continue
+        sym=m.group(1)+"USDT"
+        venue=assets.get(sym,{}).get("okx")
+        if venue is None:continue
+        try:
+            ts=int(entry["ts"])
+            contracts=number(entry["oi"])
+            notional=number(entry["oiUsd"])
+        except (KeyError,TypeError,ValueError,OverflowError):
+            continue
+        if not fresh(ts,now_ms) or contracts<0 or notional<0:continue
+        venue["oi_contracts"]=round(contracts,8)
+        venue["oi_usd"]=round(notional,2)
+        venue["oi_timestamp_ms"]=ts
+        count+=1
+    if not count:raise ValueError("OKX_OPEN_INTEREST_NO_FRESH_USDT_CONTRACTS")
+    return count
+
 def scan(get=public_json,clock=lambda:int(time.time()*1000)):
     now=clock()
     sources={};failed={}
@@ -177,7 +206,17 @@ def scan(get=public_json,clock=lambda:int(time.time()*1000)):
     for name,items in sources.items():
         for sym,data in items.items():
             assets.setdefault(sym,{})[name]=data
+    # One all-SWAP public request, not hundreds of per-symbol requests.
+    # Failure is advisory and NEVER destroys valid price observations.
+    oi_coverage=0
+    if "okx" in sources:
+        try:
+            oi_coverage=attach_okx_open_interest(assets,get(OKX_OPEN_INTEREST),clock())
+        except (ValueError,RuntimeError,TypeError,KeyError,IndexError) as exc:
+            failed["okx_open_interest"]=type(exc).__name__
+    now=max(now,clock())  # freeze as-of AFTER all observations
     return {"schema":"EAR.perp_observations.v1",
+            "open_interest_instruments_with_fresh_oi":oi_coverage,
             "scan_utc_ms":now,"sources":sorted(sources),
             "source_unavailable":failed,
             "assets":assets,"market_type":"USDT_LINEAR_PERPETUAL_ONLY",

@@ -1,0 +1,26 @@
+# V9 — Şiddetli hareketten ÖNCE ortak öncü metrik: vaka–kontrol araştırması
+
+## Hipotez (sonuç değil)
+
+Kullanıcının paylaştığı PIPPIN gibi olağanüstü yukarı/aşağı hareketlerde, tüm hareketlerin ortak bir giriş stratejisi olması gerekmeyebilir. Ancak **fiyat çok hareket etmemişken açık sözleşme sayısının (OI) artması, dönen işlem aktivitesinin hızlanması veya öncesinde fiyat sıkışması** gibi bir ortak risk/erken uyarı özelliği bulunabilir. Şu ana kadar böyle bir özelliğin kârlılığı veya öncü gücü **kanıtlanmadı**.
+
+Paylaşılan vakalar `research_v4/user_extreme_cases.json` içinde kaynak ve olay türüne göre ayrı saklanır. 18 Kasım PIPPIN hareketi gerçek fiyat hareketi örneği olsa da ilk V8 perpetual kaydı **hareketten sonradır**; bu geçmiş vaka hiçbir şekilde `PIPPIN'i önceden gördük` iddiası oluşturmaz. 17 Kasım MEXC ANT Pre-IPO yeniden ölçeklendirme örneği gerçek short kazancıyla karıştırılmaz ve fiyat değişimi sınıfının dışında tutulur. ETH/SOL V2 uyarıları da farklı spot sinyal aileleridir; vadeli kontratların büyük hareketlerinden sınıflama kanıtı olarak kullanılmaz.
+
+## V9 test tasarımı
+
+1. **Sadece hareket ÖNCESİ gözlenmiş veri:** Her V8 USDT perpetual anlık görüntüsünde fiyat, borsa bazında 24 saatlik işlem hacmi/ciro gözlemleri ve imkan varsa **OKX'in bağımsız açık pozisyon API'sinden sözleşme sayısı (oi)** alınır. Tüm uygun kontratlar (yalnız kazananlar değil) için ve yalnız ilk gözlemden **sonraki gerçek snapshotlardan** özellik hesaplanır.
+2. **Önceki iki saat:** Aynı kontrat ve aynı borsa için yaklaşık 60 ve 120 dakika önce ayrı ayrı gözlenmiş kayıt bulunmalıdır. Özellikler: son 2 saat fiyat değişimi, 24 saatlik dönen ciro göstergesinin son 1 saatteki yüzde değişimi ve OKX OI sözleşme sayısının yaklaşık 1 saatlik değişimi. 24 saatlik ciro değişimi *gerçek son 1 saatteki işlem hacmi* sayılmaz. USD karşılığı OI fiyat arttığında mekanik olarak büyüyebilir; o nedenle OI hareketi **sözleşme sayısından** ölçülür.
+3. **Hareket henüz patlamamış olmalı:** Varsayılan araştırma kohortunda önceki 2 saatin mutlak fiyat değişimi en fazla %3, mevcut 24 saatlik mutlak fiyat değişimi en fazla %15, as-of gözlenen 24 saatlik ciro en az 100.000 USDT olmalı. Bunlar kanıtlanmış kâr eşikleri **değil**, önceki büyük hareketleri öncü sinyal diye etiketlemeyi engelleyen başlangıç araştırma kurallarıdır.
+4. **Sonuç sonradan etikete dönüşür:** Önceden dondurulmuş `t` fiyatından itibaren gelen 4 saatte **yalnız gerçekten gözlenen** ara snapshotlarda +%12 veya −%12 uç olayları ayrı etiketlenir. İleriye dönük yeterli gözlem veya 4 saat sonrasında yeni snapshot yoksa **PENDING**; kuşkulu 75%+ tek-snapshot ölçek değişiminde **CENSORED**, başarı veya kayıp uydurulmaz.
+5. **Gerçek kontrol grubu:** Aynı tarama saatinde, benzer 24 saatlik ciro ve mevcut 24 saatlik fiyat oynaklığı grubunda bulunan **büyük hareket yaşamayan bütün kontratlar** ayrıca sayılır. Böylece PIPPIN gibi 1 kazananın ortak bir metriği seçilmiş tüm kazananlarda sık görülse bile, asıl belirleyici ölçüt olan **false-positive rate** ortaya çıkar.
+6. **Önceden yazılan metrik ailesi:** `activity_up_20pct`; `activity_up_flat_3pct`; `quiet_price_2pct`; `oi_contracts_up_10pct`; `oi_contracts_up_flat_3pct`. Bu hipotezler daha sonra sonuçlara bakılıp değiştirilmemeli. Eksik OI kaydı false gibi sayılmaz; OI kapsamı ayrıca raporlanır.
+7. **Yetersiz kanıt otomatik ret:** Bir yön için en az 30 ayrı örnek olay ve 200 eşleştirilmiş kontrol ölçümü yoksa **NO_PRECURSOR_EVIDENCE**. Bu asgari araştırma eşiği bile bağımsız kârlılık kanıtı değildir. 4 saatlik örtüşen ölçümler aynı coin için birbirinden en az 4 saat ayrılır; piyasa genelindeki bağımlılık devam eder. İleride çoklu test düzeltmesi, farklı dönemlerde zamansal walk-forward, yeni coinler ve gerçekleşebilir spread/funding/maliyet stresi gereklidir.
+8. **Sıfır geçmiş veri uydurma:** V9, V8'in SHA zincirli `research/v8-perp-forward` geçmişini salt okunur kullanır. Geçmişte alınmamış OI, işlem verisi, funding veya emir defteri değerleri sonradan yazılmaz. Yeni rapor `out/v9_preimpulse` artifact'ında saklanır; var olan V8 akışındaki sinyallere ve Telegram'a otomatik al/sat yönlendirmesi eklenmez.
+
+## Çalıştırma ve güvenlik
+
+Var olan `V8 all-symbol perpetual early-motion evidence (RESEARCH ONLY)` iki kez/saat GitHub iş akışında, V8 SHA kanıt dosyası yazıldıktan sonra **opsiyonel/izole bir V9 analiz adımı** çalışır. Analiz hata verse bile V8 geçmiş kanıtını GitHub'a saklama adımı bloke olmaz. Var olan V2/V3 PAPER, DEX ve V5/V7 kanıt dalları **değiştirilmez**.
+
+**Henüz olmayanlar:** Saat içi 1–5 dakikalık tüm varlık sürekli OHLCV ve imzalı alım-satım akışı, L2 emir defteri, aktif liquidation/tasfiye verisi ve tüm borsaların historical OI veri kaynağı. Bu alanların herhangi birini uydurmak yerine işaretleyeceğiz. İlk araştırma sonucu tek başına gerçek işlem veya PAPER izni vermez.
+
+**Karar kriteri:** İncelenen olaylardan ortak bir özellik çıkıyorsa aynı özellik benzer koşuldaki hareket etmeyen varlıklarda ne kadar sık görülüyor, hareketten ne kadar önce gözleniyor, kaç sahte alarm üretiyor ve gelecekteki *hiç görülmemiş* veri üzerinde maliyet sonrası işe yarıyor mu? Bu sorulara cevap olmadan eşik optimizasyonu veya sonuçların kar amaçlı stratejiye dönüştürülmesi engellenir.
