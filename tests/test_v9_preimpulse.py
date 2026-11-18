@@ -5,7 +5,18 @@ from research_v4.perp_watch import (
     BINANCE_INFO,OKX_INFO,OKX_TICKERS,BITGET_INFO,BITGET_TICKERS,
 )
 from research_v4.preimpulse_study import study,features,forward
-from tests.test_v8_perp_watch import info_o,tick_o,info_g,tick_g
+def info_o():
+    return {"code":"0","data":[{"instId":"PIPPIN-USDT-SWAP","state":"live",
+             "ctType":"linear","settleCcy":"USDT"}]}
+def tick_o(now=BASE):
+    return {"code":"0","data":[{"instId":"PIPPIN-USDT-SWAP","last":".011",
+             "open24h":".0109","volCcy24h":"200000000","ts":str(now-1000)}]}
+def info_g():
+    return {"code":"00000","data":[{"symbol":"PIPPINUSDT","quoteCoin":"USDT",
+             "symbolType":"perpetual","symbolStatus":"normal"}]}
+def tick_g(now=BASE):
+    return {"code":"00000","data":[{"symbol":"PIPPINUSDT","lastPr":".011",
+             "open24h":".0109","quoteVolume":"2500000","ts":str(now-1000)}]}
 
 BASE=1795100000000
 
@@ -16,7 +27,7 @@ def snap(i):
     own={}
     for sym,price,oi in (("PIPPINUSDT",a,100+10*max(0,i-2)),
                          ("QUIETUSDT",.01,100),("FALLUSDT",down,100)):
-        own[sym]={"okx":{"p":price,"q":1000000 if i<2 else (1300000 if sym=="PIPPINUSDT" else 1000000),
+        own[sym]={"okx":{"p":price,"q":1000000 if i<2 else (1300000 if sym=="PIPPINUSDT" and i>=4 else 1000000),
                          "d":0 if i<8 else (20 if sym=="PIPPINUSDT" else 0),
                          "ts":ts,"oi_contracts":oi}}
     return {"scan_utc_ms":ts,"sources":["okx"],"market_type":"USDT_LINEAR_PERPETUAL_ONLY",
