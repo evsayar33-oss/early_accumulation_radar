@@ -10,7 +10,7 @@ from research_v4 import pattern_learner as p
 from research_v4.pattern_notify import format_message
 from research_v4.preimpulse_study import MOTIFS
 
-BASE=datetime(2026,11,18,10,0,0,tzinfo=timezone.utc)
+BASE=datetime(2026,11,23,10,0,0,tzinfo=timezone.utc)
 RULE="relative_oi_contracts_outlier"
 
 def row(day,symbol,case=True,rule=RULE):
@@ -94,6 +94,28 @@ class V11Contracts(unittest.TestCase):
             self.assertEqual(r["eligible_asof_samples"],0)
             self.assertEqual(r["notices"],[])
             self.assertEqual(r["new_hypotheses_frozen"],0)
+    def test_candidate_does_not_lock_outside_weekly_precommitted_checkpoint(self):
+        source=[{"scan_utc_ms":int((BASE-timedelta(minutes=1)).timestamp()*1000),
+                 "sha256":"source"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch.object(p,"study",return_value=fake_study(cohort())):
+                t=BASE+timedelta(days=1)  # Tuesday
+                result=p.infer_report(source,Path(tmp),t.isoformat(),"v1")
+                self.assertFalse(result["is_new_lock_checkpoint_now"])
+                self.assertEqual(result["new_hypotheses_frozen"],0)
+                self.assertEqual(result["notices"],[])
+    def test_no_second_lock_for_same_direction_during_active_trial(self):
+        source=[{"scan_utc_ms":int((BASE-timedelta(minutes=1)).timestamp()*1000),
+                 "sha256":"source"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            state=Path(tmp)
+            with patch.object(p,"study",return_value=fake_study(cohort())):
+                first=p.infer_report(source,state,BASE.isoformat(),"v1")
+                next_monday=BASE+timedelta(days=7)
+                again=p.infer_report(source,state,next_monday.isoformat(),"v1")
+            self.assertEqual(first["new_hypotheses_frozen"],1)
+            self.assertEqual(again["new_hypotheses_frozen"],0)
+            self.assertEqual(again["notices"],[])
     def test_freeze_never_backfills_and_holdout_closes_once(self):
         first=cohort()
         start=BASE
@@ -108,12 +130,12 @@ class V11Contracts(unittest.TestCase):
             self.assertEqual(report["notices"][0]["kind"],"NEW_RESEARCH_CANDIDATE")
             original=read_verify(state/"frozen.jsonl")
             self.assertEqual(len(original),1)
-            self.assertEqual(original[0]["trial_start_utc"],"2026-11-19T00:00:00+00:00")
-            self.assertEqual(original[0]["trial_end_utc"],"2026-11-26T00:00:00+00:00")
+            self.assertEqual(original[0]["trial_start_utc"],"2026-11-24T00:00:00+00:00")
+            self.assertEqual(original[0]["trial_end_utc"],"2026-12-01T00:00:00+00:00")
             # All new observations were first timestamped AFTER the freeze,
             # never taken from the pre-freeze 15-18 November training sample.
-            future=cohort(start_day=5,days=4) # Nov 20–23 inclusive
-            closed=datetime(2026,11,26,6,tzinfo=timezone.utc)
+            future=cohort(start_day=10,days=4) # Nov 25–28 inclusive
+            closed=datetime(2026,12,1,6,tzinfo=timezone.utc)
             source2=[{"scan_utc_ms":int((closed-timedelta(minutes=1)).timestamp()*1000),
                       "sha256":"sourcehash2"}]
             with patch.object(p,"study",return_value=fake_study(future)):
