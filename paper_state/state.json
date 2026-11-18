@@ -1,54 +1,31 @@
 {
-  "cash": 6976.8481994440135,
-  "closed_trades": 5,
+  "cash": 9937.735401095742,
+  "closed_trades": 8,
   "first_seen_ms": 1794855908001,
-  "gross_losses": 66.22503476880092,
+  "gross_losses": 95.41563287879194,
   "gross_wins": 33.151033974538564,
-  "last_event_sha256": "e863f25d3ac83c53755e2c7739a5b545e35ef9146a8a416f289466ffb95951cb",
+  "last_event_sha256": "bc985ac502200fc0d3f529bdb5d3a8e17a5d244471fc76bf74306a439e7aee75",
   "last_exit_ms": {
     "ADA": 1794957032030,
+    "BTC": 1794976448180,
     "DOGE": 1794930908312,
     "ETH": 1794957032030,
+    "SOL": 1794976448180,
     "SUI": 1794930908312,
-    "XRP": 1794930908312
+    "XRP": 1794976448180
   },
-  "last_liquidation_nav": 9935.3972899538,
-  "last_observed_ms": 1794968914280,
-  "last_status": "UNMARKED_OUTAGE",
-  "last_valid_mark_ms": 1794964644647,
+  "last_liquidation_nav": 9937.735401095742,
+  "last_observed_ms": 1794976448180,
+  "last_status": "MARKED",
+  "last_valid_mark_ms": 1794976448180,
   "max_drawdown_pct": 1.128717680707809,
   "model_sha256": "239ac5299ce742d49e7fcb5e16c4e3fa5eaffff2c2fb199775bcfaf121d5cbe2",
   "model_version": "EAR-V3-FIXED-20261116",
   "outages": 11,
   "paper_start_ms": 1794855908001,
   "peak_liquidation_nav": 10031.354544400561,
-  "positions": {
-    "BTC": {
-      "cost_usdt": 996.6925999205735,
-      "entry_effective": 65124.145012999994,
-      "entry_ms": 1794957032030,
-      "entry_reference": 65078.59,
-      "entry_venue": "binance",
-      "qty": 0.015289212669414643
-    },
-    "SOL": {
-      "cost_usdt": 996.6925999205735,
-      "entry_effective": 75.44277299999999,
-      "entry_ms": 1794957032030,
-      "entry_reference": 75.39,
-      "entry_venue": "binance",
-      "qty": 13.19804221694709
-    },
-    "XRP": {
-      "cost_usdt": 996.6925999205735,
-      "entry_effective": 0.98729062,
-      "entry_ms": 1794957032030,
-      "entry_reference": 0.9866,
-      "entry_venue": "binance",
-      "qty": 1008.5144969953791
-    }
-  },
-  "realized_pnl": -33.07400079426236,
+  "positions": {},
+  "realized_pnl": -62.264598904253376,
   "schema": "EAR.paper.v1",
   "winning_trades": 2
 }
