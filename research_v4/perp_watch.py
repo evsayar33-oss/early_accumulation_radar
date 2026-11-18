@@ -100,14 +100,24 @@ def parse_okx(info,tickers,now_ms):
         if not isinstance(t,dict) or t.get("instId") not in active:continue
         try:
             p=number(t["last"])
-            turn=number(t["volCcyQuote24h"])  # Not vol24h (number of contracts).
             opening=number(t["open24h"])
             ts=int(t["ts"])
+            # OKX v5 linear SWAP tickers report volCcy24h in BASE units
+            # and vol24h in contracts, unlike SPOT. Quote-currency volume
+            # is unavailable on some schemas. NEVER treat base/contracts
+            # as USDT; where necessary, estimate with the snapshot price.
+            if t.get("volCcyQuote24h") not in (None,""):
+                turn=number(t["volCcyQuote24h"])
+                proxy=False
+            else:
+                turn=number(t["volCcy24h"])*p
+                proxy=True
         except (KeyError,TypeError,ValueError,OverflowError):
             continue
         if p<=0 or opening<=0 or turn<0 or not fresh(ts,now_ms):continue
         sym=active[t["instId"]]
         rows[sym]={"p":round(p,12),"q":round(turn,2),
+                   "q_proxy":proxy,
                    "d":round(100*(p/opening-1),4),"ts":ts}
     if not rows:raise ValueError("OKX_NO_FRESH_PERP_TICKERS")
     return rows
@@ -194,6 +204,7 @@ def classify(previous,current,prev_ms,now_ms):
             "interval_return_pct":round(change,4),
             "rolling_24h_change_pct":new["d"],
             "rolling_24h_turnover_usdt":new["q"],
+            "rolling_24h_turnover_estimated_from_base_units":new.get("q_proxy",False),
             "venue_count":len(venues),"cross_venue":cross_venue(venues),
             "scale_change_verified":False,
             "signal_is_price_motion_observation_not_prediction":True,
