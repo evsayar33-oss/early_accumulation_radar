@@ -1,0 +1,56 @@
+{
+  "schema": "EAR.user_extreme_casebook.v1",
+  "purpose": "User-provided positive, negative and structural-event examples. These examples NEVER retroactively create a first-seen signal.",
+  "cases": [
+    {
+      "id": "PIPPIN-USDT-PERP-2026-11-18",
+      "instrument": "PIPPINUSDT",
+      "market": "USDT_LINEAR_PERPETUAL",
+      "observation_date": "2026-11-18",
+      "source": "USER_SCREENSHOT",
+      "source_observed_not_pre_event": true,
+      "reported_24h_change_pct_approx": 66.01,
+      "visible_24h_low_usdt": 0.01073,
+      "visible_24h_high_usdt": 0.02197,
+      "visible_last_usdt": 0.01856,
+      "pre_event_v8_snapshot_exists": false,
+      "exact_pre_event_onset_verified": false,
+      "label": "USER_REPORTED_EXTREME_UPMOVE_NOT_AN_ASOF_SIGNAL",
+      "training_eligible": false,
+      "reason": "FIRST_V8_FUTURES_SNAPSHOT_POST_EVENT_AND_NO_PRE_ONSET_EVIDENCE"
+    },
+    {
+      "id": "ANT-USDT-MEXC-PREIPO-2026-11-17",
+      "instrument": "ANTUSDT",
+      "market": "MEXC_PREIPO_CONTRACT",
+      "observation_date": "2026-11-17",
+      "source": "EARLIER_USER_EXAMPLE_AND_CONTRACT_SCALE_DIAGNOSTIC",
+      "reported_change_pct_approx": -92.54,
+      "label": "SUSPECTED_CONTRACT_REBASE_OR_REDENOMINATION_NOT_VERIFIED_SPOT_CRASH",
+      "training_eligible": false,
+      "reason": "INSTRUMENT_IDENTITY_AND_PRICE_SCALE_CHANGED_NOT_COMPARABLE_AS_RETURN"
+    },
+    {
+      "id": "ETH-SOL-EAR-V2-2026-11-17",
+      "instruments": ["ETHUSDT", "SOLUSDT"],
+      "market": "BINANCE_SPOT_V2_CANDIDATE_ALERT",
+      "observation_date": "2026-11-17",
+      "source": "USER_TELEGRAM_EAR_V2_EXAMPLE",
+      "label": "ALERT_QUALITY_EXAMPLE_NOT_AN_EXTREME_EVENT_LABEL",
+      "training_eligible": false,
+      "reason": "DIFFERENT_INSTRUMENT_AND_FREQUENCY_NO_VALIDATED_EXTREME_FUTURE_LABEL"
+    }
+  ],
+  "candidate_event_onset_rule": "Derived from independently observed timestamped bars; screenshot intraday high/low never used to choose as-of time.",
+  "additional_cases_template": {
+    "instrument": "EXAMPLEUSDT",
+    "exchange": "VENUE",
+    "instrument_type": "PERPETUAL_OR_SPOT",
+    "observation_date": "YYYY-MM-DD",
+    "direction": "UP_OR_DOWN",
+    "screenshot_or_direct_observation": "USER_SUBMITTED",
+    "price_scale_verified": false,
+    "asof_pre_event_snapshot_available": false
+  },
+  "automatic_promotions_authorized": false
+}
