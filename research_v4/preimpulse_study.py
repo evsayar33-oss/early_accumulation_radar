@@ -13,6 +13,7 @@ from datetime import datetime,timezone
 from pathlib import Path
 from statistics import median
 from research_v4.perp_watch import read,unpack
+from research_v4.perp_anomaly import metric_sequence, METRICS
 
 HORIZON_MS=4*3600000
 EXTREME_MOVE_PCT=12.0
@@ -23,7 +24,11 @@ MIN_CONTROLS=200
 HISTORY_SCANS=1450  # <= ~30 days at 30-minute cadence, no change to ledger
 SOURCE_ORDER=("okx","bitget","binance")
 MOTIFS=("activity_up_20pct","activity_up_flat_3pct","quiet_price_2pct",
-        "oi_contracts_up_10pct","oi_contracts_up_flat_3pct")
+        "oi_contracts_up_10pct","oi_contracts_up_flat_3pct",
+        "relative_any_metric_outlier","relative_multiple_metrics_outlier",
+        "relative_turnover_24h_outlier","relative_oi_contracts_outlier",
+        "relative_spread_outlier","relative_funding_outlier",
+        "relative_mark_basis_outlier")
 
 def near(history,ts,minutes,tolerance):
     options=[x for x in history if abs((ts-x[0])/60000-minutes)<=tolerance]
@@ -62,6 +67,18 @@ def features(history,t,venue):
            and 0<oi_then and 0<=oi_now and math.isfinite(oi_now) and math.isfinite(oi_then)
         else None)
     acceleration=q/q1-1
+    historical=[(ts,rec) for ts,rec in past if ts<t]
+    anomaly_vector=metric_sequence(historical,cur,t)
+    def flag(name):
+        x=anomaly_vector[name]["status"]
+        if x=="OUTLIER_ABOVE_OWN_BASELINE":return True
+        if x=="WITHIN_OWN_BASELINE":return False
+        return None
+    metric_flags={metric:flag(metric) for metric in METRICS}
+    valid_flags=[v for v in metric_flags.values() if v is not None]
+    anomaly_count=sum(x is True for x in valid_flags)
+    any_outlier=(anomaly_count>0 if valid_flags else None)
+    multiple_outliers=(anomaly_count>=2 if len(valid_flags)>=2 else None)
     return {"price_return_2h_pct":round(r2,5),
         "price_return_1h_pct":round(r1,5),
         "turnover_24h_change_1h_pct":round(100*acceleration,5),
@@ -75,7 +92,16 @@ def features(history,t,venue):
             "quiet_price_2pct":abs(r2)<=2,
             "oi_contracts_up_10pct":oi_change>=.10 if oi_change is not None else None,
             "oi_contracts_up_flat_3pct":(oi_change>=.10 and abs(r2)<=3)
-                if oi_change is not None else None},
+                if oi_change is not None else None,
+            "relative_any_metric_outlier":any_outlier,
+            "relative_multiple_metrics_outlier":multiple_outliers,
+            "relative_turnover_24h_outlier":flag("turnover_24h_level_usdt"),
+            "relative_oi_contracts_outlier":flag("oi_contracts_level"),
+            "relative_spread_outlier":flag("bid_ask_spread_bps"),
+            "relative_funding_outlier":flag("funding_abs_pct"),
+            "relative_mark_basis_outlier":flag("mark_basis_abs_bps")},
+        "relative_outlier_metrics":[name for name,value in metric_flags.items() if value is True],
+        "relative_baseline_available_count":len(valid_flags),
         "funding_observed":False,"open_interest_observed":oi_change is not None,
         "stratum":zone(q,d24)}
 
