@@ -13,7 +13,8 @@ MAX_ALERTS=3
 ALERT_STAGES={"EARLY_UPWARD_MOTION_WATCH",
               "EARLY_DOWNWARD_MOTION_WATCH",
               "UPWARD_IMPULSE_ALREADY_IN_PROGRESS",
-              "DOWNWARD_IMPULSE_ALREADY_IN_PROGRESS"}
+              "DOWNWARD_IMPULSE_ALREADY_IN_PROGRESS",
+              "EXTREME_PRICE_MOVE_SCALE_UNVERIFIED"}
 
 def format_message(report):
     if report.get("schema")!="EAR.perp_forward_summary.v1":
@@ -22,16 +23,31 @@ def format_message(report):
             if e.get("stage") in ALERT_STAGES and
             e.get("cross_venue")!="DIVERGENT_MULTI_VENUE"]
     if not events:return None
-    # Prefer still-early intervals and corroborated prices; this is not an
-    # alpha ranking and ignores OI, funding, carry, trade depth, and fees.
-    events.sort(key=lambda e:(
-        not e["stage"].startswith("EARLY_"),
-        e["cross_venue"]!="CONSISTENT_MULTI_VENUE",
-        abs(e["interval_return_pct"]),e["symbol"]))
-    selected=events[:MAX_ALERTS]
+    # Preserve coverage across multiple distinct event types rather than
+    # filling all three slots with minor moves and hiding large PIPPIN-like
+    # impulses. This is NOT a predictive rank or trading recommendation.
+    def rank(e):
+        return (e["cross_venue"]!="CONSISTENT_MULTI_VENUE",
+                -abs(e["interval_return_pct"]),e["symbol"])
+    early_up=sorted((e for e in events if e["stage"]=="EARLY_UPWARD_MOTION_WATCH"),key=rank)
+    active_up=sorted((e for e in events if e["stage"] in (
+        "UPWARD_IMPULSE_ALREADY_IN_PROGRESS","EXTREME_PRICE_MOVE_SCALE_UNVERIFIED")
+        and e["interval_return_pct"]>0),key=rank)
+    down=sorted((e for e in events if e["interval_return_pct"]<0),key=rank)
+    selected=[]
+    for group in (early_up,active_up,down):
+        if group and len(selected)<MAX_ALERTS:
+            selected.append(group[0])
+    if len(selected)<MAX_ALERTS:
+        for e in sorted(events,key=rank):
+            if e not in selected:
+                selected.append(e)
+            if len(selected)==MAX_ALERTS:break
     lines=["📡 EAR V8 — PERPETUAL PİYASA HAREKETİ (ARAŞTIRMA)"]
     for e in selected:
-        mark=("ERKEN HAREKET GÖZLEMİ" if e["stage"].startswith("EARLY_")
+        mark=("ÖLÇEĞİ DOĞRULANMAMIŞ AŞIRI HAREKET"
+              if e["stage"]=="EXTREME_PRICE_MOVE_SCALE_UNVERIFIED"
+              else "ERKEN HAREKET GÖZLEMİ" if e["stage"].startswith("EARLY_")
               else "HAREKET ZATEN BAŞLAMIŞ")
         sign="+" if e["interval_return_pct"]>=0 else ""
         confirm=(str(e["venue_count"])+" borsa fiyatı uyumlu"
