@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/perp_early_watch.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/perp_early_watch.yml'
+      - 'research_v4/perp_watch.py'
   workflow_dispatch:
   schedule:
     - cron: '9,39 * * * *' # best effort, NOT realtime
@@ -13,6 +18,28 @@ concurrency:
   group: early-radar-v8-perp-evidence
   cancel-in-progress: false
 jobs:
+  provider-smoke-pr-only:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Probe public perpetual coverage (read-only, never a signal)
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from research_v4.perp_watch import scan
+          r=scan()
+          print('PROVIDERS',r['sources'])
+          print('UNAVAILABLE',r['source_unavailable'])
+          print('VALID_USDT_PERPS',len(r['assets']))
+          print('PIPPIN_ACTIVE', 'PIPPINUSDT' in r['assets'])
+          PY
   observe-perpetuals:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
