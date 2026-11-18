@@ -20,13 +20,13 @@ def format_message(report):
         raise ValueError("WRONG_PERP_REPORT_SCHEMA")
     events=[e for e in report.get("new_events",[])
             if e.get("stage") in ALERT_STAGES and
-            e.get("cross_venue")!="DIVERGENT_TWO_VENUES"]
+            e.get("cross_venue")!="DIVERGENT_MULTI_VENUE"]
     if not events:return None
     # Prefer still-early intervals and corroborated prices; this is not an
     # alpha ranking and ignores OI, funding, carry, trade depth, and fees.
     events.sort(key=lambda e:(
         not e["stage"].startswith("EARLY_"),
-        e["cross_venue"]!="CONSISTENT_TWO_VENUES",
+        e["cross_venue"]!="CONSISTENT_MULTI_VENUE",
         abs(e["interval_return_pct"]),e["symbol"]))
     selected=events[:MAX_ALERTS]
     lines=["📡 EAR V8 — PERPETUAL PİYASA HAREKETİ (ARAŞTIRMA)"]
@@ -34,7 +34,8 @@ def format_message(report):
         mark=("ERKEN HAREKET GÖZLEMİ" if e["stage"].startswith("EARLY_")
               else "HAREKET ZATEN BAŞLAMIŞ")
         sign="+" if e["interval_return_pct"]>=0 else ""
-        confirm=("2 borsa fiyatı uyumlu" if e["cross_venue"]=="CONSISTENT_TWO_VENUES"
+        confirm=(str(e["venue_count"])+" borsa fiyatı uyumlu"
+                 if e["cross_venue"]=="CONSISTENT_MULTI_VENUE"
                  else "TEK BORSA — TEYİTSİZ")
         lines.append(f"{mark} | {e['symbol']} | {e['price_at_observation']:.8g} USDT "
            f"| {e['interval_minutes']:.0f} dk {sign}{e['interval_return_pct']:.2f}% "
