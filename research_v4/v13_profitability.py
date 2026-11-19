@@ -88,7 +88,10 @@ def assert_source(source_root, market, now):
         if (o.get("signal_id") not in seen or o.get("market") != market
                 or o.get("horizon_sessions") not in HORIZONS
                 or o.get("id") in outcome_ids
-                or o.get("trade_authorized") is not False
+                or (o.get("status") == "OBSERVED_FUTURE_CLOSED_SESSIONS"
+                    and o.get("trade_authorized") is not False)
+                or (o.get("status") != "OBSERVED_FUTURE_CLOSED_SESSIONS"
+                    and o.get("trade_authorized") not in (None, False))
                 or o.get("status") not in (
                     "OBSERVED_FUTURE_CLOSED_SESSIONS",
                     "SUSPECTED_CORPORATE_ACTION_OR_PRICE_GAP",
