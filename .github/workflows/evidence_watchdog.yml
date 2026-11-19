@@ -1,5 +1,8 @@
 name: Evidence freshness watchdog and recovery
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/evidence_watchdog.yml']
   workflow_dispatch:
   schedule:
     - cron: '3,23,43 * * * *'
