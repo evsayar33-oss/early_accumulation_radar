@@ -1,0 +1,100 @@
+name: V13 Crypto Perpetual Costed Alpha Discovery (RESEARCH ONLY)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v13_crypto_profit.yml']
+  workflow_dispatch:
+  schedule:
+    - cron: '57 0,4,8,12,16,20 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: early-radar-v13-crypto-costed-evidence
+  cancel-in-progress: false
+jobs:
+  crypto-costed-research:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Offline integrity and no-fabrication regressions
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v
+          python -m compileall -q radar research_v4
+      - name: Read ONLY the verified V8 perpetual market snapshot archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='research/v8-perp-forward'
+          git fetch --no-tags origin "$B"
+          git show "FETCH_HEAD:observations/perp/snapshots.jsonl" > "$RUNNER_TEMP/v13-crypto-v8-input.jsonl"
+          test -s "$RUNNER_TEMP/v13-crypto-v8-input.jsonl" || {
+            echo "::error::V8_VERIFIED_SOURCE_MISSING"; exit 1;
+          }
+          echo "V13_CRYPTO_V8_SOURCE=$RUNNER_TEMP/v13-crypto-v8-input.jsonl" >> "$GITHUB_ENV"
+      - name: Open independent V13 CRYPTO append-only strategy evidence branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='research/v13-crypto-alpha-evidence'
+          ROOT="$RUNNER_TEMP/v13-crypto-evidence"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch --no-tags origin "$B"
+            git worktree add -b v13-crypto-local "$ROOT" FETCH_HEAD
+            for ledger in observations outcomes frozen decisions; do
+              test -f "$ROOT/research_archive/v13_crypto/$ledger.jsonl" || {
+                echo "::error::V13_CRYPTO_PRIOR_LEDGER_MISSING_$ledger"; exit 1;
+              }
+            done
+          else
+            git worktree add -b v13-crypto-local "$ROOT" HEAD
+            mkdir -p "$ROOT/research_archive/v13_crypto"
+            for ledger in observations outcomes frozen decisions; do
+              touch "$ROOT/research_archive/v13_crypto/$ledger.jsonl"
+            done
+          fi
+          echo "V13_CRYPTO_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Real future-entry snapshot matching and separate long/short cost screens
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.v13_crypto_profit \
+            --v8-ledger "$V13_CRYPTO_V8_SOURCE" \
+            --state "$V13_CRYPTO_ROOT/research_archive/v13_crypto" \
+            --out out/v13_crypto
+          cat out/v13_crypto/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: v13-crypto-costed-research-${{ github.run_id }}
+          path: out/v13_crypto/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Commit immutable costed entry/outcome/hypothesis evidence before notification
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$V13_CRYPTO_ROOT"
+          cp out/v13_crypto/report.json "$ROOT/research_archive/v13_crypto/latest.json"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add research_archive/v13_crypto/
+          if git -C "$ROOT" diff --cached --quiet; then
+            echo 'V13_CRYPTO_NO_CHANGE'
+          else
+            git -C "$ROOT" commit -m 'research(v13-crypto): preserve non-executable costed perpetual evidence [skip ci]'
+            git -C "$ROOT" push origin HEAD:refs/heads/research/v13-crypto-alpha-evidence
+          fi
+      - name: Notify ONLY newly frozen crypto alpha candidates or closed trials
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m research_v4.v13_crypto_notify --report out/v13_crypto/report.json
