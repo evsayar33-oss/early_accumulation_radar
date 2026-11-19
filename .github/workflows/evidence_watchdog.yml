@@ -33,6 +33,7 @@ jobs:
           targets=(
               ('V2','paper/early-radar-v2','observations/scan.jsonl','research_v2.yml'),
               ('V3 PAPER','paper/early-radar-nav','paper_state/events.jsonl','v3_paper.yml'),
+              ('V8 PERP','research/v8-perp-forward','observations/perp/snapshots.jsonl','perp_early_watch.yml'),
           )
           stale=[]
           dispatch_failures=[]
