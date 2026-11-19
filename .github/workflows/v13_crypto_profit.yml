@@ -70,6 +70,12 @@ jobs:
             --state "$V13_CRYPTO_ROOT/research_archive/v13_crypto" \
             --out out/v13_crypto
           cat out/v13_crypto/report.md >> "$GITHUB_STEP_SUMMARY"
+          python - <<'PY'
+          import json
+          report=json.load(open('out/v13_crypto/report.json',encoding='utf8'))
+          if report['source_status']!='FRESH_V8_RESEARCH_OBSERVATIONS':
+              print('::warning title=V8 producer stale::V13 crypto paused all new signals; V8 freshness watchdog will request recovery')
+          PY
       - uses: actions/upload-artifact@v6
         if: always()
         with:
