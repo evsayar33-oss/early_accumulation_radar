@@ -1,0 +1,151 @@
+name: V12 Independent BIST US Equity Pattern Discovery (RESEARCH ONLY)
+on:
+  workflow_run:
+    workflows:
+      - V5 Autonomous three-market research and prospective evidence (NO TRADING)
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Trusted completed successful main V5 run ID (from Actions)'
+        required: true
+        type: string
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: ear-v12-independent-equity-evidence
+  cancel-in-progress: false
+jobs:
+  first-seen-equity-patterns:
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository) ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Run standalone equity integrity regressions
+        run: |
+          python -m unittest discover -s tests -p 'test_v12_*.py' -v
+          python -m compileall -q research_v4/v12_equity_patterns.py research_v4/v12_equity_notify.py
+      - name: Verify exact upstream V5 run belongs to trusted main and is recent
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SOURCE_RUN="${{ github.event.workflow_run.id || inputs.source_run_id }}"
+          [[ "$SOURCE_RUN" =~ ^[0-9]+$ ]] || { echo "::error::Invalid V5 run ID"; exit 1; }
+          META=$(gh api "repos/${{ github.repository }}/actions/runs/$SOURCE_RUN")
+          python - "$META" <<'PY'
+          import json,sys
+          from datetime import datetime,timezone,timedelta
+          r=json.loads(sys.argv[1])
+          trusted=(r.get('name')=='V5 Autonomous three-market research and prospective evidence (NO TRADING)'
+                   and r.get('conclusion')=='success'
+                   and r.get('head_branch')=='main'
+                   and (r.get('head_repository') or {}).get('full_name')==r.get('repository',{}).get('full_name'))
+          when=datetime.fromisoformat(r['created_at'].replace('Z','+00:00'))
+          age=datetime.now(timezone.utc)-when
+          if not trusted or not timedelta(0)<=age<=timedelta(days=7):
+              raise SystemExit('REJECT_UNTRUSTED_OR_STALE_V5_RUN')
+          print('TRUSTED_V5_SOURCE',r['id'],r['head_sha'])
+          PY
+          echo "SOURCE_RUN_ID=$SOURCE_RUN" >> "$GITHUB_ENV"
+      - name: Download exactly verified V5 quality-screened OHLCV artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+          name: v5-autonomous-research-${{ env.SOURCE_RUN_ID }}
+          path: out
+      - name: Load dedicated append-only V12 BIST and US state branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='research/v12-equity-pattern-evidence'
+          ROOT="$RUNNER_TEMP/v12-equity-state"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch --no-tags origin "$B"
+            git worktree add -b v12-equity-local "$ROOT" FETCH_HEAD
+            for market in BIST US; do
+              for ledger in observations outcomes frozen decisions; do
+                test -f "$ROOT/research_archive/v12/$market/$ledger.jsonl" || {
+                  echo "::error::V12_EXISTING_EVIDENCE_MISSING_$market_$ledger"; exit 1;
+                }
+              done
+            done
+          else
+            git worktree add -b v12-equity-local "$ROOT" HEAD
+            for market in BIST US; do
+              mkdir -p "$ROOT/research_archive/v12/$market"
+              for ledger in observations outcomes frozen decisions; do
+                touch "$ROOT/research_archive/v12/$market/$ledger.jsonl"
+              done
+            done
+          fi
+          echo "V12_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Run independent BIST equity as-of monitoring and future validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.v12_equity_patterns \
+            --market BIST \
+            --csv out/data_quality/screened_prices.csv \
+            --quality out/data_quality/report.json \
+            --source-run-id "$SOURCE_RUN_ID" \
+            --state-root "$V12_ROOT/research_archive/v12" \
+            --out out/v12_equities
+          cat out/v12_equities/BIST/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Run independent US equity as-of monitoring and future validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.v12_equity_patterns \
+            --market US \
+            --csv out/data_quality/screened_prices.csv \
+            --quality out/data_quality/report.json \
+            --source-run-id "$SOURCE_RUN_ID" \
+            --state-root "$V12_ROOT/research_archive/v12" \
+            --out out/v12_equities
+          cat out/v12_equities/US/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the two independent diagnostic reports even on failure
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: v12-equity-discovery-${{ github.run_id }}
+          path: out/v12_equities/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Persist both SHA-linked evidence histories before any notification
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$V12_ROOT"
+          cp out/v12_equities/BIST/report.json "$ROOT/research_archive/v12/BIST/latest.json"
+          cp out/v12_equities/US/report.json "$ROOT/research_archive/v12/US/latest.json"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add research_archive/v12/
+          if git -C "$ROOT" diff --cached --quiet; then
+            echo 'V12 evidence unchanged'
+          else
+            git -C "$ROOT" commit -m 'research(v12): append BIST and US as-of and prospective evidence [skip ci]'
+            git -C "$ROOT" push origin HEAD:refs/heads/research/v12-equity-pattern-evidence
+          fi
+      - name: Notify only when equity pattern frozen or independent trial closed
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -m research_v4.v12_equity_notify --reports out/v12_equities/BIST/report.json out/v12_equities/US/report.json
