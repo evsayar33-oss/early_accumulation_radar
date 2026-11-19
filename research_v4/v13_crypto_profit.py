@@ -188,16 +188,19 @@ def future_mark(signal,snapshots,horizon,now_ms):
         if now_ms<t+STALE_OUTCOME_HOURS*3600000:return None
         return {"status":"CENSORED_NO_VERIFIABLE_NEXT_QUOTE"}
     start,quote=entry
-    end=next(((stamp,v) for stamp,v in upcoming
-              if abs(stamp-(start+horizon*60000))<=EXIT_TOLERANCE_MIN*60000
-              and valid_quote(v)),None)
+    target=start+horizon*60000
+    exits=[(stamp,v) for stamp,v in upcoming
+           if abs(stamp-target)<=EXIT_TOLERANCE_MIN*60000
+           and valid_quote(v)]
+    end=min(exits,key=lambda row:abs(row[0]-target)) if exits else None
     if end is None:
         if now_ms<t+STALE_OUTCOME_HOURS*3600000:return None
         return {"status":"CENSORED_FUTURE_QUOTE_GAP"}
     stop,exit_quote=end
-    contiguous=[(stamp,v) for stamp,v in upcoming if start<=stamp<=stop
-                and valid_quote(v)]
-    if (not contiguous or contiguous[0][0]!=start or contiguous[-1][0]!=stop
+    all_venue=[(stamp,v) for stamp,v in upcoming if start<=stamp<=stop]
+    contiguous=[(stamp,v) for stamp,v in all_venue if valid_quote(v)]
+    if (len(contiguous)!=len(all_venue) or not contiguous
+            or contiguous[0][0]!=start or contiguous[-1][0]!=stop
             or any((b[0]-a[0])>MAX_QUOTE_GAP_MIN*60000
                    for a,b in zip(contiguous,contiguous[1:]))):
         return {"status":"CENSORED_NONCONTIGUOUS_FUTURE_PRICES"}
