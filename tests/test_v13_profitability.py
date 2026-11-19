@@ -118,6 +118,30 @@ class V13Contracts(unittest.TestCase):
         self.assertEqual(len(fills), p.MAX_SLOTS)
         self.assertEqual(decline["portfolio_slots"], 11 - p.MAX_SLOTS)
 
+    def test_later_missing_peer_does_not_change_signal_time_trade_selection(self):
+        source = sample(days=14)
+        baseline, _ = p.one_rule(source, "volume_surge")
+        only_winners = [x for x in source if x["motifs"]["volume_surge"]]
+        after, controls = p.one_rule(only_winners, "volume_surge")
+        self.assertEqual({x["id"] for x in baseline},
+                         {x["id"] for x in after})
+        self.assertEqual(controls, [])
+        self.assertEqual(len(p.chronological_fills(baseline)[0]),
+                         len(p.chronological_fills(after)[0]))
+
+    def test_orphaned_source_outcomes_fail_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / "BIST"
+            root.mkdir(parents=True)
+            append_sealed(root / "outcomes.jsonl", [{
+                "kind": "outcome", "id": "orphan",
+                "signal_id": "no_observation", "market": "BIST",
+                "symbol": "ABC", "horizon_sessions": 1,
+                "status": "ENTRY_NOT_OBSERVED_IN_ALLOWED_WINDOW",
+            }], int(BASE.timestamp()*1000))
+            with self.assertRaises(ValueError):
+                p.assert_source(Path(d), "BIST", BASE + timedelta(days=1))
+
     def test_censored_unknown_future_outcome_is_not_a_winner(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d) / "BIST"
