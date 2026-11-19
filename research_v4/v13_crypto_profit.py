@@ -111,8 +111,12 @@ def spread_bps(quote):
 
 def asof_signals(snapshots,now_ms,previous_ids,version):
     """Only latest actually observed scan, never backfill earlier history."""
-    if not snapshots or not 0<=now_ms-snapshots[-1][0]<=MAX_SOURCE_AGE_MIN*60000:
-        raise ValueError("STALE_V8_LAST_SNAPSHOT")
+    if not snapshots or snapshots[-1][0]>now_ms:
+        raise ValueError("V8_SOURCE_EMPTY_OR_FUTURE")
+    if now_ms-snapshots[-1][0]>MAX_SOURCE_AGE_MIN*60000:
+        # Source outage is a recorded degraded state, NEVER an invitation
+        # to manufacture new first-seen signals from old V8 snapshots.
+        return [],{"STALE_UPSTREAM_V8_NEW_OBSERVATIONS_BLOCKED":1}
     t,assets,sha=snapshots[-1]
     own=defaultdict(list)
     for when,frame,_ in snapshots:
@@ -431,6 +435,10 @@ def run(source_path,state_dir,now_ms,version=None,root="."):
                                 now_ms+len(new_obs)+len(future)+len(locks)+100)
     return {
         "schema":"EAR.v13_crypto_costed_research.v1",
+        "source_status":("STALE_UPSTREAM_V8_WATCH_ONLY" if
+                         skips.get("STALE_UPSTREAM_V8_NEW_OBSERVATIONS_BLOCKED")
+                         else "FRESH_V8_RESEARCH_OBSERVATIONS"),
+        "source_age_minutes":round((now_ms-snapshots[-1][0])/60000,3),
         "asof_utc":now.isoformat(),"source_v8_last_sha256":snapshots[-1][2],
         "source_v8_scans_in_window":len(snapshots),
         "methodology_sha256":version,
@@ -480,7 +488,8 @@ def main():
     (out/"report.json").write_text(json.dumps(report,indent=2,sort_keys=True,
                                          allow_nan=False)+"\n",encoding="utf8")
     lines=["# V13 CRYPTO — cost-stressed, future-only perpetual research",
-        "",f"Real V8 snapshots available in features window: {report['source_v8_scans_in_window']}",
+        "",f"V8 source status: {report['source_status']} (age min: {report['source_age_minutes']})",
+        f"Real V8 snapshots available in features window: {report['source_v8_scans_in_window']}",
         f"First-seen observations: {report['asof_observations']} (+{report['new_observations']})",
         f"Modelled quote-to-quote future outcomes: {report['modeled_outcomes']} (+{report['new_outcomes']})",
         f"Pending: {report['pending_future_outcomes']}",
