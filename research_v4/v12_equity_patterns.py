@@ -181,6 +181,8 @@ def latest_observations(series, market, now, source_sha, source_run_id, version)
             "entry_strictly_after_utc_date": today.isoformat(),
             "source_run_id": str(source_run_id),
             "source_sha256": source_sha, "methodology_sha256": version,
+            "outcome_threshold_pct": EXTREME_PCT[market],
+            "round_trip_cost_proxy_pct": COST[market],
             "close_reference_not_executable": z["last_close"],
             "stratum": stratum, "motifs": motifs,
             "asof_features": {
@@ -227,7 +229,8 @@ def evaluate_horizon(signal, bars, horizon):
     if entry <= 0 or exit_price <= 0:
         return None
     gross = 100 * (exit_price / entry - 1)
-    threshold = EXTREME_PCT[signal["market"]]
+    threshold = signal["outcome_threshold_pct"]
+    cost = signal["round_trip_cost_proxy_pct"]
     label = ("UPSIDE_EXTREME" if gross >= threshold else
              "DOWNSIDE_EXTREME" if gross <= -threshold else
              "NO_EXTREME_MOVE") if horizon == PRIMARY_HORIZON else None
@@ -243,8 +246,8 @@ def evaluate_horizon(signal, bars, horizon):
         "entry_open_price_unverified_fill": entry,
         "exit_close_price_unverified_fill": exit_price,
         "gross_return_pct": round(gross, 6),
-        "long_assumed_cost_pct": COST[signal["market"]],
-        "long_costed_diagnostic_pct": round(gross - COST[signal["market"]], 6),
+        "long_assumed_cost_pct": cost,
+        "long_costed_diagnostic_pct": round(gross - cost, 6),
         "bearish_result_is_not_executable_short": True,
         "label": label,
         "paper_approved": False, "trade_authorized": False,
@@ -252,14 +255,15 @@ def evaluate_horizon(signal, bars, horizon):
     }
 
 
-def research_rows(signals, outcomes, market):
+def research_rows(signals, outcomes, market, version=None):
     pairs = {o["signal_id"]: o for o in outcomes
              if o["horizon_sessions"] == PRIMARY_HORIZON
              and o["market"] == market
              and o["status"] == "OBSERVED_FUTURE_CLOSED_SESSIONS"}
     rows = []
     for s in signals:
-        if s["market"] != market or s["id"] not in pairs:
+        if (s["market"] != market or s["id"] not in pairs
+                or (version is not None and s["methodology_sha256"] != version)):
             continue
         o = pairs[s["id"]]
         rows.append({
@@ -335,7 +339,7 @@ def execute(series, market, now, source_sha, source_run_id, state_root, version=
     future.sort(key=lambda x: (x["signal_id"], x["horizon_sessions"]))
     outcomes = append_sealed(paths["outcomes"], future, stamp + len(new_signals) + 100)
 
-    rows = research_rows(signals, outcomes, market)
+    rows = research_rows(signals, outcomes, market, version)
     exploration = stats(rows)
     frozen = old["frozen"]
     decisions = old["decisions"]
