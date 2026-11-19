@@ -101,8 +101,21 @@ class CryptoContracts(unittest.TestCase):
             replay,_=c.asof_signals(scan,T+5*60000,{obs[0]["id"]},"v1")
             self.assertEqual(replay,[])
             self.assertFalse(obs[0]["trade_authorized"])
-        with self.assertRaises(ValueError):
-            c.asof_signals(scan,T+91*60000,set(),"v1")
+        empty,health=c.asof_signals(scan,T+91*60000,set(),"v1")
+        self.assertEqual(empty,[])
+        self.assertEqual(health["STALE_UPSTREAM_V8_NEW_OBSERVATIONS_BLOCKED"],1)
+
+    def test_stale_real_verified_source_blocks_synthetic_entries_and_reports_degraded(self):
+        with tempfile.TemporaryDirectory() as d:
+            ledger=Path(d)/"v8.jsonl"
+            make_sha_v8(ledger,[T,T+30*60000])
+            report=c.run(ledger,Path(d)/"v13",T+9*3600000,version="v1")
+            self.assertEqual(report["source_status"],"STALE_UPSTREAM_V8_WATCH_ONLY")
+            self.assertEqual(report["new_observations"],0)
+            self.assertEqual(report["strategy_variants_tested"],92)
+            self.assertEqual(report["exploratory_candidates"],[])
+            self.assertEqual(len(read_verify(Path(d)/"v13"/"observations.jsonl")),0)
+            self.assertFalse(report["limitations"]["trade_authorized"])
 
     def test_future_prices_not_event_extrema_and_fees_nonzero(self):
         s=observation()
