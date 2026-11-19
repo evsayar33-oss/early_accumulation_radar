@@ -1,0 +1,119 @@
+name: V13 Costed Alpha Discovery and Future Profit Validation (RESEARCH ONLY)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v13_profitability.yml']
+  workflow_run:
+    workflows:
+      - V12 Independent BIST US Equity Pattern Discovery (RESEARCH ONLY)
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: early-radar-v13-net-alpha-evidence
+  cancel-in-progress: false
+jobs:
+  costed-alpha:
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository) ||
+      ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+       github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: All offline profitability and upstream evidence regressions
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v
+          python -m compileall -q radar research_v4
+      - name: Mount previously persisted SHA-linked V12 equity evidence (read only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE='research/v12-equity-pattern-evidence'
+          ROOT="$RUNNER_TEMP/v13-v12-input"
+          git fetch --no-tags origin "$SOURCE"
+          git worktree add --detach "$ROOT" FETCH_HEAD
+          for market in BIST US; do
+            for ledger in observations outcomes frozen decisions; do
+              test -f "$ROOT/research_archive/v12/$market/$ledger.jsonl" || {
+                echo "::error::V12_SOURCE_LEDGER_MISSING_${market}_${ledger}"; exit 1;
+              }
+            done
+          done
+          echo "V13_SOURCE_ROOT=$ROOT/research_archive/v12" >> "$GITHUB_ENV"
+      - name: Load isolated V13 locked trials and decisions (fail on missing ledger)
+        shell: bash
+        run: |
+          set -euo pipefail
+          B='research/v13-alpha-evidence'
+          ROOT="$RUNNER_TEMP/v13-alpha-state"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch --no-tags origin "$B"
+            git worktree add -b v13-alpha-local "$ROOT" FETCH_HEAD
+            for market in BIST US; do
+              for ledger in frozen decisions; do
+                test -f "$ROOT/research_archive/v13/$market/$ledger.jsonl" || {
+                  echo "::error::V13_EXISTING_LEDGER_MISSING_${market}_${ledger}"; exit 1;
+                }
+              done
+            done
+          else
+            git worktree add -b v13-alpha-local "$ROOT" HEAD
+            for market in BIST US; do
+              mkdir -p "$ROOT/research_archive/v13/$market"
+              for ledger in frozen decisions; do
+                touch "$ROOT/research_archive/v13/$market/$ledger.jsonl"
+              done
+            done
+          fi
+          echo "V13_STATE_ROOT=$ROOT/research_archive/v13" >> "$GITHUB_ENV"
+          echo "V13_GIT_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Discover and qualify net-positive strategy candidates only from future observed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m research_v4.v13_profitability \
+            --source "$V13_SOURCE_ROOT" \
+            --state "$V13_STATE_ROOT" \
+            --out out/v13_alpha
+          cat out/v13_alpha/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: v13-net-alpha-report-${{ github.run_id }}
+          path: out/v13_alpha/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Persist separate BIST and US SHA-linked strategy evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$V13_GIT_ROOT"
+          cp out/v13_alpha/report.json "$ROOT/research_archive/v13/latest.json"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add research_archive/v13/
+          if git -C "$ROOT" diff --cached --quiet; then
+            echo 'V13_NO_EVIDENCE_CHANGE'
+          else
+            git -C "$ROOT" commit -m 'research(v13): costed strategy discovery and frozen future validation [skip ci]'
+            git -C "$ROOT" push origin HEAD:refs/heads/research/v13-alpha-evidence
+          fi
+      - name: Notify only when a profitable candidate is frozen or future trial closes
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m research_v4.v13_notify --input out/v13_alpha/report.json
