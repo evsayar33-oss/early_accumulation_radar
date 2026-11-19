@@ -98,6 +98,21 @@ class V12Equity(unittest.TestCase):
                  if x["signal_id"] == first_id}, set(p.HORIZONS))
             self.assertEqual(next_run["matured_primary_cohort"], 1)
 
+    def test_frozen_thresholds_cannot_relabel_old_future_outcomes(self):
+        from unittest.mock import patch
+        signal = p.latest_observations(prices(), "BIST", NOW, "sha", "1", "v1")[0]
+        before = p.evaluate_horizon(signal, prices(133)[("BIST", "TEST")], 5)
+        with patch.dict(p.EXTREME_PCT, {"BIST": 0.00001}):
+            after = p.evaluate_horizon(signal, prices(133)[("BIST", "TEST")], 5)
+        self.assertEqual(before["label"], after["label"])
+        self.assertEqual(before["long_assumed_cost_pct"], after["long_assumed_cost_pct"])
+
+    def test_changed_method_never_trains_on_old_first_seen_records(self):
+        s = p.latest_observations(prices(), "BIST", NOW, "sha", "1", "old")[0]
+        o = p.evaluate_horizon(s, prices(133)[("BIST", "TEST")], 5)
+        self.assertEqual(len(p.research_rows([s], [o], "BIST", "old")), 1)
+        self.assertEqual(p.research_rows([s], [o], "BIST", "new"), [])
+
     def test_corrupted_source_sha_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             csv = Path(d) / "prices.csv"
