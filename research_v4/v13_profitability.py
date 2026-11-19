@@ -71,6 +71,8 @@ def assert_source(source_root, market, now):
     result = {name: read_verify(root / (name + ".jsonl"))
               for name in ("observations", "outcomes", "frozen", "decisions")}
     if not result["observations"]:
+        if result["outcomes"] or result["frozen"] or result["decisions"]:
+            raise ValueError("V12_ORPHANED_EVIDENCE_WITHOUT_FIRST_SEEN")
         return result
     seen = set()
     for s in result["observations"]:
@@ -162,16 +164,14 @@ def one_rule(rows, rule, *, since=None, before=None):
     for x in eligible:
         if rule_on(x["motifs"], rule) is not None:
             cohorts[(x["observed_utc"], x["stratum"])].append(x)
-    matched_ids = set()
+    # Trade eligibility depends only on the as-of rule (and later maturity
+    # for measurement), NEVER on whether a peer later survived or was priced.
+    active = [x for x in eligible if rule_on(x["motifs"], rule) is True]
     controls = []
     for group in cohorts.values():
-        active = [x for x in group if rule_on(x["motifs"], rule)]
-        inactive = [x for x in group if rule_on(x["motifs"], rule) is False]
-        if active and inactive:
-            matched_ids.update(x["id"] for x in active)
-            controls.extend(inactive)
-    active = [x for x in eligible
-              if x["id"] in matched_ids and rule_on(x["motifs"], rule)]
+        if any(rule_on(x["motifs"], rule) is True for x in group):
+            controls.extend(x for x in group
+                            if rule_on(x["motifs"], rule) is False)
     return active, controls
 
 
