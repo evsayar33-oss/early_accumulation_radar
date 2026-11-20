@@ -1,13 +1,13 @@
 {
   "all_settlements": 0,
-  "all_signals": 17,
-  "asof_utc": "2026-11-19T12:14:08.331562+00:00",
+  "all_signals": 22,
+  "asof_utc": "2026-11-20T12:16:19.797272+00:00",
   "by_family": [],
-  "current_source_csv_sha256": "54314250a1cb0fa32c4f77989094e452d3913bdd73728ea625b2e1ad80f715d0",
+  "current_source_csv_sha256": "2a12912455c9ec646489cdf0519a3ef6c07261c2270e56caa2940ea5f11371d3",
   "historical_pit_verified": false,
   "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
   "new_settlements": 0,
-  "new_signals": 4,
+  "new_signals": 5,
   "notes": "First-observed signals only; entry strictly AFTER observation UTC date. Survivorship and data-provider revisions unresolved.",
   "paper_approved": false,
   "profitable_strategy_confirmed": false,
@@ -16,6 +16,6 @@
   "schema": "EAR.prospective_research_ledger.v1",
   "trade_authorized": false,
   "unsettled_reasons": {
-    "AWAITING_FUTURE_CLOSED_BARS": 17
+    "AWAITING_FUTURE_CLOSED_BARS": 22
   }
 }
