@@ -1,0 +1,54 @@
+name: V14 Autonomous BIST US research continuity (NO TRADING)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v14_equity_autonomy.yml']
+  workflow_dispatch:
+  schedule:
+    # GitHub schedule is best-effort. The 9-hour V5 grace avoids duplicate
+    # recoveries of materially delayed 03:47 UTC Tue-Sat normal runs.
+    - cron: '17 14,19 * * 2-6'
+  workflow_run:
+    workflows:
+      - V13 Costed Alpha Discovery and Future Profit Validation (RESEARCH ONLY)
+    types: [completed]
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: ear-v14-equity-continuity
+  cancel-in-progress: false
+jobs:
+  equity-liveness:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify V14 continuity logic and unchanged V12 source integrity
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_v14_*.py' -v
+          python -m compileall -q research_v4
+      - name: Inspect main-branch workflow lifecycle and BIST US source evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python -m research_v4.equity_autonomy --out out/v14_equity_autonomy
+          cat out/v14_equity_autonomy/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve audit including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v14-equity-continuity-${{ github.run_id }}
+          path: out/v14_equity_autonomy/
+          retention-days: 90
+          if-no-files-found: warn
