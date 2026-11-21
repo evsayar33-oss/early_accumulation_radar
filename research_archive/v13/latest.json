@@ -1,5 +1,5 @@
 {
-  "asof_utc": "2026-11-20T12:17:02.251396+00:00",
+  "asof_utc": "2026-11-21T11:52:10.733251+00:00",
   "markets": {
     "BIST": {
       "active_trials": [],
@@ -1419,7 +1419,7 @@
       "new_forward_decisions": [],
       "new_frozen": [],
       "rule_horizon_trials": 64,
-      "v12_first_seen_total": 46,
+      "v12_first_seen_total": 69,
       "v12_matured_outcomes": {
         "1": 0,
         "10": 0,
@@ -2845,7 +2845,7 @@
       "new_forward_decisions": [],
       "new_frozen": [],
       "rule_horizon_trials": 64,
-      "v12_first_seen_total": 44,
+      "v12_first_seen_total": 67,
       "v12_matured_outcomes": {
         "1": 0,
         "10": 0,
@@ -2854,11 +2854,11 @@
       }
     }
   },
-  "methodology_sha256": "2a7650b89c80f850351340a592576e90033865a090f818be7b91c7e1f0e3d572",
+  "methodology_sha256": "6e19305990d4a0afbc1528b4d5a6bcedf5347ba83cd5ae6826fe43220c94b3e1",
   "paper_approved": false,
   "profitable_strategy_proven": false,
   "research_only": true,
   "schema": "EAR.v13_costed_profitability_discovery.v1",
-  "source_v12_methodology_sha256": "83cf7708e49666388d393f4d4ccb9c11391d563e093b0cdbbb40d9886118ddec",
+  "source_v12_methodology_sha256": "16714f14a574e96b65ad62845543a194d9b25808e87b15339ba012136eef78bc",
   "trade_authorized": false
 }
