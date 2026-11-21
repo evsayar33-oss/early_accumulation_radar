@@ -298,7 +298,8 @@ def stats(rows):
     return all_rows
 
 
-def execute(series, market, now, source_sha, source_run_id, state_root, version=None):
+def execute(series, market, now, source_sha, source_run_id, state_root, version=None,
+            settlement_series=None, recovery=None):
     if market not in MARKETS:
         raise ValueError("UNKNOWN_MARKET")
     if now.tzinfo is None:
@@ -323,15 +324,19 @@ def execute(series, market, now, source_sha, source_run_id, state_root, version=
     already = {o["id"] for o in old["outcomes"]}
     future = []
     pending = Counter()
+    recovery = recovery or {"symbols_recovered": [], "missing_symbols": [], "errors": {}}
+    actual_settlement_series = settlement_series if settlement_series is not None else series
+    recovered = set(recovery.get("symbols_recovered", []))
     for s in signals:
-        bars = series.get((market, s["symbol"]))
+        bars = actual_settlement_series.get((market, s["symbol"]))
         for h in HORIZONS:
             key = stable_id(s["id"], h)
             if key in already:
                 continue
             out = evaluate_horizon(s, bars, h)
             if out is not None:
-                out["source_sha256_at_settlement"] = source_sha
+                out["source_sha256_at_settlement"] = (None if s["symbol"] in recovered else source_sha)
+                out["settlement_source"] = ("FUTURE_YAHOO_RECOVERY_NOT_V5_ARTIFACT" if s["symbol"] in recovered else "TRUSTED_V5_SCREENED_ARTIFACT")
                 out["methodology_sha256"] = s["methodology_sha256"]
                 future.append(out)
             else:
@@ -426,6 +431,7 @@ def execute(series, market, now, source_sha, source_run_id, state_root, version=
         "forward_outcomes_total": len(outcomes),
         "new_forward_outcomes": len(future),
         "pending_horizons": dict(pending),
+        "recovery": recovery,
         "matured_primary_cohort": len(rows),
         "primary_label_counts": dict(Counter(r["future"]["label"] for r in rows)),
         "tests_per_checkpoint": len(RULES) * len(DIRECTIONS),
@@ -484,9 +490,15 @@ def main():
     if quality.get("coverage", {}).get(a.market, {}).get("screened", 0) < 2:
         raise ValueError("NO_VALID_EQUITY_SOURCE_COVERAGE")
     now = timestamp(a.asof) if a.asof else datetime.now(timezone.utc)
+    series = load(a.csv)
+    from research_v4.equity_followthrough import recover_settlement_universe
+    prior_observations = read_verify(Path(a.state_root) / a.market / "observations.jsonl")
+    settlement_series, recovery = recover_settlement_universe(
+        series, a.market, prior_observations, now)
     report = execute(
-        load(a.csv), a.market, now, source_sha,
-        a.source_run_id, a.state_root)
+        series, a.market, now, source_sha,
+        a.source_run_id, a.state_root,
+        settlement_series=settlement_series, recovery=recovery)
     out = Path(a.out) / a.market
     out.mkdir(parents=True, exist_ok=True)
     (out / "report.json").write_text(
@@ -499,6 +511,8 @@ def main():
         "New observations: " + str(report["new_asof_observations"]),
         "Matured five-session samples: " + str(report["matured_primary_cohort"]),
         "Forward outcomes: " + str(report["forward_outcomes_total"]),
+        "Off-universe symbols recovered: " + str(len(report["recovery"]["symbols_recovered"])),
+        "Off-universe recovery errors: " + str(report["recovery"]["errors"]),
         "Frozen rules: " + str(report["total_frozen_patterns"]),
         "Holdout decisions: " + str(report["completed_holdout_decisions"]),
         "",
