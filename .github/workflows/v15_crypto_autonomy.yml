@@ -1,0 +1,47 @@
+name: V15 Crypto autonomous evidence and strategy discovery health (NO TRADING)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v15_crypto_autonomy.yml']
+  workflow_dispatch:
+  schedule:
+    # Independent fallback for GitHub's best-effort V8 :09/:39 schedule.
+    # This does not claim 30m observation, or replace the V8 evidence producer.
+    - cron: '16,46 * * * *'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: ear-v15-independent-crypto-evidence-health
+  cancel-in-progress: false
+jobs:
+  monitor-crypto-chain:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Offline evidence causality and bounded recovery regressions
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_v15_*.py' -v
+          python -m compileall -q research_v4
+      - name: Verify real V8 historical hash chain, source health and dependent research
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python -m research_v4.crypto_autonomy --out out/v15_crypto_autonomy
+          cat out/v15_crypto_autonomy/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve V15 diagnostic report even if a producer fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v15-crypto-discovery-${{ github.run_id }}
+          path: out/v15_crypto_autonomy/
+          retention-days: 90
+          if-no-files-found: warn
