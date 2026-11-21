@@ -1843,7 +1843,7 @@
     }
   ],
   "asof_observations": 0,
-  "asof_utc": "2026-11-21T01:55:22.426000+00:00",
+  "asof_utc": "2026-11-21T09:14:54.352000+00:00",
   "completed_forward_trials": 0,
   "exploratory_candidates": [],
   "frozen_trials": 0,
@@ -1860,7 +1860,7 @@
     "shorts_are_not_verified_fills": true,
     "trade_authorized": false
   },
-  "methodology_sha256": "cb4f959d8f118b9c9e664b76c1a71817d63919b22e414b79b3fc76cb1da6c943",
+  "methodology_sha256": "1eddb8395e2b4b07a7bb95d1b53dee0648b5bf37d519ad841433ed881510f915",
   "modeled_outcomes": 0,
   "new_decisions": [],
   "new_frozen": [],
@@ -1868,12 +1868,12 @@
   "new_outcomes": 0,
   "pending_future_outcomes": 0,
   "schema": "EAR.v13_crypto_costed_research.v1",
-  "source_age_minutes": 122.305,
+  "source_age_minutes": 154.42,
   "source_rejections": {
     "STALE_UPSTREAM_V8_NEW_OBSERVATIONS_BLOCKED": 1
   },
   "source_status": "STALE_UPSTREAM_V8_WATCH_ONLY",
-  "source_v8_last_sha256": "e751272ff798d3622e07117afcf2441a4b0f0fa04115183eff00f7a48019e228",
-  "source_v8_scans_in_window": 17,
+  "source_v8_last_sha256": "40778ce4caa1d39df6ce80567972af6f14b21307d40982a667e95fda35939a11",
+  "source_v8_scans_in_window": 19,
   "strategy_variants_tested": 92
 }
