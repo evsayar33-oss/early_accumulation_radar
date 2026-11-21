@@ -81,7 +81,10 @@ def coverage_windows(stamps):
         if end is None or len(within) < 4:
             continue
         seq = [start] + within + [end]
-        if all(0 < b-a <= 90*60000 for a,b in zip(seq,seq[1:])):
+        # V9 includes a scan exactly at +4h both as the last within-horizon
+        # snapshot and as the final observation. That boundary duplicate is
+        # the SAME real scan, not an extra fabricated observation.
+        if all(0 <= b-a <= 90*60000 for a,b in zip(seq,seq[1:])):
             viable += 1
     return {"eligible_completed_windows":total,
             "observed_cadence_viable_windows":viable,
