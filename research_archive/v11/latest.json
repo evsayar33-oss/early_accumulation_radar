@@ -1,6 +1,6 @@
 {
   "active_trials": [],
-  "asof_utc": "2026-11-20T10:12:09.342338+00:00",
+  "asof_utc": "2026-11-21T09:58:18.560388+00:00",
   "claims": {
     "association_not_causation": true,
     "matched_controls_not_full_universe_ppv": true,
@@ -29,7 +29,7 @@
   "frozen_hypotheses_total": 0,
   "is_new_lock_checkpoint_now": false,
   "matured_case_control_samples": 0,
-  "methodology_sha256": "833b33ede9d4edfcc97e17b8b289a55d4b932df4cc4c52b5598491c2dc1c6546",
+  "methodology_sha256": "b27c92d1777ce3a092f9ade40f3df00382da420f9a8cb882a21dd8ededee5823",
   "minimum_days_between_same_direction_locks": 14,
   "new_hypotheses_frozen": 0,
   "new_lock_checkpoint_utc_weekday": 0,
@@ -38,6 +38,6 @@
   "prospective_rows_total": 0,
   "schema": "EAR.v11_automatic_pattern_discovery.v1",
   "source_outcome_counts": {},
-  "source_scans_in_window": 13,
-  "source_sha256": "81fbe3f686e9260313418b2c9b827ba9a426bd051c68b7f410ce15d7dbd1531d"
+  "source_scans_in_window": 20,
+  "source_sha256": "7377a03f6fa9ffb6a02bf524f5e3fda70ed016556f650f817b589d9784556d6b"
 }
