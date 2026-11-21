@@ -12,8 +12,9 @@ NOW = datetime(2026, 11, 21, 9, tzinfo=timezone.utc)
 def bars(symbol, market, now_ms):
     first = date(2026, 10, 1)
     from datetime import timedelta
-    return ([(first + timedelta(days=i)).isoformat(),100.,101.,99.,100.+i*.05,1000.]
-             for i in range(51)], "public_unauthenticated")
+    return ([((first + timedelta(days=i)).isoformat(), 100., 103., 99.,
+              100. + i * .05, 1000.) for i in range(51)],
+            "public_unauthenticated")
 
 class OffUniverseFollowThrough(unittest.TestCase):
     def test_recover_only_prior_symbols_for_settlement(self):
