@@ -1,5 +1,5 @@
 {
-  "asof_utc": "2026-11-20T12:16:43.387646+00:00",
+  "asof_utc": "2026-11-21T11:51:54.067713+00:00",
   "by_family": [
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
@@ -23,39 +23,49 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 1,
+      "distinct_symbols": 2,
       "family": "supply_absorption_risk",
       "hold_sessions": 2,
       "market": "BIST",
-      "mean_long_net_pct": -4.29592,
-      "n": 1,
+      "mean_long_net_pct": -5.50553,
+      "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
       "distinct_symbols": 1,
+      "family": "supply_absorption_risk",
+      "hold_sessions": 2,
+      "market": "CRYPTO",
+      "mean_long_net_pct": -8.68314,
+      "n": 1,
+      "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 2,
       "family": "absorption_probe",
       "hold_sessions": 2,
       "market": "US",
-      "mean_long_net_pct": 4.26316,
-      "n": 1,
+      "mean_long_net_pct": -1.07405,
+      "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
     }
   ],
   "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
   "historical_pit_verified": false,
-  "new_settlements": 5,
-  "new_signals": 9,
+  "new_settlements": 3,
+  "new_signals": 3,
   "notes": "No old signals backfilled; entry day strictly after first observation UTC date, with closed daily bars only. Old V5 ledger untouched.",
   "paper_approved": false,
   "pending": {
-    "AWAITING_FUTURE_CLOSED_SESSIONS": 40,
-    "SOURCE_SYMBOL_MISSING": 3
+    "AWAITING_FUTURE_CLOSED_SESSIONS": 35,
+    "SOURCE_SYMBOL_MISSING": 8
   },
   "profitable_strategy_confirmed": false,
   "schema": "EAR.v7_forward_summary.v1",
   "short_execution_model": false,
-  "total_settlements": 5,
-  "total_signals": 48,
+  "total_settlements": 8,
+  "total_signals": 51,
   "trade_authorized": false
 }
