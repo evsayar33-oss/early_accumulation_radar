@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths: ['.github/workflows/v13_crypto_profit.yml']
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - V8 all-symbol perpetual early-motion evidence (RESEARCH ONLY)
+    types: [completed]
   schedule:
     - cron: '57 0,4,8,12,16,20 * * *'
 permissions:
@@ -13,7 +17,12 @@ concurrency:
   cancel-in-progress: false
 jobs:
   crypto-costed-research:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository) ||
+      (github.event_name != 'workflow_run' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

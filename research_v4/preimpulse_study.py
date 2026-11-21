@@ -159,12 +159,16 @@ def study(records,include_rows=False):
             bucket=t//HORIZON_MS
             if last_eligible.get(sym)==bucket:continue
             own=by_asset[sym]
+            available_venues=0
             for venue in SOURCE_ORDER:
                 if venue not in current:continue
+                available_venues+=1
                 z=features(own,t,venue)
                 if z is None:
-                    skipped["NO_2H_ASOF_HISTORY"]+=1
-                    break
+                    # Do not discard a coin just because preferred OKX data is
+                    # discontinuous: inspect another venue's *own* prior tape.
+                    # Never merge bars, prices or OI between venues.
+                    continue
                 # Exclude already-running moves BEFORE any future labels.
                 if abs(z["price_return_2h_pct"])>3 or abs(z["return_24h_pct"])>15:
                     skipped["ALREADY_MOVING_NOT_PRECURSOR"]+=1
@@ -179,6 +183,9 @@ def study(records,include_rows=False):
                     "case_ascertainment":"FULL_ASOF_COHORT_NOT_SELECTED_BY_POST_EVENT_WINNER",
                     "trade_authorized":False})
                 break
+            else:
+                if available_venues:
+                    skipped["NO_2H_ASOF_HISTORY_ON_ANY_VENUE"]+=1
     eligible=[r for r in rows if r["future"]["status"]=="OBSERVED_FUTURE_ONLY_NOT_EXECUTION"]
     # Report full-universe denominators and matched contemporaneous controls
     # in frozen as-of liquidity + 24h return bands.
