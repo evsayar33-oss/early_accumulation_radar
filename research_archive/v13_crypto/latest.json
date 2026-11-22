@@ -1843,7 +1843,7 @@
     }
   ],
   "asof_observations": 0,
-  "asof_utc": "2026-11-22T07:41:31.011000+00:00",
+  "asof_utc": "2026-11-22T11:58:44.339000+00:00",
   "completed_forward_trials": 0,
   "exploratory_candidates": [],
   "frozen_trials": 0,
@@ -1868,12 +1868,13 @@
   "new_outcomes": 0,
   "pending_future_outcomes": 0,
   "schema": "EAR.v13_crypto_costed_research.v1",
-  "source_age_minutes": 271.038,
+  "source_age_minutes": 0.453,
   "source_rejections": {
-    "STALE_UPSTREAM_V8_NEW_OBSERVATIONS_BLOCKED": 1
+    "INSUFFICIENT_INDEPENDENT_VENUES": 111,
+    "NO_USABLE_PRICE_SPREAD_OR_PRECURSOR": 109
   },
-  "source_status": "STALE_UPSTREAM_V8_WATCH_ONLY",
-  "source_v8_last_sha256": "ebee8c2ba3c83c4c9b9e494372f2a5442ffefa2f7429e5e32a6f1c756ada8154",
-  "source_v8_scans_in_window": 28,
+  "source_status": "FRESH_V8_RESEARCH_OBSERVATIONS",
+  "source_v8_last_sha256": "2ad6ca47a50f157bc5b12e1f97c961d70825dcc3c958b491944cf0df9c1d0655",
+  "source_v8_scans_in_window": 31,
   "strategy_variants_tested": 92
 }
