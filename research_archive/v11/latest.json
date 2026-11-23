@@ -1,6 +1,6 @@
 {
   "active_trials": [],
-  "asof_utc": "2026-11-22T09:56:34.826344+00:00",
+  "asof_utc": "2026-11-23T10:55:59.379282+00:00",
   "claims": {
     "association_not_causation": true,
     "matched_controls_not_full_universe_ppv": true,
@@ -12,7 +12,7 @@
   },
   "completed_decisions_now": [],
   "decisions_total": 0,
-  "eligible_asof_samples": 0,
+  "eligible_asof_samples": 480,
   "evidence_thresholds": {
     "fdr_q_max": 0.05,
     "holdout_days": 7,
@@ -27,7 +27,7 @@
   "families_tested": 23,
   "familywise_tests_including_directions": 46,
   "frozen_hypotheses_total": 0,
-  "is_new_lock_checkpoint_now": false,
+  "is_new_lock_checkpoint_now": true,
   "matured_case_control_samples": 0,
   "methodology_sha256": "b27c92d1777ce3a092f9ade40f3df00382da420f9a8cb882a21dd8ededee5823",
   "minimum_days_between_same_direction_locks": 14,
@@ -37,7 +37,9 @@
   "notices": [],
   "prospective_rows_total": 0,
   "schema": "EAR.v11_automatic_pattern_discovery.v1",
-  "source_outcome_counts": {},
-  "source_scans_in_window": 29,
-  "source_sha256": "682ba499954c09baa3fce4cb640bfcc1938a5541595db1fbb89f97d1e8a1f4d6"
+  "source_outcome_counts": {
+    "PENDING_INCOMPLETE_FUTURE_SNAPSHOTS": 480
+  },
+  "source_scans_in_window": 39,
+  "source_sha256": "70194b7d9b13ffe609f5e6f48e6bb4e7a1fb960feb43ffc80a2c86ef742d7dfe"
 }
