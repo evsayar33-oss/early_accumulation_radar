@@ -1,0 +1,46 @@
+name: V16 Independent as-of indicator/control research (NO TRADING)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37 5 * * *' # best effort; no real-time claims
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/v16_indicator_controls.yml'
+      - 'research_v4/v16_indicator_controls.py'
+      - 'tests/test_v16_indicator_controls.py'
+permissions:
+  contents: read
+concurrency:
+  group: early-radar-v16-exploratory-controls
+  cancel-in-progress: false
+jobs:
+  exploratory-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: V16 offline non-leakage and missing-data tests
+        run: python -m unittest discover -s tests -p 'test_v16_*.py' -v
+      - name: Read existing SHA-linked V8 source without writing to any branch
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin research/v8-perp-forward
+          git show FETCH_HEAD:observations/perp/snapshots.jsonl > "$RUNNER_TEMP/v8-ledger.jsonl"
+          python -m research_v4.v16_indicator_controls \
+            --ledger "$RUNNER_TEMP/v8-ledger.jsonl" \
+            --out out/v16_indicator_controls
+          cat out/v16_indicator_controls/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve exploratory diagnostics, never send trading alerts
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: v16-indicator-controls-${{ github.run_id }}
+          path: out/v16_indicator_controls/
+          retention-days: 90
+          if-no-files-found: warn
