@@ -20,6 +20,9 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: true
+      - name: Start bounded resource telemetry
+        continue-on-error: true
+        run: python3 scripts/resource_probe.py start
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -87,3 +90,9 @@ jobs:
             git -C "$ROOT" commit -m "research(v7): preserve first-seen early-stage hypothesis outcomes [skip ci]"
             git -C "$ROOT" push origin HEAD:refs/heads/research/v7-forward-evidence
           fi
+      - name: Report runner capacity
+        if: always()
+        continue-on-error: true
+        run: |
+          probe="$RUNNER_TEMP/repo-resource-$GITHUB_RUN_ID-$GITHUB_JOB/probe.py"
+          if test -f "$probe"; then python3 "$probe" finish; else echo "::warning::Resource telemetry unavailable"; fi
