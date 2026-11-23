@@ -1,10 +1,10 @@
 {
-  "cash": 8864.376232288983,
+  "cash": 7879.8216428349515,
   "closed_trades": 14,
   "first_seen_ms": 1794855908001,
   "gross_losses": 225.6599772120943,
   "gross_wins": 74.96690197763633,
-  "last_event_sha256": "fa4c92347e55b0af3766edd42e56d981fed219b22f39cb4c6992c642279a4deb",
+  "last_event_sha256": "fb1ab9c7f1778422a36304fec666d5746cbb930e6436d208a124377ec40c175c",
   "last_exit_ms": {
     "ADA": 1795291796334,
     "BTC": 1795382404138,
@@ -14,10 +14,10 @@
     "SUI": 1795243229187,
     "XRP": 1794976448180
   },
-  "last_liquidation_nav": 9846.316527425897,
-  "last_observed_ms": 1795427023180,
+  "last_liquidation_nav": 9842.027868778248,
+  "last_observed_ms": 1795431304671,
   "last_status": "MARKED",
-  "last_valid_mark_ms": 1795427023180,
+  "last_valid_mark_ms": 1795431304671,
   "max_drawdown_pct": 2.2453137758147155,
   "model_sha256": "239ac5299ce742d49e7fcb5e16c4e3fa5eaffff2c2fb199775bcfaf121d5cbe2",
   "model_version": "EAR-V3-FIXED-20261116",
@@ -32,6 +32,14 @@
       "entry_reference": 61509.01,
       "entry_venue": "binance",
       "qty": 0.015985600561697535
+    },
+    "DOGE": {
+      "cost_usdt": 984.5545894540318,
+      "entry_effective": 0.055718975999999996,
+      "entry_ms": 1795431304671,
+      "entry_reference": 0.05568,
+      "entry_venue": "binance",
+      "qty": 17652.352735908076
     }
   },
   "realized_pnl": -150.69307523445798,
