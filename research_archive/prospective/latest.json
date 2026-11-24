@@ -1,12 +1,40 @@
 {
-  "all_settlements": 0,
-  "all_signals": 26,
-  "asof_utc": "2026-11-21T11:51:30.080524+00:00",
-  "by_family": [],
-  "current_source_csv_sha256": "18613d2eaf05391a0839d8045b559a9acf26143f63e40032cb6d05ab0d374351",
+  "all_settlements": 7,
+  "all_signals": 30,
+  "asof_utc": "2026-11-24T11:25:22.860071+00:00",
+  "by_family": [
+    {
+      "family": "baseline/pullback_rebound",
+      "market": "CRYPTO",
+      "mean_excess_pct": -2.24645,
+      "mean_net_pct": -8.4888,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 5,
+      "symbols": 4
+    },
+    {
+      "family": "v2/capitulation_reversal",
+      "market": "CRYPTO",
+      "mean_excess_pct": -2.42564,
+      "mean_net_pct": -7.60947,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
+    {
+      "family": "v3/downside_exhaustion",
+      "market": "CRYPTO",
+      "mean_excess_pct": -2.42564,
+      "mean_net_pct": -7.60947,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    }
+  ],
+  "current_source_csv_sha256": "903e0849a119bcdb5c62aeb28d6a35bf8c601cd2e79ec7beeb65d2c6883531ef",
   "historical_pit_verified": false,
   "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
-  "new_settlements": 0,
+  "new_settlements": 7,
   "new_signals": 4,
   "notes": "First-observed signals only; entry strictly AFTER observation UTC date. Survivorship and data-provider revisions unresolved.",
   "paper_approved": false,
@@ -16,6 +44,6 @@
   "schema": "EAR.prospective_research_ledger.v1",
   "trade_authorized": false,
   "unsettled_reasons": {
-    "AWAITING_FUTURE_CLOSED_BARS": 26
+    "AWAITING_FUTURE_CLOSED_BARS": 23
   }
 }
