@@ -1,0 +1,97 @@
+{
+  "repository": "evsayar33-oss/early_accumulation_radar",
+  "observed_at": "2026-11-24T11:22:43.087831+00:00",
+  "metrics": {
+    "repository_bytes": 4727808,
+    "cache_bytes": 0,
+    "artifact_bytes": 52644227,
+    "artifact_count": 379,
+    "release_count": 10,
+    "release_asset_bytes": 41560
+  },
+  "alerts": [],
+  "errors": [],
+  "repaired": [],
+  "archives": [
+    {
+      "id": 14249941302,
+      "tag": "evidence-archive-28499882"
+    },
+    {
+      "id": 14249148485,
+      "tag": "evidence-archive-28498296"
+    },
+    {
+      "id": 14249403394,
+      "tag": "evidence-archive-28498806"
+    },
+    {
+      "id": 14249178719,
+      "tag": "evidence-archive-28498357"
+    },
+    {
+      "id": 14250105957,
+      "tag": "evidence-archive-28500211"
+    },
+    {
+      "id": 14248934631,
+      "tag": "evidence-archive-28497869"
+    },
+    {
+      "id": 14250260929,
+      "tag": "evidence-archive-28500521"
+    },
+    {
+      "id": 14251195579,
+      "tag": "evidence-archive-28502391"
+    },
+    {
+      "id": 14252483772,
+      "tag": "evidence-archive-28504967"
+    },
+    {
+      "id": 14254631868,
+      "tag": "evidence-archive-28509263"
+    }
+  ],
+  "billing_quota": "unknown: account billing permission required",
+  "archive_candidates": 10,
+  "archive_pending": 0,
+  "workflow_states": {
+    ".github/workflows/audit_evidence.yml": "active",
+    ".github/workflows/ci.yml": "active",
+    ".github/workflows/evidence_watchdog.yml": "active",
+    ".github/workflows/expanded_historical_discovery.yml": "active",
+    ".github/workflows/historical_discovery.yml": "active",
+    ".github/workflows/live_source_diagnostics.yml": "active",
+    ".github/workflows/native_strategy_research.yml": "active",
+    ".github/workflows/perp_early_watch.yml": "active",
+    ".github/workflows/public_market_scan.yml": "active",
+    ".github/workflows/repository_guardian.yml": "active",
+    ".github/workflows/research_autonomous.yml": "active",
+    ".github/workflows/research_v2.yml": "active",
+    ".github/workflows/v11_pattern_discovery.yml": "active",
+    ".github/workflows/v12_equity_discovery.yml": "active",
+    ".github/workflows/v13_crypto_profit.yml": "active",
+    ".github/workflows/v13_profitability.yml": "active",
+    ".github/workflows/v14_equity_autonomy.yml": "active",
+    ".github/workflows/v15_crypto_autonomy.yml": "active",
+    ".github/workflows/v16_indicator_controls.yml": "active",
+    ".github/workflows/v3_historical.yml": "active",
+    ".github/workflows/v3_loss_diagnostic.yml": "active",
+    ".github/workflows/v3_paper.yml": "active",
+    ".github/workflows/v3_performance_audit.yml": "active",
+    ".github/workflows/v4_equities.yml": "active",
+    ".github/workflows/v4_original_universe.yml": "active",
+    ".github/workflows/v7_forward_evidence.yml": "active"
+  },
+  "operational_warning_budgets": {
+    "repository_bytes": 734003200,
+    "artifact_bytes": 419430400,
+    "cache_bytes": 8589934592,
+    "checkpoint_uncompressed_bytes": 603979776
+  },
+  "large_files": [],
+  "default_branch_commit_age_days": 0,
+  "status": "ok"
+}
