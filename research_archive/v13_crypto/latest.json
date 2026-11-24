@@ -1843,7 +1843,7 @@
     }
   ],
   "asof_observations": 76,
-  "asof_utc": "2026-11-24T04:58:37.027000+00:00",
+  "asof_utc": "2026-11-24T05:06:27.799000+00:00",
   "completed_forward_trials": 0,
   "exploratory_candidates": [],
   "frozen_trials": 0,
@@ -1868,7 +1868,7 @@
   "new_outcomes": 0,
   "pending_future_outcomes": 152,
   "schema": "EAR.v13_crypto_costed_research.v1",
-  "source_age_minutes": 0.508,
+  "source_age_minutes": 8.354,
   "source_rejections": {
     "INSUFFICIENT_INDEPENDENT_VENUES": 101,
     "NO_USABLE_PRICE_SPREAD_OR_PRECURSOR": 119
