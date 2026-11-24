@@ -27,6 +27,9 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: true
+      - name: Start bounded resource telemetry
+        continue-on-error: true
+        run: python3 scripts/resource_probe.py start
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
@@ -186,3 +189,9 @@ jobs:
             git push origin HEAD:refs/heads/research/auto-evidence
           fi
           echo "Evidence persists on research/auto-evidence; main branch remains unchanged." >> "$GITHUB_STEP_SUMMARY"
+      - name: Report runner capacity
+        if: always()
+        continue-on-error: true
+        run: |
+          probe="$RUNNER_TEMP/repo-resource-$GITHUB_RUN_ID-$GITHUB_JOB/probe.py"
+          if test -f "$probe"; then python3 "$probe" finish; else echo "::warning::Resource telemetry unavailable"; fi
