@@ -1,7 +1,7 @@
 {
   "all_settlements": 7,
   "all_signals": 30,
-  "asof_utc": "2026-11-24T11:25:22.860071+00:00",
+  "asof_utc": "2026-11-24T14:21:12.889110+00:00",
   "by_family": [
     {
       "family": "baseline/pullback_rebound",
@@ -31,11 +31,11 @@
       "symbols": 1
     }
   ],
-  "current_source_csv_sha256": "903e0849a119bcdb5c62aeb28d6a35bf8c601cd2e79ec7beeb65d2c6883531ef",
+  "current_source_csv_sha256": "f8efcb68b17d133a25915ff27d5243a31730496f8da3bc86aed38f448af4ac00",
   "historical_pit_verified": false,
   "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
-  "new_settlements": 7,
-  "new_signals": 4,
+  "new_settlements": 0,
+  "new_signals": 0,
   "notes": "First-observed signals only; entry strictly AFTER observation UTC date. Survivorship and data-provider revisions unresolved.",
   "paper_approved": false,
   "profitable_strategy_confirmed": false,
