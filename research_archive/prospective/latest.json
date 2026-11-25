@@ -1,16 +1,16 @@
 {
-  "all_settlements": 7,
-  "all_signals": 30,
-  "asof_utc": "2026-11-24T14:21:12.889110+00:00",
+  "all_settlements": 10,
+  "all_signals": 34,
+  "asof_utc": "2026-11-25T13:34:29.076988+00:00",
   "by_family": [
     {
       "family": "baseline/pullback_rebound",
       "market": "CRYPTO",
-      "mean_excess_pct": -2.24645,
-      "mean_net_pct": -8.4888,
+      "mean_excess_pct": -2.22184,
+      "mean_net_pct": -8.68194,
       "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
-      "n": 5,
-      "symbols": 4
+      "n": 6,
+      "symbols": 5
     },
     {
       "family": "v2/capitulation_reversal",
@@ -29,13 +29,31 @@
       "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
       "n": 1,
       "symbols": 1
+    },
+    {
+      "family": "baseline/quiet_accumulation",
+      "market": "US",
+      "mean_excess_pct": 6.47988,
+      "mean_net_pct": 0.75438,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
+    {
+      "family": "v3/relative_strength_rotation",
+      "market": "US",
+      "mean_excess_pct": -1.70663,
+      "mean_net_pct": -7.21669,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
     }
   ],
-  "current_source_csv_sha256": "f8efcb68b17d133a25915ff27d5243a31730496f8da3bc86aed38f448af4ac00",
+  "current_source_csv_sha256": "a3c974f86569031c13227c5ad933d0f495f678a9d2a3109b068cd68f18614f40",
   "historical_pit_verified": false,
   "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
-  "new_settlements": 0,
-  "new_signals": 0,
+  "new_settlements": 3,
+  "new_signals": 4,
   "notes": "First-observed signals only; entry strictly AFTER observation UTC date. Survivorship and data-provider revisions unresolved.",
   "paper_approved": false,
   "profitable_strategy_confirmed": false,
@@ -44,6 +62,6 @@
   "schema": "EAR.prospective_research_ledger.v1",
   "trade_authorized": false,
   "unsettled_reasons": {
-    "AWAITING_FUTURE_CLOSED_BARS": 23
+    "AWAITING_FUTURE_CLOSED_BARS": 24
   }
 }
