@@ -1,14 +1,24 @@
 {
-  "asof_utc": "2026-11-24T14:21:37.796324+00:00",
+  "asof_utc": "2026-11-25T13:34:53.674855+00:00",
   "by_family": [
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 3,
+      "distinct_symbols": 4,
       "family": "prebreakout_pressure",
       "hold_sessions": 2,
       "market": "BIST",
-      "mean_long_net_pct": -0.96947,
-      "n": 3,
+      "mean_long_net_pct": -5.72596,
+      "n": 4,
+      "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 2,
+      "family": "prebreakout_pressure",
+      "hold_sessions": 5,
+      "market": "BIST",
+      "mean_long_net_pct": -5.49732,
+      "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -23,12 +33,32 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 3,
+      "distinct_symbols": 1,
+      "family": "quiet_base",
+      "hold_sessions": 5,
+      "market": "BIST",
+      "mean_long_net_pct": -12.625,
+      "n": 1,
+      "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 4,
       "family": "supply_absorption_risk",
       "hold_sessions": 2,
       "market": "BIST",
-      "mean_long_net_pct": -2.03181,
-      "n": 3,
+      "mean_long_net_pct": -0.52126,
+      "n": 4,
+      "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 1,
+      "family": "supply_absorption_risk",
+      "hold_sessions": 5,
+      "market": "BIST",
+      "mean_long_net_pct": -6.16667,
+      "n": 1,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -43,12 +73,12 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 1,
+      "distinct_symbols": 2,
       "family": "supply_absorption_risk",
       "hold_sessions": 5,
       "market": "CRYPTO",
-      "mean_long_net_pct": -0.6,
-      "n": 1,
+      "mean_long_net_pct": -8.38433,
+      "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -60,22 +90,32 @@
       "mean_long_net_pct": -1.07405,
       "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 2,
+      "family": "supply_absorption_risk",
+      "hold_sessions": 2,
+      "market": "US",
+      "mean_long_net_pct": 3.45178,
+      "n": 2,
+      "status": "RESEARCH_INSUFFICIENT"
     }
   ],
   "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
   "historical_pit_verified": false,
-  "new_settlements": 0,
-  "new_signals": 0,
+  "new_settlements": 9,
+  "new_signals": 21,
   "notes": "No old signals backfilled; entry day strictly after first observation UTC date, with closed daily bars only. Old V5 ledger untouched.",
   "paper_approved": false,
   "pending": {
-    "AWAITING_FUTURE_CLOSED_SESSIONS": 48,
-    "SOURCE_SYMBOL_MISSING": 5
+    "AWAITING_FUTURE_CLOSED_SESSIONS": 54,
+    "SOURCE_SYMBOL_MISSING": 11
   },
   "profitable_strategy_confirmed": false,
   "schema": "EAR.v7_forward_summary.v1",
   "short_execution_model": false,
-  "total_settlements": 13,
-  "total_signals": 66,
+  "total_settlements": 22,
+  "total_signals": 87,
   "trade_authorized": false
 }
