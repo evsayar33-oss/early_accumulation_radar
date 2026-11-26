@@ -1,8 +1,17 @@
 {
-  "all_settlements": 10,
-  "all_signals": 34,
-  "asof_utc": "2026-11-25T13:34:29.076988+00:00",
+  "all_settlements": 14,
+  "all_signals": 38,
+  "asof_utc": "2026-11-26T13:15:11.862581+00:00",
   "by_family": [
+    {
+      "family": "baseline/pullback_rebound",
+      "market": "BIST",
+      "mean_excess_pct": -1.07919,
+      "mean_net_pct": -8.35593,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
     {
       "family": "baseline/pullback_rebound",
       "market": "CRYPTO",
@@ -40,6 +49,24 @@
       "symbols": 1
     },
     {
+      "family": "v2/capitulation_reversal",
+      "market": "US",
+      "mean_excess_pct": 14.86416,
+      "mean_net_pct": -0.45887,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
+    {
+      "family": "v3/downside_exhaustion",
+      "market": "US",
+      "mean_excess_pct": 14.86416,
+      "mean_net_pct": -0.45887,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
+    {
       "family": "v3/relative_strength_rotation",
       "market": "US",
       "mean_excess_pct": -1.70663,
@@ -47,12 +74,21 @@
       "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
       "n": 1,
       "symbols": 1
+    },
+    {
+      "family": "v4/overnight_gap_fade",
+      "market": "US",
+      "mean_excess_pct": 12.20231,
+      "mean_net_pct": -3.04678,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
     }
   ],
-  "current_source_csv_sha256": "a3c974f86569031c13227c5ad933d0f495f678a9d2a3109b068cd68f18614f40",
+  "current_source_csv_sha256": "fa57eeb2af1d47d21d3d9f652f84e2655702d01983c326028c1b29d641cee73f",
   "historical_pit_verified": false,
   "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
-  "new_settlements": 3,
+  "new_settlements": 4,
   "new_signals": 4,
   "notes": "First-observed signals only; entry strictly AFTER observation UTC date. Survivorship and data-provider revisions unresolved.",
   "paper_approved": false,
