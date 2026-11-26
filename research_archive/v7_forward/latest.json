@@ -1,5 +1,5 @@
 {
-  "asof_utc": "2026-11-25T13:34:53.674855+00:00",
+  "asof_utc": "2026-11-26T13:15:40.615292+00:00",
   "by_family": [
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
@@ -53,12 +53,12 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 1,
+      "distinct_symbols": 2,
       "family": "supply_absorption_risk",
       "hold_sessions": 5,
       "market": "BIST",
-      "mean_long_net_pct": -6.16667,
-      "n": 1,
+      "mean_long_net_pct": -3.19925,
+      "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -93,6 +93,16 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 1,
+      "family": "absorption_probe",
+      "hold_sessions": 5,
+      "market": "US",
+      "mean_long_net_pct": -0.45887,
+      "n": 1,
+      "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
       "distinct_symbols": 2,
       "family": "supply_absorption_risk",
       "hold_sessions": 2,
@@ -100,22 +110,32 @@
       "mean_long_net_pct": 3.45178,
       "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
+    },
+    {
+      "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
+      "distinct_symbols": 1,
+      "family": "supply_absorption_risk",
+      "hold_sessions": 5,
+      "market": "US",
+      "mean_long_net_pct": -2.96078,
+      "n": 1,
+      "status": "RESEARCH_INSUFFICIENT"
     }
   ],
   "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
   "historical_pit_verified": false,
-  "new_settlements": 9,
-  "new_signals": 21,
+  "new_settlements": 3,
+  "new_signals": 27,
   "notes": "No old signals backfilled; entry day strictly after first observation UTC date, with closed daily bars only. Old V5 ledger untouched.",
   "paper_approved": false,
   "pending": {
-    "AWAITING_FUTURE_CLOSED_SESSIONS": 54,
-    "SOURCE_SYMBOL_MISSING": 11
+    "AWAITING_FUTURE_CLOSED_SESSIONS": 76,
+    "SOURCE_SYMBOL_MISSING": 13
   },
   "profitable_strategy_confirmed": false,
   "schema": "EAR.v7_forward_summary.v1",
   "short_execution_model": false,
-  "total_settlements": 22,
-  "total_signals": 87,
+  "total_settlements": 25,
+  "total_signals": 114,
   "trade_authorized": false
 }
