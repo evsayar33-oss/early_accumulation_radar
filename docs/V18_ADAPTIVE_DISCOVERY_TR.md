@@ -14,7 +14,12 @@ Yeni token/ücretli kaynak gerekmez.
   alınır. Mevcut aktif evren keşfedilir; en fazla 32 yeni sözleşme/tur,
   takip bekleyenler öncelikli. BTC/ETH/SOL/BNB/XRP ve stablecoinler yeni
   araştırma rotasyonundan çıkarılır; piyasa değeri geçmişi doğrulanmamıştır.
-  Diğer dayanakları içeren perpetual sözleşmeler ayrı kimlik konusu olarak kalır.
+  OKX instCategory, Bitget isRwa ve Binance underlyingType ile kripto dayanağı
+  doğrulanmayan ya da çelişen sözleşmeler bu araştırma evreninden çıkarılır.
+  İlk karma evrenin gözlem ve denemeleri değişmeden saklanır, aktif kripto
+  öğrenmesinde kullanılmaz; bütün gerçek denemeler çoklu karşılaştırmada sayılır.
+  Güncel dayanak metadatası geçmiş tarihteki kimliği doğrulamaz; retrospektif
+  sonuçlar geçmiş PIT evreni olarak yorumlanmaz.
 - Mumlar başka borsaya eklemlenmez. Bağımsız borsanın örtüşen mumları
   karşılaştırılır, çelişkili veri yeni gözlem üretmez. Geç gelen gerçek kapalı
   mumlar ilk görülme zamanından SONRA gerçekleşmiş sonucu tamamlayabilir;

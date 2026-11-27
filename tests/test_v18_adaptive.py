@@ -26,6 +26,16 @@ class Sources(unittest.TestCase):
         data["data"][0][3]="110"
         with self.assertRaisesRegex(ValueError,"INVALID_CANDLE"):
             s.parse_bars(data,"okx",T+2*s.BAR_MS)
+    def test_underlying_identity_is_not_symbol_name(self):
+        assets={x:{"okx":{"q":200000},"bitget":{"q":200000}} for x in ("AAAUSDT","AAPLUSDT","MYSTERYUSDT","CLASHUSDT")}
+        info={"okx":{"data":[{"instId":"AAA-USDT-SWAP","instCategory":"1"},{"instId":"AAPL-USDT-SWAP","instCategory":"3"},{"instId":"CLASH-USDT-SWAP","instCategory":"1"}]},
+              "bitget":{"data":[{"symbol":"AAAUSDT","isRwa":"NO"},{"symbol":"AAPLUSDT","isRwa":"YES"},{"symbol":"CLASHUSDT","isRwa":"YES"}]}}
+        result, excluded=s.classified_assets(assets,info)
+        self.assertEqual(set(result),{"AAAUSDT"})
+        self.assertEqual(set(excluded),{"AAPLUSDT","MYSTERYUSDT","CLASHUSDT"})
+        self.assertTrue(a.qualified({"market":"BIST"}))
+        self.assertFalse(a.qualified({"market":"CRYPTO"}))
+        self.assertTrue(a.qualified({"market":"CRYPTO","cohort":s.COHORT}))
     def test_rotating_small_universe(self):
         assets={f"COIN{i}USDT":{"okx":{"q":200000}} for i in range(7)}
         assets["BTCUSDT"]={"okx":{"q":10000000}}
@@ -105,13 +115,26 @@ class Research(unittest.TestCase):
         self.assertEqual(len(p),4)
         memory={rid:{"rule":r,"dataset":data,"stats":{"rows":1,"reason":"INSUFFICIENT_EVIDENCE","matched_stress_excess":None}} for _,rid,r,data in p}
         self.assertEqual(a.proposals("CRYPTO",{},memory,[row],"seed"),[])
+    def test_mixed_underlying_ledger_quarantine_preserves_evidence(self):
+        with tempfile.TemporaryDirectory() as d:
+            state=Path(d)/"state"
+            old_rule=a.rule("CRYPTO","UP",[("volume_high",True)])
+            obs={"market":"CRYPTO","id":"old","kind":"HISTORICAL_DISCOVERY"}
+            attempt={"rule":old_rule,"rule_id":a.rule_id(old_rule)}
+            batch={"schema":a.VERSION,"observed_ms":T,"cursor":32,"observations":[obs],"settlements":[],"attempts":[attempt],"locks":[],"decisions":[]}
+            saved=a.append_batch(state,[],batch)
+            report=a.run(state,{},{},T+1,{}, {"status":"MISSING"}, {m:{} for m in a.MARKETS})
+            self.assertEqual(report["quarantined_legacy_mixed_underlying"],{"observations":1,"rules":1,"locks":0})
+            self.assertEqual(report["unique_rules"],0)
+            self.assertEqual(report["total_actual_tests"],1)
+            self.assertEqual(a.read_state(state)[0]["sha256"],saved["sha256"])
     def test_real_engine_state_survives_second_round(self):
         with tempfile.TemporaryDirectory() as d:
             key=("CRYPTO","TESTUSDT","okx")
             b=bars(300)
             t=b[-1]["end"]+100
             state=Path(d)/"state"
-            panel={key:{"bars":b,"corroboration":"AGREEMENT"}}
+            panel={key:{"bars":b,"corroboration":"AGREEMENT","cohort":s.COHORT}}
             specs={m:a.catalog(m) for m in a.MARKETS}
             first=a.run(state,panel,{key:b},t,{},{"status":"MISSING"},specs)
             self.assertGreater(first["historical_observations"],0)
@@ -119,7 +142,7 @@ class Research(unittest.TestCase):
             self.assertGreater(first["new_tests"],0)
             b2=bars(324)
             t2=b2[-1]["end"]+100
-            second=a.run(state,{key:{"bars":b2,"corroboration":"AGREEMENT"}},{key:b2},t2,{},{"status":"MISSING"},specs)
+            second=a.run(state,{key:{"bars":b2,"corroboration":"AGREEMENT","cohort":s.COHORT}},{key:b2},t2,{},{"status":"MISSING"},specs)
             self.assertEqual(second["settlement_statuses"]["COMPLETE_MARK_ONLY"],1)
             self.assertFalse(second["trade_authorized"])
             self.assertEqual(second["official_gate"],"NOT_RUN")

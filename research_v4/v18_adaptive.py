@@ -192,9 +192,9 @@ def outcome(bars, market, start_after, *, historical=False, now=None):
             "up_pct":round(up,8),"down_pct":round(down,8),
             "bars_sha":digest(window),"bars":window,"first_next_open_is_not_verified_fill":True}
 
-def obs_id(market,symbol,venue,stamp,kind):
+def obs_id(market,symbol,venue,stamp,kind,cohort=None):
     # No re-enrolment after source revisions or code changes.
-    return digest([market,symbol,stamp,kind])
+    return digest([market,symbol,stamp,kind]+([cohort] if cohort else []))
 
 def liquidity(bars,i):
     vol=sum(b["volume"]*b["close"] for b in bars[max(0,i-19):i+1])
@@ -214,6 +214,8 @@ def firstseen_flags(micro, macro, market, seen):
 
 def records_from_panel(key,panel,asof,specs,known,allow_forward,macro):
     market,symbol,venue=key
+    if market=="CRYPTO" and panel.get("cohort")!=source.COHORT:
+        raise ValueError("V18_UNVERIFIED_CRYPTO_UNDERLYING")
     bars=panel["bars"]
     if not bars or any(b["end"]>asof for b in bars):raise ValueError("FUTURE_BAR_INPUT")
     # A gap/scale discontinuity resets all recursive indicator history.
@@ -236,10 +238,11 @@ def records_from_panel(key,panel,asof,specs,known,allow_forward,macro):
         return valid_path(bars[max(0,i-90):i+1],market) and bool(flags_at(i))
     def make(i,kind,seen):
         bar=bars[i]
-        return {"id":obs_id(market,symbol,venue,bar["end"],kind), "kind":kind,"market":market,
+        return {"id":obs_id(market,symbol,venue,bar["end"],kind,panel.get("cohort")), "kind":kind,"market":market,
                 "symbol":symbol,"venue":venue,"anchor":bar["end"],"seen":seen,"liquidity":liquidity(bars,i),
                 "features":flags_at(i),"asof_bar_sha":digest(bars[max(0,i-90):i+1]),
                 "corroboration":panel["corroboration"],"source_sha":panel.get("source_sha"),
+                "cohort":panel.get("cohort"),"underlying_metadata":panel.get("underlying_metadata"),
                 "method":VERSION,"feature_catalog_keys":sorted(specs),"prior_move_pct":round(100*(bar["close"]/bars[max(0,i-(8 if market=="CRYPTO" else 1))]["close"]-1),6)}
     for i in anchors:
         if not usable(i):continue
@@ -460,10 +463,22 @@ def fresh_forward_rows(observations,settlements,lock):
             and lock["start"]<=r["seen"]<lock["end"] and i in settlements
             and settlements[i]["status"]=="COMPLETE_MARK_ONLY"]
 
+def qualified(row):
+    market=row.get("market",row.get("rule",{}).get("market"))
+    return market!="CRYPTO" or row.get("cohort")==source.COHORT
+
 def run(state,panels,settle,asof,metadata,macro,specs_by_market,cursor=None,allow_forward=True,legacy=None):
     path=Path(state)
     old=read_state(path)
-    obs,outcomes,attempts,locks,decisions,shadows,prior_cursor=restore(old)
+    raw_obs,raw_outcomes,raw_attempts,raw_locks,raw_decisions,raw_shadows,prior_cursor=restore(old)
+    # Old mixed-underlying evidence is immutable, but not eligible for crypto training.
+    obs={i:r for i,r in raw_obs.items() if qualified(r)}
+    outcomes={i:r for i,r in raw_outcomes.items() if i in obs}
+    attempts={i:r for i,r in raw_attempts.items() if qualified(r)}
+    locks={i:r for i,r in raw_locks.items() if qualified(r)}
+    decisions={i:r for i,r in raw_decisions.items() if i in locks}
+    shadows={i:r for i,r in raw_shadows.items() if i in locks}
+    quarantined={"observations":len(raw_obs)-len(obs),"rules":len(raw_attempts)-len(attempts),"locks":len(raw_locks)-len(locks)}
     if old and asof<=old[-1]["observed_ms"]:raise ValueError("V18_CLOCK_REWIND")
     new=[];new_out=[];errors={}
     historical_intervals=defaultdict(list)
@@ -526,7 +541,7 @@ def run(state,panels,settle,asof,metadata,macro,specs_by_market,cursor=None,allo
         batches=proposals(market,specs_by_market[market],attempts,rows,digest([market,len(rows),len(attempts)]))
         for lane,rid,r,data in batches:
             stats=evaluate(rows,r)
-            a={"rule_id":rid,"rule":r,"lane":lane,"dataset":data,"stats":stats,"tested_at":asof,"latest_anchor":max(x["anchor"] for x in rows_for_rule(rows,r))}
+            a={"rule_id":rid,"rule":r,"lane":lane,"dataset":data,"stats":stats,"cohort":source.COHORT if market=="CRYPTO" else None,"tested_at":asof,"latest_anchor":max(x["anchor"] for x in rows_for_rule(rows,r))}
             if attempts.get(rid,{}).get("forward_failed"):
                 a["forward_failed"]=True
                 a["forward_checks"]=attempts[rid].get("forward_checks",{})
@@ -558,7 +573,7 @@ def run(state,panels,settle,asof,metadata,macro,specs_by_market,cursor=None,allo
                 receipt=validate(a["rule"],rows_for_rule(rows,a["rule"]),stage="DISCOVERY",n_trials=max(1,total_attempts+len(new_attempts)))
                 if receipt["verdict"]!="SCREEN_PASSED":continue
                 lock={"id":digest([a["rule_id"],asof]),"rule":a["rule"],"rule_id":a["rule_id"],
-                      "created":asof,"start":((asof//DAY)+1)*DAY,"end":((asof//DAY)+1+TRIAL_DAYS)*DAY,
+                      "cohort":source.COHORT if market=="CRYPTO" else None,"created":asof,"start":((asof//DAY)+1)*DAY,"end":((asof//DAY)+1+TRIAL_DAYS)*DAY,
                       "discovery_receipt":receipt,"n_trials":max(1,total_attempts+len(new_attempts))}
                 locks[lock["id"]]=lock;new_locks.append(lock);break
     for lock in list(locks.values()):
@@ -627,7 +642,7 @@ def run(state,panels,settle,asof,metadata,macro,specs_by_market,cursor=None,allo
             "historical_observations":sum(r["kind"]=="HISTORICAL_DISCOVERY" for r in obs.values()),
             "first_seen_observations":sum(r["kind"]=="FIRST_SEEN" for r in obs.values()),
             "settlement_statuses":dict(Counter(o["status"] for o in outcomes.values())),
-            "event_labels":dict(counts),"new_observations":len(new),"new_settlements":len(new_out),
+            "event_labels":dict(counts),"new_observations":len(new),"new_settlements":len(new_out),"quarantined_legacy_mixed_underlying":quarantined,
             "unique_rules":len(attempts),"total_actual_tests":total_attempts+len(new_attempts),
             "new_tests":len(new_attempts),"test_lanes":dict(Counter(a["lane"] for a in new_attempts)),
             "rule_statuses":dict(Counter(a["stats"]["reason"] for a in attempts.values())),
@@ -648,7 +663,8 @@ def main():
     path=Path(a.state)
     prior=read_state(path);obs,settlements,_,locks,decisions,shadows,cursor=restore(prior)
     t=source.now_ms()
-    pending=[r for i,r in obs.items() if r["kind"]=="FIRST_SEEN" and i not in settlements]
+    pending=[r for i,r in obs.items() if r["kind"]=="FIRST_SEEN" and i not in settlements and qualified(r)]
+    if prior and not any(b.get("source",{}).get("CRYPTO",{}).get("cohort")==source.COHORT for b in prior):cursor=0
     panels={};settle={};meta={}
     if not a.skip_crypto:
         panels,settle,cursor,meta["CRYPTO"]=source.collect_crypto(obs,pending,asof=t,cursor=cursor,limit=a.symbols)
