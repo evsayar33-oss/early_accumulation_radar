@@ -1,0 +1,4889 @@
+{
+  "BIST": {
+    "e_01b730fbf17d": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_01e1509b63ad": {
+      "frame": "1w",
+      "rule": {
+        "level": 0.3,
+        "metric": "value",
+        "name": "cmf",
+        "op": "cross_down",
+        "params": {
+          "n": 60
+        }
+      }
+    },
+    "e_0362b345a29d": {
+      "frame": "1d",
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "donchian",
+        "op": "below",
+        "params": {
+          "n": 90
+        }
+      }
+    },
+    "e_0539abd4b9d9": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_064d93e749ea": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "histogram",
+        "name": "chaikin_oscillator",
+        "op": "rising",
+        "params": {
+          "fast": 18,
+          "signal": 7,
+          "slow": 20
+        }
+      }
+    },
+    "e_081c7c79a66f": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "aroon",
+        "op": "rising",
+        "params": {
+          "n": 18
+        }
+      }
+    },
+    "e_1091fb0fc112": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_10b4091715a4": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_10f8cb1eadf3": {
+      "frame": "1d",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_13d62e657178": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "macd",
+        "op": "falling",
+        "params": {
+          "fast": 7,
+          "slow": 50,
+          "source": "open"
+        }
+      }
+    },
+    "e_149983ca315e": {
+      "frame": "1w",
+      "rule": {
+        "level": -50,
+        "metric": "line",
+        "name": "tsi",
+        "op": "cross_down",
+        "params": {
+          "fast": 18,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_15e565bb816d": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_161114455f45": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "keltner",
+        "op": "rising",
+        "params": {
+          "atr": 21,
+          "average": "ema",
+          "multiplier": 1,
+          "n": 14,
+          "source": "open"
+        }
+      }
+    },
+    "e_17ddb7d1b4d4": {
+      "frame": "1d",
+      "rule": {
+        "level": 10,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 120,
+          "smooth": 18
+        }
+      }
+    },
+    "e_1828b0c980e4": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "cmf",
+        "op": "rising",
+        "params": {
+          "n": 60
+        }
+      }
+    },
+    "e_195d4312dc37": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_19b1e9643243": {
+      "frame": "1w",
+      "rule": {
+        "level": 20,
+        "metric": "value",
+        "name": "adx",
+        "op": "cross_up",
+        "params": {
+          "average": "wilder",
+          "n": 30,
+          "smooth": 7
+        }
+      }
+    },
+    "e_20a65931c9af": {
+      "frame": "1w",
+      "rule": {
+        "level": -250,
+        "metric": "value",
+        "name": "cci",
+        "op": "cross_up",
+        "params": {
+          "constant": 0.025,
+          "n": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_2b333ea94eef": {
+      "frame": "1w",
+      "rule": {
+        "level": 80,
+        "metric": "value",
+        "name": "mfi",
+        "op": "cross_up",
+        "params": {
+          "n": 7
+        }
+      }
+    },
+    "e_31ee1ffa7770": {
+      "frame": "1d",
+      "generation": 2969,
+      "rule": {
+        "level": 0.5,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 75,
+          "average": "sma",
+          "multiplier": 0.5,
+          "n": 10,
+          "source": "open"
+        }
+      }
+    },
+    "e_32a1e743e159": {
+      "frame": "1w",
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "dmi",
+        "op": "cross_up",
+        "params": {
+          "average": "wma",
+          "n": 40
+        }
+      }
+    },
+    "e_36e6409ada02": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "histogram",
+        "name": "macd",
+        "op": "below",
+        "params": {
+          "fast": 18,
+          "signal": 5,
+          "slow": 40,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_387bc5743281": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_3f9549e8c564": {
+      "frame": "1w",
+      "rule": {
+        "level": -0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "ema",
+          "multiplier": 2.25,
+          "n": 30,
+          "source": "open"
+        }
+      }
+    },
+    "e_440819db7c5d": {
+      "frame": "1w",
+      "rule": {
+        "level": 5,
+        "metric": "histogram",
+        "name": "wavetrend",
+        "op": "cross_up",
+        "params": {
+          "average": 20,
+          "channel": 7,
+          "signal": 1,
+          "source": "close"
+        }
+      }
+    },
+    "e_44128f1a67ec": {
+      "frame": "1w",
+      "rule": {
+        "level": 10,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "middle": 18,
+          "slow": 40
+        }
+      }
+    },
+    "e_44b2c985073b": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "dmi",
+        "op": "rising",
+        "params": {
+          "average": "wma",
+          "n": 9
+        }
+      }
+    },
+    "e_44dd31d84fd3": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_4552a1a27021": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_475b4709c1f4": {
+      "frame": "1w",
+      "rule": {
+        "level": -20,
+        "metric": "cross",
+        "name": "stochastic",
+        "op": "cross_down",
+        "params": {
+          "d": 7,
+          "k": 14,
+          "n": 21,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_479b59b51135": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 4,
+          "n": 90,
+          "slow": 40,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_4b00e0eb1aeb": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_4fbaabee1633": {
+      "frame": "1d",
+      "rule": {
+        "level": -20,
+        "metric": "cross",
+        "name": "stochastic_rsi",
+        "op": "cross_down",
+        "params": {
+          "average": "sma",
+          "d": 3,
+          "k": 2,
+          "n": 50,
+          "source": "ohlc4",
+          "stoch_window": 120
+        }
+      }
+    },
+    "e_52afee3f5d0e": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "aroon",
+        "op": "rising",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_536726224c37": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_5369f783a211": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_553b81ec95f9": {
+      "frame": "1d",
+      "generation": 2969,
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "aroon",
+        "op": "cross_down",
+        "params": {
+          "n": 12
+        }
+      }
+    },
+    "e_55b3181cdf65": {
+      "frame": "1d",
+      "rule": {
+        "level": -1,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 40,
+          "slow": 120
+        }
+      }
+    },
+    "e_599933912417": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_59f84190a976": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_5aa2465f5419": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "trix",
+        "op": "falling",
+        "params": {
+          "n": 50,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_5ba3d10e85df": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_5c5f92600323": {
+      "frame": "1d",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_5ca54b91942a": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_60740cbf5cae": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_6371b5929682": {
+      "frame": "1d",
+      "rule": {
+        "level": -1,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "cross_up",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3.5,
+          "n": 7
+        }
+      }
+    },
+    "e_6807e9e9ec94": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_6c5d8bad7625": {
+      "frame": "1w",
+      "generation": 2969,
+      "rule": {
+        "level": 50,
+        "metric": "d",
+        "name": "stochastic_rsi",
+        "op": "cross_down",
+        "params": {
+          "average": "ema",
+          "d": 2,
+          "k": 9,
+          "n": 21,
+          "source": "ohlc4",
+          "stoch_window": 5
+        }
+      }
+    },
+    "e_75b6f235d699": {
+      "frame": "1w",
+      "rule": {
+        "level": -2,
+        "metric": "tenkan_kijun",
+        "name": "ichimoku",
+        "op": "below",
+        "params": {
+          "kijun": 12,
+          "tenkan": 5
+        }
+      }
+    },
+    "e_788e5d0e8528": {
+      "frame": "1d",
+      "rule": {
+        "level": 75,
+        "metric": "value",
+        "name": "mfi",
+        "op": "below",
+        "params": {
+          "n": 18
+        }
+      }
+    },
+    "e_7e193fc6eec1": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_822e5649332b": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "ppo",
+        "op": "rising",
+        "params": {
+          "fast": 5,
+          "slow": 50,
+          "source": "close"
+        }
+      }
+    },
+    "e_8502a2a2b7aa": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_85e3802aa771": {
+      "frame": "1d",
+      "rule": {
+        "level": -2,
+        "metric": "line",
+        "name": "ppo",
+        "op": "cross_up",
+        "params": {
+          "fast": 26,
+          "slow": 120,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_88cb7293676e": {
+      "frame": "1w",
+      "rule": {
+        "level": -10,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_down",
+        "params": {
+          "n": 9
+        }
+      }
+    },
+    "e_8a7121f259a4": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "donchian",
+        "op": "falling",
+        "params": {
+          "n": 30
+        }
+      }
+    },
+    "e_8aa2e2654db7": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_8e0831d17583": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_91d120f5d671": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "histogram",
+        "name": "trix",
+        "op": "falling",
+        "params": {
+          "n": 3,
+          "signal": 9,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_92db6b837d0f": {
+      "frame": "1d",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_94e6e9d2585d": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_98eded9e32d5": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_99990d2cdae4": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_9d07c6625d6b": {
+      "frame": "1w",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_9fb4617ce37f": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "histogram",
+        "name": "tsi",
+        "op": "falling",
+        "params": {
+          "fast": 18,
+          "signal": 1,
+          "slow": 60,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_a27d32d9ad06": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_a32042f2a784": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_a73c7d73d313": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "rsi",
+        "op": "falling",
+        "params": {
+          "average": "wilder",
+          "n": 10,
+          "source": "open"
+        }
+      }
+    },
+    "e_a9d1681c876a": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_ad2100e068ce": {
+      "frame": "1d",
+      "rule": {
+        "level": 20,
+        "metric": "signal_spread",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "n": 30,
+          "signal": 12,
+          "source": "close"
+        }
+      }
+    },
+    "e_ad31f494f091": {
+      "frame": "1w",
+      "generation": 2969,
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "mfi",
+        "op": "cross_down",
+        "params": {
+          "n": 3
+        }
+      }
+    },
+    "e_b1bc256ece6f": {
+      "frame": "1d",
+      "rule": {
+        "level": 20,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "below",
+        "params": {
+          "fast": 9,
+          "middle": 50,
+          "slow": 90
+        }
+      }
+    },
+    "e_b32e0a8be1ae": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "tenkan_kijun",
+        "name": "ichimoku",
+        "op": "cross_up",
+        "params": {
+          "kijun": 30,
+          "tenkan": 14
+        }
+      }
+    },
+    "e_b4e5772e2240": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "cross_up",
+        "params": {
+          "n": 50
+        }
+      }
+    },
+    "e_b656ac1c7a2d": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_b7015f7ecb21": {
+      "frame": "1w",
+      "rule": {
+        "level": 0.5,
+        "metric": "value",
+        "name": "keltner",
+        "op": "cross_down",
+        "params": {
+          "atr": 50,
+          "average": "wma",
+          "multiplier": 2,
+          "n": 12,
+          "source": "close"
+        }
+      }
+    },
+    "e_b8b04a369cbe": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_b9652f3135f4": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_bad7164fe014": {
+      "frame": "1d",
+      "rule": {
+        "level": -75,
+        "metric": "value",
+        "name": "cci",
+        "op": "below",
+        "params": {
+          "constant": 0.025,
+          "n": 18,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_be80945ef769": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_c44f30b32ac3": {
+      "frame": "1w",
+      "rule": {
+        "level": 85,
+        "metric": "d",
+        "name": "stochastic_rsi",
+        "op": "cross_down",
+        "params": {
+          "average": "ema",
+          "d": 12,
+          "k": 7,
+          "n": 18,
+          "source": "hlc3",
+          "stoch_window": 3
+        }
+      }
+    },
+    "e_c4b52bbd02e8": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_c93beb516f5b": {
+      "frame": "1w",
+      "rule": {
+        "level": 2,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 5,
+          "n": 10,
+          "slow": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_c9eee75c084a": {
+      "frame": "1d",
+      "rule": {
+        "level": 0.75,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "below",
+        "params": {
+          "average": "wilder",
+          "multiplier": 2,
+          "n": 12,
+          "source": "close"
+        }
+      }
+    },
+    "e_ca9cac12a472": {
+      "frame": "1d",
+      "rule": {
+        "level": -20,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_up",
+        "params": {
+          "n": 40
+        }
+      }
+    },
+    "e_cb301b9918b1": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_ce546bd30561": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "d",
+        "name": "stochastic",
+        "op": "rising",
+        "params": {
+          "d": 3,
+          "k": 1,
+          "n": 18,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_cf9dc26ef822": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_d27ca7dc57f7": {
+      "frame": "1w",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_d33b38eadced": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "rising",
+        "params": {
+          "average": 26,
+          "channel": 50,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_dc52f1f5765d": {
+      "frame": "1w",
+      "generation": 2969,
+      "rule": {
+        "level": -5,
+        "metric": "value",
+        "name": "dmi",
+        "op": "cross_down",
+        "params": {
+          "average": "wilder",
+          "n": 12
+        }
+      }
+    },
+    "e_de24b5b97bdf": {
+      "frame": "1d",
+      "generation": 2969,
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_up",
+        "params": {
+          "n": 7
+        }
+      }
+    },
+    "e_e4b7b9759b21": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_e5b8244c53d2": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_ec298c0595ba": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_ecdd12db7ddb": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "vortex",
+        "op": "falling",
+        "params": {
+          "n": 18
+        }
+      }
+    },
+    "e_eee8f546836d": {
+      "frame": "1w",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_f43b59652700": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "cross_up",
+        "params": {
+          "average": "ema",
+          "multiplier": 6,
+          "n": 7
+        }
+      }
+    },
+    "e_f5dbb88608e5": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_f5fada13be32": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_f87e36bdcbfd": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_fddb1732af80": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    }
+  },
+  "CRYPTO": {
+    "e_03a91249d95c": {
+      "frame": "1h",
+      "rule": {
+        "level": -1,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 30,
+          "slow": 25,
+          "source": "open"
+        }
+      }
+    },
+    "e_05651200d683": {
+      "frame": "4h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "dmi",
+        "op": "rising",
+        "params": {
+          "average": "sma",
+          "n": 7
+        }
+      }
+    },
+    "e_07b76120e45f": {
+      "frame": "1h",
+      "rule": {
+        "level": 5,
+        "metric": "d",
+        "name": "stochastic_rsi",
+        "op": "below",
+        "params": {
+          "average": "wma",
+          "d": 14,
+          "k": 12,
+          "n": 50,
+          "source": "open",
+          "stoch_window": 5
+        }
+      }
+    },
+    "e_07debe3e8566": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_098142b06dd8": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_0b0538779630": {
+      "frame": "4h",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_0c5594088861": {
+      "frame": "4h",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_0f4cceb9803a": {
+      "frame": "4h",
+      "rule": {
+        "level": 1,
+        "metric": "histogram",
+        "name": "trix",
+        "op": "below",
+        "params": {
+          "n": 20,
+          "signal": 4,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_10a4f4ed524b": {
+      "frame": "4h",
+      "rule": {
+        "level": 10,
+        "metric": "line",
+        "name": "rsi",
+        "op": "cross_up",
+        "params": {
+          "average": "sma",
+          "n": 9,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_125814cc216a": {
+      "frame": "15m",
+      "rule": {
+        "level": -40,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "ema",
+          "n": 14
+        }
+      }
+    },
+    "e_1272edd75b77": {
+      "frame": "1h",
+      "rule": {
+        "level": 30,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "cross_down",
+        "params": {
+          "fast": 7,
+          "middle": 12,
+          "slow": 60
+        }
+      }
+    },
+    "e_13423da8db6e": {
+      "frame": "15m",
+      "rule": {
+        "level": 20,
+        "metric": "bandwidth",
+        "name": "bollinger",
+        "op": "cross_down",
+        "params": {
+          "average": "wma",
+          "multiplier": 1.75,
+          "n": 21,
+          "source": "open"
+        }
+      }
+    },
+    "e_14b414a2931a": {
+      "frame": "15m",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_17da3a529319": {
+      "frame": "4h",
+      "rule": {
+        "level": null,
+        "metric": "cross",
+        "name": "stochastic",
+        "op": "rising",
+        "params": {
+          "d": 7,
+          "k": 5,
+          "n": 18,
+          "source": "open"
+        }
+      }
+    },
+    "e_1a792a97b7f7": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_1bbb3655b6a9": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_1c39112baa88": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "tenkan_kijun",
+        "name": "ichimoku",
+        "op": "cross_down",
+        "params": {
+          "kijun": 12,
+          "tenkan": 7
+        }
+      }
+    },
+    "e_1d61bec87946": {
+      "frame": "4h",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_1f38338a8778": {
+      "frame": "1h",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_1fcad347dc33": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_213b5977acc8": {
+      "frame": "4h",
+      "generation": 2969,
+      "rule": {
+        "level": 35,
+        "metric": "d",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "ema",
+          "d": 2,
+          "k": 12,
+          "n": 60,
+          "source": "hl2",
+          "stoch_window": 12
+        }
+      }
+    },
+    "e_228c05fd21ee": {
+      "frame": "4h",
+      "rule": {
+        "level": null,
+        "metric": "tenkan_kijun",
+        "name": "ichimoku",
+        "op": "rising",
+        "params": {
+          "kijun": 21,
+          "tenkan": 12
+        }
+      }
+    },
+    "e_242909c8468e": {
+      "frame": "4h",
+      "rule": {
+        "level": 0.9,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "below",
+        "params": {
+          "average": "sma",
+          "multiplier": 1.25,
+          "n": 3,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_248d99dd4417": {
+      "frame": "1h",
+      "rule": {
+        "level": 60,
+        "metric": "value",
+        "name": "donchian",
+        "op": "cross_up",
+        "params": {
+          "n": 12
+        }
+      }
+    },
+    "e_26ee1df346df": {
+      "frame": "15m",
+      "generation": 2969,
+      "rule": {
+        "level": -15,
+        "metric": "value",
+        "name": "dmi",
+        "op": "cross_up",
+        "params": {
+          "average": "sma",
+          "n": 18
+        }
+      }
+    },
+    "e_28cd652c613d": {
+      "frame": "15m",
+      "rule": {
+        "level": -0.5,
+        "metric": "histogram",
+        "name": "macd",
+        "op": "cross_up",
+        "params": {
+          "fast": 10,
+          "signal": 2,
+          "slow": 40,
+          "source": "close"
+        }
+      }
+    },
+    "e_2ae74312e111": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_2d2d661420d2": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_2f463f4cd385": {
+      "frame": "1h",
+      "rule": {
+        "level": -150,
+        "metric": "value",
+        "name": "cci",
+        "op": "cross_up",
+        "params": {
+          "constant": 0.02,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_303d23110bc8": {
+      "frame": "4h",
+      "rule": {
+        "level": -75,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.01,
+          "n": 21,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_30deb33e8a83": {
+      "frame": "4h",
+      "rule": {
+        "level": 60,
+        "metric": "value",
+        "name": "aroon",
+        "op": "cross_down",
+        "params": {
+          "n": 60
+        }
+      }
+    },
+    "e_328b6c964fcf": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_32e919a5f8de": {
+      "frame": "4h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "adx",
+        "op": "rising",
+        "params": {
+          "average": "wma",
+          "n": 3,
+          "smooth": 40
+        }
+      }
+    },
+    "e_35fde6d53d7b": {
+      "frame": "15m",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_3bd89f40f30e": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "trix",
+        "op": "falling",
+        "params": {
+          "n": 9,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_3cb37b0c555d": {
+      "frame": "4h",
+      "rule": {
+        "level": 0.5,
+        "metric": "line",
+        "name": "macd",
+        "op": "below",
+        "params": {
+          "fast": 12,
+          "slow": 40,
+          "source": "close"
+        }
+      }
+    },
+    "e_3faee8726132": {
+      "frame": "1h",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_42207693b182": {
+      "frame": "15m",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_43f2c029c2e9": {
+      "frame": "1h",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_44e2a87c74bc": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_454d3cb5d466": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_463890f3cc55": {
+      "frame": "15m",
+      "rule": {
+        "level": 30,
+        "metric": "value",
+        "name": "adx",
+        "op": "below",
+        "params": {
+          "average": "wma",
+          "n": 40,
+          "smooth": 3
+        }
+      }
+    },
+    "e_48fe2b2e62c2": {
+      "frame": "15m",
+      "rule": {
+        "level": 53,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 3,
+          "source": "open"
+        }
+      }
+    },
+    "e_4a13ad1cabfa": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_4ed8a74ac5a9": {
+      "frame": "15m",
+      "rule": {
+        "level": 1,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 6,
+          "n": 9
+        }
+      }
+    },
+    "e_532dcb4446a4": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_53b12789a9c0": {
+      "frame": "15m",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_56fb3c1d0294": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_584f0d95d778": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_597be8d2cc80": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_5a730d4531dc": {
+      "frame": "15m",
+      "rule": {
+        "level": -75,
+        "metric": "value",
+        "name": "cci",
+        "op": "below",
+        "params": {
+          "constant": 0.01,
+          "n": 40,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_5e6b21a7a914": {
+      "frame": "4h",
+      "rule": {
+        "level": 0.5,
+        "metric": "histogram",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 14,
+          "signal": 7,
+          "slow": 50,
+          "source": "open"
+        }
+      }
+    },
+    "e_5fc7e3d36897": {
+      "frame": "4h",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_5fcead1e7328": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_603502237793": {
+      "frame": "1h",
+      "rule": {
+        "level": -25,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wma",
+          "n": 5
+        }
+      }
+    },
+    "e_60972ac237cb": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_636ad854ac3d": {
+      "frame": "4h",
+      "rule": {
+        "level": 75,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 10,
+          "middle": 40,
+          "slow": 50
+        }
+      }
+    },
+    "e_6395bc15e121": {
+      "frame": "15m",
+      "rule": {
+        "level": -0.5,
+        "metric": "histogram",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 21,
+          "signal": 9,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_6541b2cd1706": {
+      "frame": "1h",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_66cbd942bb98": {
+      "frame": "4h",
+      "rule": {
+        "level": 65,
+        "metric": "d",
+        "name": "stochastic_rsi",
+        "op": "cross_down",
+        "params": {
+          "average": "wma",
+          "d": 14,
+          "k": 2,
+          "n": 50,
+          "source": "hlc3",
+          "stoch_window": 21
+        }
+      }
+    },
+    "e_67de657a8766": {
+      "frame": "1h",
+      "rule": {
+        "level": 0.5,
+        "metric": "value",
+        "name": "vortex",
+        "op": "below",
+        "params": {
+          "n": 40
+        }
+      }
+    },
+    "e_686d6515e894": {
+      "frame": "1h",
+      "rule": {
+        "level": 0.1,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 7
+        }
+      }
+    },
+    "e_6ed5e8c99c3d": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "cross_up",
+        "params": {
+          "fast": 9,
+          "slow": 30
+        }
+      }
+    },
+    "e_6ef40bb55755": {
+      "frame": "1h",
+      "rule": {
+        "level": -30,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_up",
+        "params": {
+          "n": 3
+        }
+      }
+    },
+    "e_71c7ded1964a": {
+      "frame": "4h",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_72f4bd9bf973": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "adx",
+        "op": "falling",
+        "params": {
+          "average": "wilder",
+          "n": 60,
+          "smooth": 40
+        }
+      }
+    },
+    "e_73c29639d381": {
+      "frame": "15m",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_73fcf6f52489": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_75b02fcd6256": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "d",
+        "name": "stochastic",
+        "op": "falling",
+        "params": {
+          "d": 5,
+          "k": 3,
+          "n": 14,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_760b23d48d0a": {
+      "frame": "15m",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_797b34f9e61d": {
+      "frame": "1h",
+      "rule": {
+        "level": 1,
+        "metric": "bandwidth",
+        "name": "bollinger",
+        "op": "below",
+        "params": {
+          "average": "sma",
+          "multiplier": 2.25,
+          "n": 7,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_7ed9842739d9": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "falling",
+        "params": {
+          "n": 12
+        }
+      }
+    },
+    "e_833b5239dbab": {
+      "frame": "4h",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_834d31498011": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_89b6232edcd8": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "rising",
+        "params": {
+          "fast": 9,
+          "slow": 18
+        }
+      }
+    },
+    "e_8b2e7226399b": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_8b73ba753f08": {
+      "frame": "15m",
+      "rule": {
+        "level": -30,
+        "metric": "line",
+        "name": "tsi",
+        "op": "cross_up",
+        "params": {
+          "fast": 3,
+          "slow": 18,
+          "source": "close"
+        }
+      }
+    },
+    "e_8e10ee42fd7a": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "keltner",
+        "op": "rising",
+        "params": {
+          "atr": 7,
+          "average": "wilder",
+          "multiplier": 0.5,
+          "n": 7,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_8e60c2168266": {
+      "frame": "1h",
+      "rule": {
+        "level": -30,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "below",
+        "params": {
+          "average": 10,
+          "channel": 10,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_8fc3e315840c": {
+      "frame": "1h",
+      "rule": {
+        "level": -5,
+        "metric": "cross",
+        "name": "stochastic",
+        "op": "below",
+        "params": {
+          "d": 14,
+          "k": 4,
+          "n": 21,
+          "source": "close"
+        }
+      }
+    },
+    "e_903b0178249b": {
+      "frame": "4h",
+      "rule": {
+        "level": 0.2,
+        "metric": "value",
+        "name": "vortex",
+        "op": "below",
+        "params": {
+          "n": 10
+        }
+      }
+    },
+    "e_91680052388e": {
+      "frame": "15m",
+      "rule": {
+        "level": -1,
+        "metric": "histogram",
+        "name": "ppo",
+        "op": "below",
+        "params": {
+          "fast": 14,
+          "signal": 4,
+          "slow": 50,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_964fda46e310": {
+      "frame": "1h",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_96cdb2d425cb": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_97f5d373e721": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_98575815ab3a": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_9a217269bdc3": {
+      "frame": "15m",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 3
+        }
+      }
+    },
+    "e_9d8d143f8442": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_9e447b7b9a7b": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_9eaa4058add8": {
+      "frame": "15m",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_9f66f3e42079": {
+      "frame": "4h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "kama",
+        "op": "rising",
+        "params": {
+          "fast": 2,
+          "n": 9,
+          "slow": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_9fa517565b41": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "falling",
+        "params": {
+          "average": "sma",
+          "multiplier": 3,
+          "n": 26
+        }
+      }
+    },
+    "e_a1e8bdf73497": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "cross_up",
+        "params": {
+          "fast": 14,
+          "slow": 21,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_a32e5f488140": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "cross",
+        "name": "stochastic_rsi",
+        "op": "falling",
+        "params": {
+          "average": "wma",
+          "d": 9,
+          "k": 14,
+          "n": 50,
+          "source": "hl2",
+          "stoch_window": 10
+        }
+      }
+    },
+    "e_a39fc65284b0": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_a5c1981049c4": {
+      "frame": "4h",
+      "rule": {
+        "level": 90,
+        "metric": "value",
+        "name": "donchian",
+        "op": "cross_up",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_a6a13af46f90": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "vortex",
+        "op": "falling",
+        "params": {
+          "n": 7
+        }
+      }
+    },
+    "e_aaa4bde96c0e": {
+      "frame": "15m",
+      "rule": {
+        "level": 30,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "below",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 26
+        }
+      }
+    },
+    "e_abc5fcca816a": {
+      "frame": "1h",
+      "rule": {
+        "level": 15,
+        "metric": "histogram",
+        "name": "tsi",
+        "op": "below",
+        "params": {
+          "fast": 3,
+          "signal": 2,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_ac2b43475f18": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_ac7f74f346d7": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_adb222f9cda7": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_b3b85e15e10d": {
+      "frame": "4h",
+      "rule": {
+        "level": -0.5,
+        "metric": "histogram",
+        "name": "chaikin_oscillator",
+        "op": "cross_up",
+        "params": {
+          "fast": 5,
+          "signal": 4,
+          "slow": 60
+        }
+      }
+    },
+    "e_b59a1b7b2c88": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_b68919b9431f": {
+      "frame": "1h",
+      "generation": 2969,
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "keltner",
+        "op": "falling",
+        "params": {
+          "atr": 40,
+          "average": "wma",
+          "multiplier": 1.5,
+          "n": 30,
+          "source": "open"
+        }
+      }
+    },
+    "e_b807828ca19a": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_bad8c4885085": {
+      "frame": "4h",
+      "rule": {
+        "level": -2,
+        "metric": "value",
+        "name": "keltner",
+        "op": "below",
+        "params": {
+          "atr": 20,
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_bb09d3ab487f": {
+      "frame": "4h",
+      "rule": {
+        "level": 10,
+        "metric": "value",
+        "name": "mfi",
+        "op": "cross_up",
+        "params": {
+          "n": 26
+        }
+      }
+    },
+    "e_bbd97c79012d": {
+      "frame": "1h",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_bd4c30e169c0": {
+      "frame": "15m",
+      "generation": 2969,
+      "rule": {
+        "level": -80,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_up",
+        "params": {
+          "n": 26
+        }
+      }
+    },
+    "e_bdea8d09350c": {
+      "frame": "4h",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_c08b7caa1331": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "donchian",
+        "op": "falling",
+        "params": {
+          "n": 50
+        }
+      }
+    },
+    "e_c129b5fb78b1": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_c28f5bccfb21": {
+      "frame": "1h",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_c5ae42e325a7": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "rsi",
+        "op": "falling",
+        "params": {
+          "average": "ema",
+          "n": 30,
+          "source": "open"
+        }
+      }
+    },
+    "e_c9e77d31a7b0": {
+      "frame": "4h",
+      "generation": 2969,
+      "rule": {
+        "level": 80,
+        "metric": "value",
+        "name": "aroon",
+        "op": "below",
+        "params": {
+          "n": 5
+        }
+      }
+    },
+    "e_ca0780bb9684": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "below",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_cb325c47264e": {
+      "frame": "4h",
+      "rule": {
+        "level": 0.05,
+        "metric": "value",
+        "name": "cmf",
+        "op": "cross_down",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_cba0acdb6de4": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "mfi",
+        "op": "falling",
+        "params": {
+          "n": 26
+        }
+      }
+    },
+    "e_cc70d8d7bb63": {
+      "frame": "15m",
+      "rule": {
+        "level": 1,
+        "metric": "value",
+        "name": "keltner",
+        "op": "cross_down",
+        "params": {
+          "atr": 9,
+          "average": "wilder",
+          "multiplier": 1.5,
+          "n": 9,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_d2f8c8059dfa": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_d39625ae7bac": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_d41a6823336e": {
+      "frame": "4h",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_d747d400cf6f": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_d9094db5e09b": {
+      "frame": "1h",
+      "rule": {
+        "level": 1,
+        "metric": "span_cross",
+        "name": "ichimoku",
+        "op": "cross_up",
+        "params": {
+          "displacement": 5,
+          "kijun": 5,
+          "span_b": 18,
+          "tenkan": 3
+        }
+      }
+    },
+    "e_db76c2954816": {
+      "frame": "15m",
+      "rule": {
+        "level": -5,
+        "metric": "signal_spread",
+        "name": "rsi",
+        "op": "cross_down",
+        "params": {
+          "average": "sma",
+          "n": 40,
+          "signal": 14,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_dbf483a3b3fc": {
+      "frame": "4h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "falling",
+        "params": {
+          "average": "sma",
+          "multiplier": 0.5,
+          "n": 26
+        }
+      }
+    },
+    "e_dc5ce166f13f": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_dd6ebc0d0754": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_dfa491592437": {
+      "frame": "1h",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_e150dbc7c206": {
+      "frame": "4h",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_e241dbe1fe4f": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_e34dedaa3f2c": {
+      "frame": "1h",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "aroon",
+        "op": "falling",
+        "params": {
+          "n": 30
+        }
+      }
+    },
+    "e_e47697c67cfc": {
+      "frame": "15m",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "aroon",
+        "op": "rising",
+        "params": {
+          "n": 10
+        }
+      }
+    },
+    "e_ebd31d68606d": {
+      "frame": "15m",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_eca60dbf2dc4": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_eccf4cc3ac07": {
+      "frame": "4h",
+      "rule": {
+        "level": -80,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "below",
+        "params": {
+          "n": 60
+        }
+      }
+    },
+    "e_edde4416694c": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_efe047d50c4b": {
+      "frame": "1h",
+      "rule": {
+        "level": -5,
+        "metric": "line",
+        "name": "ppo",
+        "op": "below",
+        "params": {
+          "fast": 7,
+          "slow": 40,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_f0b1ab27e23d": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_f248c11732a5": {
+      "frame": "1h",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_f68c12d04089": {
+      "frame": "15m",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_f737423d6bda": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_f9449cd249e1": {
+      "frame": "4h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_fad7b840a0ae": {
+      "frame": "1h",
+      "rule": {
+        "level": -2,
+        "metric": "histogram",
+        "name": "macd",
+        "op": "cross_down",
+        "params": {
+          "fast": 10,
+          "signal": 3,
+          "slow": 20,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_fcc59a816d71": {
+      "frame": "15m",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_fe0ccc0ce716": {
+      "frame": "1h",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_fe897d1c2495": {
+      "frame": "4h",
+      "rule": {
+        "level": -53,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 14,
+          "channel": 40,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_ff89d8efe42a": {
+      "frame": "15m",
+      "rule": {
+        "level": 1,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 6,
+          "n": 21,
+          "slow": 40,
+          "source": "close"
+        }
+      }
+    },
+    "e_fff05b0fc492": {
+      "frame": "1h",
+      "generation": 2969,
+      "rule": {
+        "level": 60,
+        "metric": "value",
+        "name": "mfi",
+        "op": "cross_down",
+        "params": {
+          "n": 5
+        }
+      }
+    }
+  },
+  "US": {
+    "e_018a7acf7548": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "mfi",
+        "op": "rising",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_01b730fbf17d": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_0539abd4b9d9": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_0bac6d47f260": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "span_cross",
+        "name": "ichimoku",
+        "op": "rising",
+        "params": {
+          "displacement": 9,
+          "kijun": 30,
+          "span_b": 90,
+          "tenkan": 7
+        }
+      }
+    },
+    "e_0bd673c09908": {
+      "frame": "1w",
+      "rule": {
+        "level": 0.5,
+        "metric": "histogram",
+        "name": "chaikin_oscillator",
+        "op": "cross_down",
+        "params": {
+          "fast": 5,
+          "signal": 3,
+          "slow": 60
+        }
+      }
+    },
+    "e_0dc739f77238": {
+      "frame": "1d",
+      "rule": {
+        "level": -50,
+        "metric": "histogram",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 26,
+          "signal": 9,
+          "slow": 30,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_1091fb0fc112": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_10b4091715a4": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_10f8cb1eadf3": {
+      "frame": "1d",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_133d124b2a46": {
+      "frame": "1d",
+      "generation": 2969,
+      "rule": {
+        "level": -1,
+        "metric": "value",
+        "name": "keltner",
+        "op": "below",
+        "params": {
+          "atr": 18,
+          "average": "wma",
+          "multiplier": 4,
+          "n": 7,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_1394aa203636": {
+      "frame": "1d",
+      "generation": 2969,
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "aroon",
+        "op": "rising",
+        "params": {
+          "n": 21
+        }
+      }
+    },
+    "e_1476938efa9f": {
+      "frame": "1w",
+      "generation": 2969,
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "mfi",
+        "op": "cross_up",
+        "params": {
+          "n": 12
+        }
+      }
+    },
+    "e_15e565bb816d": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_16b1da6c1220": {
+      "frame": "1w",
+      "rule": {
+        "level": 15,
+        "metric": "value",
+        "name": "adx",
+        "op": "cross_down",
+        "params": {
+          "average": "sma",
+          "n": 20,
+          "smooth": 10
+        }
+      }
+    },
+    "e_195d4312dc37": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_350029bf0bcb": {
+      "frame": "1d",
+      "rule": {
+        "level": -60,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 3
+        }
+      }
+    },
+    "e_36196c18fa1d": {
+      "frame": "1w",
+      "rule": {
+        "level": -10,
+        "metric": "signal_spread",
+        "name": "rsi",
+        "op": "below",
+        "params": {
+          "average": "sma",
+          "n": 60,
+          "signal": 7,
+          "source": "open"
+        }
+      }
+    },
+    "e_377f44a4fc5a": {
+      "frame": "1d",
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "mfi",
+        "op": "cross_up",
+        "params": {
+          "n": 50
+        }
+      }
+    },
+    "e_387bc5743281": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_3a0a6db267d8": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "rising",
+        "params": {
+          "fast": 18,
+          "middle": 20,
+          "slow": 21
+        }
+      }
+    },
+    "e_3d72ab2849a4": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "keltner",
+        "op": "falling",
+        "params": {
+          "atr": 50,
+          "average": "sma",
+          "multiplier": 4,
+          "n": 14,
+          "source": "open"
+        }
+      }
+    },
+    "e_42fa402e2bcf": {
+      "frame": "1d",
+      "rule": {
+        "level": -40,
+        "metric": "value",
+        "name": "dmi",
+        "op": "cross_up",
+        "params": {
+          "average": "ema",
+          "n": 26
+        }
+      }
+    },
+    "e_44dd31d84fd3": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_4552a1a27021": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_4b00e0eb1aeb": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_4f804fa86803": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "rising",
+        "params": {
+          "average": "sma",
+          "k": 2,
+          "n": 12,
+          "source": "hlc3",
+          "stoch_window": 20
+        }
+      }
+    },
+    "e_50b349299df1": {
+      "frame": "1w",
+      "rule": {
+        "level": 90,
+        "metric": "d",
+        "name": "stochastic",
+        "op": "cross_up",
+        "params": {
+          "d": 5,
+          "k": 9,
+          "n": 60,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_536726224c37": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "ppo",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_5369f783a211": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_599933912417": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_59f84190a976": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14
+        }
+      }
+    },
+    "e_5ba3d10e85df": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_5c5f92600323": {
+      "frame": "1d",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_5ca54b91942a": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic",
+        "op": "above",
+        "params": {
+          "k": 3,
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_5eb51409791a": {
+      "frame": "1d",
+      "rule": {
+        "level": 2,
+        "metric": "value",
+        "name": "kama",
+        "op": "below",
+        "params": {
+          "fast": 6,
+          "n": 120,
+          "slow": 30,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_60740cbf5cae": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_64999ccc6bb7": {
+      "frame": "1w",
+      "generation": 2969,
+      "rule": {
+        "level": -25,
+        "metric": "value",
+        "name": "dmi",
+        "op": "above",
+        "params": {
+          "average": "ema",
+          "n": 40
+        }
+      }
+    },
+    "e_6807e9e9ec94": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_751c80d98fde": {
+      "frame": "1d",
+      "rule": {
+        "level": 200,
+        "metric": "value",
+        "name": "cci",
+        "op": "cross_down",
+        "params": {
+          "constant": 0.01,
+          "n": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_7a0a2497007c": {
+      "frame": "1w",
+      "rule": {
+        "level": -2,
+        "metric": "value",
+        "name": "kama",
+        "op": "cross_up",
+        "params": {
+          "fast": 3,
+          "n": 5,
+          "slow": 25,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_7e193fc6eec1": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_7fd31a074e2b": {
+      "frame": "1d",
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "aroon",
+        "op": "cross_down",
+        "params": {
+          "n": 75
+        }
+      }
+    },
+    "e_8502a2a2b7aa": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_88e5fe4ccffe": {
+      "frame": "1w",
+      "generation": 2969,
+      "rule": {
+        "level": null,
+        "metric": "cross",
+        "name": "stochastic_rsi",
+        "op": "rising",
+        "params": {
+          "average": "ema",
+          "d": 2,
+          "k": 4,
+          "n": 5,
+          "source": "open",
+          "stoch_window": 60
+        }
+      }
+    },
+    "e_8aa2e2654db7": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_8e0831d17583": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "multiplier": 3,
+          "n": 10
+        }
+      }
+    },
+    "e_91804982b338": {
+      "frame": "1w",
+      "rule": {
+        "level": 90,
+        "metric": "value",
+        "name": "donchian",
+        "op": "below",
+        "params": {
+          "n": 3
+        }
+      }
+    },
+    "e_92c66d38697c": {
+      "frame": "1w",
+      "rule": {
+        "level": -0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "cross_up",
+        "params": {
+          "average": "wilder",
+          "multiplier": 2,
+          "n": 9,
+          "source": "open"
+        }
+      }
+    },
+    "e_92db6b837d0f": {
+      "frame": "1d",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_94e6e9d2585d": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "above",
+        "params": {
+          "n": 15,
+          "source": "close"
+        }
+      }
+    },
+    "e_98eded9e32d5": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "k",
+        "name": "stochastic_rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "k": 3,
+          "n": 14,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_99990d2cdae4": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "keltner",
+        "op": "above",
+        "params": {
+          "atr": 10,
+          "average": "ema",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_9ae7d5d05344": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "cci",
+        "op": "below",
+        "params": {
+          "constant": 0.015,
+          "n": 14,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_9d07c6625d6b": {
+      "frame": "1w",
+      "rule": {
+        "level": 25,
+        "metric": "value",
+        "name": "adx",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "smooth": 14
+        }
+      }
+    },
+    "e_a0c376f6aa4e": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "trix",
+        "op": "cross_up",
+        "params": {
+          "n": 40,
+          "source": "close"
+        }
+      }
+    },
+    "e_a27d32d9ad06": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_a32042f2a784": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 3,
+          "slow": 10
+        }
+      }
+    },
+    "e_a6db4bdd2712": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "cross",
+        "name": "stochastic_rsi",
+        "op": "rising",
+        "params": {
+          "average": "ema",
+          "d": 9,
+          "k": 5,
+          "n": 10,
+          "source": "close",
+          "stoch_window": 14
+        }
+      }
+    },
+    "e_a9d1681c876a": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 21,
+          "channel": 10,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_ac212202fc68": {
+      "frame": "1w",
+      "rule": {
+        "level": 20,
+        "metric": "histogram",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 10,
+          "channel": 10,
+          "signal": 9,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_adca2b2f2fe9": {
+      "frame": "1w",
+      "rule": {
+        "level": 15,
+        "metric": "histogram",
+        "name": "tsi",
+        "op": "cross_down",
+        "params": {
+          "fast": 3,
+          "signal": 3,
+          "slow": 18,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_b1dac1e3e95f": {
+      "frame": "1w",
+      "rule": {
+        "level": -1,
+        "metric": "value",
+        "name": "keltner",
+        "op": "cross_down",
+        "params": {
+          "atr": 30,
+          "average": "sma",
+          "multiplier": 1,
+          "n": 26,
+          "source": "open"
+        }
+      }
+    },
+    "e_b505f28bfd1a": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "chaikin_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 60,
+          "slow": 200
+        }
+      }
+    },
+    "e_b593a6f5f17f": {
+      "frame": "1w",
+      "rule": {
+        "level": -85,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_up",
+        "params": {
+          "n": 18
+        }
+      }
+    },
+    "e_b5bce128026a": {
+      "frame": "1d",
+      "rule": {
+        "level": -5,
+        "metric": "histogram",
+        "name": "ppo",
+        "op": "below",
+        "params": {
+          "fast": 10,
+          "signal": 14,
+          "slow": 150,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_b656ac1c7a2d": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "cloud",
+        "name": "ichimoku",
+        "op": "above",
+        "params": {
+          "displacement": 26,
+          "kijun": 26,
+          "span_b": 52,
+          "tenkan": 9
+        }
+      }
+    },
+    "e_b8b04a369cbe": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_b9652f3135f4": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "mfi",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_bc36c58e06f6": {
+      "frame": "1d",
+      "rule": {
+        "level": 80,
+        "metric": "line",
+        "name": "wavetrend",
+        "op": "above",
+        "params": {
+          "average": 200,
+          "channel": 14,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_be2a89b3132b": {
+      "frame": "1w",
+      "rule": {
+        "level": null,
+        "metric": "value",
+        "name": "aroon",
+        "op": "falling",
+        "params": {
+          "n": 26
+        }
+      }
+    },
+    "e_be80945ef769": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cci",
+        "op": "above",
+        "params": {
+          "constant": 0.015,
+          "n": 20,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_c036fa9e840c": {
+      "frame": "1w",
+      "rule": {
+        "level": 1,
+        "metric": "tenkan_kijun",
+        "name": "ichimoku",
+        "op": "cross_up",
+        "params": {
+          "kijun": 14,
+          "tenkan": 7
+        }
+      }
+    },
+    "e_c0bf41533e5f": {
+      "frame": "1d",
+      "rule": {
+        "level": 3,
+        "metric": "bandwidth",
+        "name": "bollinger",
+        "op": "cross_down",
+        "params": {
+          "average": "ema",
+          "multiplier": 3,
+          "n": 14,
+          "source": "hl2"
+        }
+      }
+    },
+    "e_c4b52bbd02e8": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "macd",
+        "op": "above",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "source": "close"
+        }
+      }
+    },
+    "e_c7f371013304": {
+      "frame": "1w",
+      "rule": {
+        "level": -1,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "cross_down",
+        "params": {
+          "average": "wilder",
+          "multiplier": 4,
+          "n": 12
+        }
+      }
+    },
+    "e_c81a132b99c6": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "trix",
+        "op": "falling",
+        "params": {
+          "n": 12,
+          "source": "close"
+        }
+      }
+    },
+    "e_caf8db42c76e": {
+      "frame": "1d",
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "adx",
+        "op": "below",
+        "params": {
+          "average": "ema",
+          "n": 120,
+          "smooth": 21
+        }
+      }
+    },
+    "e_cb301b9918b1": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "cmf",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_cf9dc26ef822": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_d04b2094a846": {
+      "frame": "1w",
+      "rule": {
+        "level": -0.05,
+        "metric": "value",
+        "name": "cmf",
+        "op": "cross_up",
+        "params": {
+          "n": 7
+        }
+      }
+    },
+    "e_d27ca7dc57f7": {
+      "frame": "1w",
+      "rule": {
+        "level": 0.5,
+        "metric": "percent_b",
+        "name": "bollinger",
+        "op": "above",
+        "params": {
+          "average": "sma",
+          "multiplier": 2,
+          "n": 20,
+          "source": "close"
+        }
+      }
+    },
+    "e_d41bbbf00db3": {
+      "frame": "1w",
+      "rule": {
+        "level": -0.2,
+        "metric": "value",
+        "name": "vortex",
+        "op": "cross_down",
+        "params": {
+          "n": 30
+        }
+      }
+    },
+    "e_d49b5d53c359": {
+      "frame": "1d",
+      "rule": {
+        "level": 20,
+        "metric": "value",
+        "name": "donchian",
+        "op": "cross_down",
+        "params": {
+          "n": 9
+        }
+      }
+    },
+    "e_db74348634db": {
+      "frame": "1w",
+      "rule": {
+        "level": 40,
+        "metric": "value",
+        "name": "dmi",
+        "op": "cross_down",
+        "params": {
+          "average": "wma",
+          "n": 30
+        }
+      }
+    },
+    "e_dd44ee311d12": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "line",
+        "name": "macd",
+        "op": "falling",
+        "params": {
+          "fast": 20,
+          "slow": 150,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_e4b7b9759b21": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "line",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wilder",
+          "n": 14,
+          "source": "close"
+        }
+      }
+    },
+    "e_e5b8244c53d2": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "kama",
+        "op": "above",
+        "params": {
+          "fast": 2,
+          "n": 10,
+          "slow": 30,
+          "source": "close"
+        }
+      }
+    },
+    "e_e67efd835c30": {
+      "frame": "1d",
+      "rule": {
+        "level": null,
+        "metric": "d",
+        "name": "stochastic",
+        "op": "falling",
+        "params": {
+          "d": 1,
+          "k": 4,
+          "n": 14,
+          "source": "ohlc4"
+        }
+      }
+    },
+    "e_ec298c0595ba": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "aroon",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_eee8f546836d": {
+      "frame": "1w",
+      "rule": {
+        "level": -50,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_ef18fb6826d9": {
+      "frame": "1d",
+      "generation": 2969,
+      "rule": {
+        "level": -5,
+        "metric": "value",
+        "name": "williams_r",
+        "op": "cross_down",
+        "params": {
+          "n": 26
+        }
+      }
+    },
+    "e_f5dbb88608e5": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "donchian",
+        "op": "above",
+        "params": {
+          "n": 20
+        }
+      }
+    },
+    "e_f5fada13be32": {
+      "frame": "1d",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "above",
+        "params": {
+          "fast": 7,
+          "middle": 14,
+          "slow": 28
+        }
+      }
+    },
+    "e_f77365b1b601": {
+      "frame": "1w",
+      "rule": {
+        "level": 50,
+        "metric": "value",
+        "name": "ultimate_oscillator",
+        "op": "below",
+        "params": {
+          "fast": 9,
+          "middle": 10,
+          "slow": 14
+        }
+      }
+    },
+    "e_f87e36bdcbfd": {
+      "frame": "1d",
+      "rule": {
+        "level": 0,
+        "metric": "line",
+        "name": "tsi",
+        "op": "above",
+        "params": {
+          "fast": 13,
+          "slow": 25,
+          "source": "close"
+        }
+      }
+    },
+    "e_f8b72b75d463": {
+      "frame": "1d",
+      "rule": {
+        "level": 5,
+        "metric": "signal_spread",
+        "name": "rsi",
+        "op": "above",
+        "params": {
+          "average": "wma",
+          "n": 90,
+          "signal": 1,
+          "source": "close"
+        }
+      }
+    },
+    "e_f8e544376d79": {
+      "frame": "1w",
+      "rule": {
+        "level": 5,
+        "metric": "line",
+        "name": "macd",
+        "op": "cross_down",
+        "params": {
+          "fast": 9,
+          "slow": 26,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_f94e9cc8b382": {
+      "frame": "1w",
+      "rule": {
+        "level": 0.5,
+        "metric": "line",
+        "name": "ppo",
+        "op": "cross_up",
+        "params": {
+          "fast": 30,
+          "slow": 50,
+          "source": "hlc3"
+        }
+      }
+    },
+    "e_fdb3fa97c1cc": {
+      "frame": "1d",
+      "rule": {
+        "level": 1,
+        "metric": "value",
+        "name": "supertrend",
+        "op": "cross_up",
+        "params": {
+          "average": "wilder",
+          "multiplier": 6,
+          "n": 5
+        }
+      }
+    },
+    "e_fddb1732af80": {
+      "frame": "1w",
+      "rule": {
+        "level": 0,
+        "metric": "value",
+        "name": "vortex",
+        "op": "above",
+        "params": {
+          "n": 14
+        }
+      }
+    },
+    "e_ff4ac38204d1": {
+      "frame": "1d",
+      "rule": {
+        "level": 0.2,
+        "metric": "value",
+        "name": "vortex",
+        "op": "below",
+        "params": {
+          "n": 90
+        }
+      }
+    },
+    "e_ff51a2f3556d": {
+      "frame": "1d",
+      "rule": {
+        "level": -0.05,
+        "metric": "value",
+        "name": "cmf",
+        "op": "cross_down",
+        "params": {
+          "n": 26
+        }
+      }
+    }
+  }
+}
