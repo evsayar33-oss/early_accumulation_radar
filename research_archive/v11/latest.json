@@ -1,6 +1,6 @@
 {
   "active_trials": [],
-  "asof_utc": "2026-11-26T11:07:42.493584+00:00",
+  "asof_utc": "2026-11-27T11:01:43.474531+00:00",
   "claims": {
     "association_not_causation": true,
     "matched_controls_not_full_universe_ppv": true,
@@ -40,6 +40,6 @@
   "source_outcome_counts": {
     "PENDING_INCOMPLETE_FUTURE_SNAPSHOTS": 480
   },
-  "source_scans_in_window": 60,
-  "source_sha256": "0a2e25af642f61a3a7b46272029f2019dfbdbcff9e0dafd1661182af912e497c"
+  "source_scans_in_window": 68,
+  "source_sha256": "3edfef79791af4b3f627b5ea7ac7e6f70648869ca457e2631eb54b151617d297"
 }
