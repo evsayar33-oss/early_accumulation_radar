@@ -674,11 +674,11 @@
       "sampled_recall": null
     }
   ],
-  "asof_observations_total": 138,
-  "asof_utc": "2026-11-26T13:15:39.329061+00:00",
+  "asof_observations_total": 161,
+  "asof_utc": "2026-11-27T13:11:33.554835+00:00",
   "completed_holdout_decisions": 0,
   "exploratory_candidates": [],
-  "forward_outcomes_total": 161,
+  "forward_outcomes_total": 207,
   "limitations": {
     "bearish_signals_not_executable_shorts": true,
     "corporate_actions_unverified": true,
@@ -698,14 +698,14 @@
   "methodology_sha256": "16714f14a574e96b65ad62845543a194d9b25808e87b15339ba012136eef78bc",
   "new_asof_observations": 23,
   "new_completed_holdouts": 0,
-  "new_forward_outcomes": 69,
+  "new_forward_outcomes": 46,
   "new_frozen_patterns": 0,
   "notices": [],
   "pending_horizons": {
     "1": 46,
-    "3": 69,
+    "3": 92,
     "5": 138,
-    "10": 138
+    "10": 161
   },
   "primary_label_counts": {},
   "recovery": {
@@ -722,8 +722,8 @@
   },
   "rules": 16,
   "schema": "EAR.v12_equity_discovery.v1",
-  "source_csv_sha256": "fa57eeb2af1d47d21d3d9f652f84e2655702d01983c326028c1b29d641cee73f",
-  "source_run_id": "45826785461",
+  "source_csv_sha256": "6ab6d89086e95c161472ae316d5f9fa8a868d09e5896198945c4e59af285b8b2",
+  "source_run_id": "46004516067",
   "tests_per_checkpoint": 32,
   "thresholds": {
     "additional_horizons": [

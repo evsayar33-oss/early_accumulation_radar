@@ -674,11 +674,11 @@
       "sampled_recall": null
     }
   ],
-  "asof_observations_total": 128,
-  "asof_utc": "2026-11-26T13:15:39.901990+00:00",
+  "asof_observations_total": 129,
+  "asof_utc": "2026-11-27T13:11:34.424737+00:00",
   "completed_holdout_decisions": 0,
   "exploratory_candidates": [],
-  "forward_outcomes_total": 155,
+  "forward_outcomes_total": 156,
   "limitations": {
     "bearish_signals_not_executable_shorts": true,
     "corporate_actions_unverified": true,
@@ -696,16 +696,16 @@
   "market": "US",
   "matured_primary_cohort": 0,
   "methodology_sha256": "16714f14a574e96b65ad62845543a194d9b25808e87b15339ba012136eef78bc",
-  "new_asof_observations": 20,
+  "new_asof_observations": 1,
   "new_completed_holdouts": 0,
-  "new_forward_outcomes": 69,
+  "new_forward_outcomes": 1,
   "new_frozen_patterns": 0,
   "notices": [],
   "pending_horizons": {
-    "1": 38,
+    "1": 39,
     "3": 63,
-    "5": 128,
-    "10": 128
+    "5": 129,
+    "10": 129
   },
   "primary_label_counts": {},
   "recovery": {
@@ -713,18 +713,17 @@
     "coverage_complete": false,
     "errors": {},
     "missing_symbols": [
-      "RVP",
       "UONE"
     ],
     "not_executable_fill": true,
     "not_historical_pit": true,
     "recovery_mode": "SETTLEMENT_ONLY_YAHOO_UNOFFICIAL_DAILY",
-    "requested": 22,
+    "requested": 21,
     "source_sha256": {
       "ACCS": "11cc9731dcfd688dd8c196d03b819247a4c596acb38d2cecb8f7dac8d594557a",
       "AEI": "6501f8b14e3bdaeeb3932b1cec45f2afd5c6842891f3c542b96d9a34bc515fad",
       "ATOS": "04f121d729f931d64839886a92233f3020e7fdb6cb7516fb642481a7271fd8b1",
-      "BFRI": "feb300523bb61bf318d6609583fdb7b915bc6ca67ecb135411889cf1a72b1925",
+      "BFRI": "c7c444f6ec8bacfa8e3f4f59d36edce17b61d976d9befb978a60bcbcbe9b2275",
       "BNGO": "47acb17864e4ddc5b3f4635e432456493bb4faf534056df16a7aa64636a8df2c",
       "BOLT": "b8f949881908f9e9d0fd32979882a4f74f7c5418d03aeaa487517f360926af6b",
       "BRFH": "42ae8fe053f802b6580d50090a6a58176c4a87702f312df238f06f44de78068f",
@@ -734,13 +733,13 @@
       "FABC": "ffb2439105ca24a3f53941788d9ff1cc7867ff0f3aed5c4b93bc2c8447aaa4a2",
       "FMST": "7ffd743c40b7ce5056f14a4bffd2951f0b2bfe3ebd0b3c32599e5b51947a8681",
       "GOW": "978a5b72c445d88d744f0dd5e84b45d338bc237aac7299b7dc970d9ea9d08b32",
-      "HTCO": "9d38f7a19a206700bfec1d832208cd55d2fa116efa719d2c477935806d9c81d6",
       "LVLU": "88ce5a69afaac8c844086e1961257bb42f43ec948ccfd952f022a55754880b46",
       "MPU": "19c3188c4f116ad57395c71b561b5f29d7e55cdcea7fc53876a2f40878c3cc67",
       "NXGL": "f7fdedbc64d52b239c8a3b4b833bfa399e7ccfba7ad320bba4265da2995b38c3",
       "PLUR": "7cb46d2b425ca49b2f774efc8fb93e72f5f6676ca5f998927f137f5947abd108",
       "PMA": "bb21706cd3062586e3e51123257262c82f45efa68f363e474195e635f2ce435f",
-      "PRZO": "d939822881f1daaf160144e823e72406b3a29d378caecb2bb8da74f3ba7e85d5"
+      "PRZO": "d939822881f1daaf160144e823e72406b3a29d378caecb2bb8da74f3ba7e85d5",
+      "RVP": "c034c14df9f801e7ef1f1a949f0ffe0013cdb8db8d0c12487a093232912864a5"
     },
     "symbols_recovered": [
       "ACCS",
@@ -756,19 +755,19 @@
       "FABC",
       "FMST",
       "GOW",
-      "HTCO",
       "LVLU",
       "MPU",
       "NXGL",
       "PLUR",
       "PMA",
-      "PRZO"
+      "PRZO",
+      "RVP"
     ]
   },
   "rules": 16,
   "schema": "EAR.v12_equity_discovery.v1",
-  "source_csv_sha256": "fa57eeb2af1d47d21d3d9f652f84e2655702d01983c326028c1b29d641cee73f",
-  "source_run_id": "45826785461",
+  "source_csv_sha256": "6ab6d89086e95c161472ae316d5f9fa8a868d09e5896198945c4e59af285b8b2",
+  "source_run_id": "46004516067",
   "tests_per_checkpoint": 32,
   "thresholds": {
     "additional_horizons": [
