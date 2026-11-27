@@ -1,0 +1,84 @@
+name: V18 full perpetual universe forward observation (RESEARCH ONLY)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/v18_forward_universe.yml'
+      - 'research_v4/v18_forward_universe.py'
+      - 'tests/test_v18_forward_universe.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v18_forward_universe.yml'
+      - 'research_v4/v18_forward_universe.py'
+  workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: ear-v18-forward-universe
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p 'test_v18_forward_universe.py' -v
+  observe:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Restore forward-only branch (never force push)
+        run: |
+          set -euo pipefail
+          B=research/v18-forward-universe
+          ROOT="$RUNNER_TEMP/forward-universe"
+          set +e
+          git ls-remote --exit-code --heads origin "$B" >/dev/null
+          rc=$?
+          set -e
+          if [[ "$rc" == 0 ]]; then
+            git fetch -q --depth 1 origin "$B"
+            git worktree add --detach "$ROOT" FETCH_HEAD
+            test -s "$ROOT/research_archive/v18_forward_universe/state.json"
+          elif [[ "$rc" == 2 ]]; then
+            git worktree add --detach "$ROOT" HEAD
+          else
+            exit "$rc"
+          fi
+          echo "FORWARD_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Observe every available native USDT perpetual without historical data
+        run: |
+          set -euo pipefail
+          python -m research_v4.v18_forward_universe --state "$FORWARD_ROOT/research_archive/v18_forward_universe" --out out/v18_forward_universe
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d=json.load(open('out/v18_forward_universe/report.json'))
+          print('# V18 forward-only universe (not trades)')
+          for k in ('observed_contracts','distinct_normalized_symbol_strings_not_unique_assets','asset_classes','sources','new_forward_anchors','settled_this_run','settlement_statuses','pending'):
+              print(f'- **{k}**: {d[k]}')
+          PY
+      - name: Seal full snapshot, outcome batch and bounded active state
+        run: |
+          set -euo pipefail
+          git -C "$FORWARD_ROOT" config user.name 'github-actions[bot]'
+          git -C "$FORWARD_ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$FORWARD_ROOT" add research_archive/v18_forward_universe/
+          git -C "$FORWARD_ROOT" commit -m 'research(v18): full-universe forward observation [skip ci]'
+          git -C "$FORWARD_ROOT" push origin HEAD:refs/heads/research/v18-forward-universe

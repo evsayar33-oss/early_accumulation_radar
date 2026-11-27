@@ -73,14 +73,24 @@ def fetch_candles(symbol, venue, asof, get=public_json):
         raise ValueError("UNKNOWN_VENUE")
     return parse_bars(get(url), venue, asof)
 
-def select_assets(assets, cursor, limit=MAX_SYMBOLS):
+def select_assets(assets, cursor, limit=MAX_SYMBOLS, priority=()):
     """Cyclic, outcome-independent rotation across eligible non-core contracts."""
     syms = sorted(s for s, vs in assets.items() if s not in CORE | STABLE
                   and any(v.get("q",0) >= 100_000 for v in vs.values()))
     if not syms:
         return [], cursor
     count = min(limit, len(syms))
-    return [syms[(cursor+i)%len(syms)] for i in range(count)], (cursor+count)%len(syms)
+    # At least 75% budget remains unbiased cyclic coverage, never allow a
+    # snapshot heuristic to starve unselected instruments.
+    ranked=list(dict.fromkeys(s for s in priority if s in syms))[:count//4]
+    rotated=[syms[(cursor+i)%len(syms)] for i in range(count-len(ranked))]
+    chosen=list(dict.fromkeys(rotated+ranked))
+    i=len(rotated)
+    while len(chosen)<count and i<len(syms):
+        candidate=syms[(cursor+i)%len(syms)]
+        if candidate not in chosen:chosen.append(candidate)
+        i+=1
+    return chosen, (cursor+i)%len(syms)
 
 def classified_assets(assets, instrument_info):
     """Use actual venue metadata, not symbol-name heuristics. Unknown is excluded.
@@ -110,7 +120,21 @@ def classified_assets(assets, instrument_info):
         else:excluded[sym]="UNVERIFIED_UNDERLYING"
     return eligible, excluded
 
-def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=public_json):
+def read_forward_priority(path, asof):
+    """New independent survey can suggest a limited deep-research budget.
+    No inferred feature, price outcome or trading authority enters V18.
+    """
+    import json
+    from pathlib import Path
+    if not path or not Path(path).is_file():return []
+    try:
+        doc=json.loads(Path(path).read_text())
+        if doc.get("schema")!="EAR.v18.forward_universe.v1" or not 0<=asof-int(doc["asof_ms"])<=2*3600000:return []
+        return list(dict.fromkeys(r["symbol"] for r in doc.get("deep_research_priority",[])
+            if re.fullmatch(r"[A-Z0-9]{2,25}USDT",r["symbol"]) and 0<=asof-int(r["seen"])<=2*3600000))[:128]
+    except (ValueError,TypeError,KeyError,OSError):return []
+
+def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=public_json, priority=()):
     """Pending symbols have priority for settlement; new symbols rotate independently.
     Use an archived universe only for settlement if current discovery fails.
     """
@@ -132,7 +156,7 @@ def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=pu
         errors["universe"] = type(exc).__name__
     raw_size=len(assets)
     assets, excluded=classified_assets(assets,info)
-    symbols, next_cursor = select_assets(assets, cursor, limit)
+    symbols, next_cursor = select_assets(assets, cursor, limit, priority)
     preferred = {}
     for s in symbols:
         preferred[s] = [v for v in VENUES if v in assets[s]]
@@ -181,7 +205,7 @@ def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=pu
     settle={("CRYPTO",s,v):b for (s,v),b in data.items()}
     return new_panels,settle,next_cursor,{"universe_status":universe_status,"universe_size":raw_size,"verified_crypto_universe":len(assets),
         "excluded_underlyings":excluded,"cohort":COHORT,
-        "selected":len(symbols),"new_panels":len(new_panels),"settlement_requests":len(req),"errors":errors}
+        "selected":len(symbols),"priority_selected":sum(s in priority for s in symbols),"new_panels":len(new_panels),"settlement_requests":len(req),"errors":errors}
 
 def equity_panels(csv, quality, asof):
     sha,_=read_quality(csv,quality)

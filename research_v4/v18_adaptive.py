@@ -656,7 +656,7 @@ def run(state,panels,settle,asof,metadata,macro,specs_by_market,cursor=None,allo
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--state",required=True);p.add_argument("--out",required=True)
-    p.add_argument("--equity-csv");p.add_argument("--equity-quality");p.add_argument("--macro");p.add_argument("--v8-ledger")
+    p.add_argument("--equity-csv");p.add_argument("--equity-quality");p.add_argument("--macro");p.add_argument("--v8-ledger");p.add_argument("--forward-priority")
     p.add_argument("--symbols",type=int,default=source.MAX_SYMBOLS)
     p.add_argument("--skip-crypto",action="store_true");a=p.parse_args()
     if not 1<=a.symbols<=source.MAX_SYMBOLS:raise ValueError("SYMBOL_BUDGET")
@@ -667,7 +667,7 @@ def main():
     if prior and not any(b.get("source",{}).get("CRYPTO",{}).get("cohort")==source.COHORT for b in prior):cursor=0
     panels={};settle={};meta={}
     if not a.skip_crypto:
-        panels,settle,cursor,meta["CRYPTO"]=source.collect_crypto(obs,pending,asof=t,cursor=cursor,limit=a.symbols)
+        panels,settle,cursor,meta["CRYPTO"]=source.collect_crypto(obs,pending,asof=t,cursor=cursor,limit=a.symbols,priority=source.read_forward_priority(a.forward_priority,t))
     if a.equity_csv and a.equity_quality:
         ep=source.equity_panels(a.equity_csv,a.equity_quality,t)
         panels.update(ep);settle.update({k:v["bars"] for k,v in ep.items()})

@@ -90,3 +90,36 @@ gün içi BIST/ABD henüz yok. Mevcut maliyet varsayımları ve iki kat stres
 ayrı raporlanır. PBO için tam, hizalanmış aday portföy getirisi henüz yok;
 DSR yalnız yeterli günlük eşleşmiş işaretleme serisinde araştırma tanısıdır.
 Resmi `lab/validation.py` kapısı ve canlı emirler değiştirilmez.
+
+## İleriye dönük tüm vadeli sözleşme evreni (geçmiş veri şartı yok)
+
+Ayrı `v18_forward_universe.yml` iş akışı 30 dakikalık hedef sıklıkta
+OKX, Bitget, Binance, Gate.io, BingX ve erişilebilir olduğunda Bybit ile
+natif USDT perpetual sözleşmelerin bütün taze toplu ticker verisini toplar.
+Yeni listeleme, sıfır geçmiş ve düşük hacim gözlemi engellemez. Aynı dayanak
+farklı borsalarda farklı sözleşmedir; normalize sembol sayısı benzersiz
+varlık sayısı değildir. Kripto, hisse, endeks, emtia, FX, tahvil, ETF,
+standart perpetual ve dayanağı açıklanmayan RWA/kimliği belirsiz sözleşmeler
+ayrı raporlanır. Gate'in boş sınıfı veya BingX'in displayName alanı, kripto
+kimliğinin doğrulanması değildir. Bir borsa kesintisinde diğerleri sürer.
+
+Gerçek ilk ticker'dan sonra 4 saat ila 4 saat 45 dakika aralığında yine aynı
+natif sözleşmenin yeni fiyatı ile yalnız **uç nokta fiyat sonucu** ölçülür.
+Kayıp, kimliği değişmiş, zaman aralığı dışı veya olası yeniden ölçekleme
+sonucu censored; borsa değiştirme, geçmiş fiyat yerleştirme, işlem fill'i,
+OHLC maksimum/minimum ya da kesin gerçek zamanlılık iddiası yok. Gate ticker
+başına exchange timestamp sağlamadığında yalnız gerçek alınma saati açıkça
+belirtilir. Olay eşikleri sınıfa göre deneysel ve raporda görünür. Hacim
+artışı yalnız yuvarlanan 24 saatlik turnover farkı olup gerçek CVD değildir.
+Eksik özellik unknown; gerçek sonuçlarda true/false/UP/DOWN/NONE sayımları
+borsa ve sınıf bazında tutulur. Bağımsız strateji/işlem onayı değildir.
+
+Yeni `research/v18-forward-universe` kanıt dalındaki `latest.json` ve
+`state.json` aktiftir. En son alınan fiyatlar, açık takip pencereleri, kümülatif
+sayım ve son sonuç partisi sınırlı aktif durumdur; önceki anlık durumlar
+normal (force olmayan) commit zincirinde korunur. Git geçmişi doğal olarak
+büyür; sonsuz depolama garantisi yoktur. Ana V18 geçmiş OHLC araştırması
+ayrı ve değişmeden devam eder. Doğrulanmış kripto kimliği, güncel sessiz fiyat
+ve turnover/OI değişimi görüldüğünde ana V18'e en çok %25 ayrıntılı araştırma
+önceliği verilir. %75 rotasyon korunur. Öneri 2 saati aşarsa kullanılmaz.
+V18 doğrulama, PAPER ve canlı işlem kapıları değişmez.

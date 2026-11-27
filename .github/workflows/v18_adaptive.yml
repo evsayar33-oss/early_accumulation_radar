@@ -162,6 +162,14 @@ jobs:
           else
             echo "::warning::V8 legacy recovery unavailable"
           fi
+      - name: Read verified recent full-universe research hint (read-only)
+        if: github.event_name != 'pull_request'
+        run: |
+          if git fetch -q --depth 1 origin research/v18-forward-universe; then
+            git show FETCH_HEAD:research_archive/v18_forward_universe/latest.json > out/v18_input/forward_priority.json
+          else
+            echo "::notice::Full-universe hint not available; normal independent rotation remains active"
+          fi
       - name: Observe native completed candles, settle old events and learn
         if: github.event_name != 'pull_request'
         run: |
@@ -172,6 +180,7 @@ jobs:
           fi
           if test -f out/v18_input/macro.json; then ARGS+=(--macro out/v18_input/macro.json); fi
           if test -s out/v18_input/v8.jsonl; then ARGS+=(--v8-ledger out/v18_input/v8.jsonl); fi
+          if test -s out/v18_input/forward_priority.json; then ARGS+=(--forward-priority out/v18_input/forward_priority.json); fi
           python -m research_v4.v18_adaptive --state "$V18_ROOT/research_archive/v18/ledger" --out out/v18_adaptive "${ARGS[@]}"
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
