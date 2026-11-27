@@ -9,7 +9,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
-from research_v4.perp_watch import public_json, scan, unpack
+from research_v4.perp_watch import public_json, scan, unpack, OKX_INFO, BITGET_INFO, BINANCE_INFO
 from research_v4.multimarket_exploratory import load, STABLE
 from research_v4.v12_equity_patterns import read_quality
 from radar.ledger import digest, read_verify
@@ -18,6 +18,7 @@ BAR_MS = 15 * 60_000
 VENUES = ("okx", "bitget", "binance")
 MAX_HISTORY = 300
 MAX_SYMBOLS = 32
+COHORT = "VERIFIED_CRYPTO_UNDERLYING_V1"
 CORE = {"BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"}
 
 def now_ms():
@@ -81,13 +82,47 @@ def select_assets(assets, cursor, limit=MAX_SYMBOLS):
     count = min(limit, len(syms))
     return [syms[(cursor+i)%len(syms)] for i in range(count)], (cursor+count)%len(syms)
 
+def classified_assets(assets, instrument_info):
+    """Use actual venue metadata, not symbol-name heuristics. Unknown is excluded.
+
+    OKX instCategory=1, Bitget isRwa=NO, Binance underlyingType=COIN.
+    If a symbol has contradictory classifications, do not compare its prices.
+    """
+    categories = {}
+    for venue, info in instrument_info.items():
+        rows=info.get("symbols" if venue=="binance" else "data", [])
+        if not isinstance(rows,list):continue
+        for row in rows:
+            if not isinstance(row,dict):continue
+            sym=row.get("symbol") if venue!="okx" else str(row.get("instId", "")).replace("-USDT-SWAP","USDT")
+            field, expected = {"okx":("instCategory","1"),"bitget":("isRwa","NO"),"binance":("underlyingType","COIN")}[venue]
+            value=row.get(field)
+            if value not in (None, ""):
+                categories[(sym,venue)]={"field":field,"value":str(value),"crypto":str(value)==expected}
+    eligible={};excluded={}
+    for sym, venues in assets.items():
+        known={v:categories[(sym,v)] for v in venues if (sym,v) in categories}
+        if any(not c["crypto"] for c in known.values()):
+            excluded[sym]="NON_CRYPTO_OR_CONFLICTING_UNDERLYING"
+            continue
+        valid={v:{**values,"underlying_metadata":known[v]} for v,values in venues.items() if v in known}
+        if valid:eligible[sym]=valid
+        else:excluded[sym]="UNVERIFIED_UNDERLYING"
+    return eligible, excluded
+
 def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=public_json):
     """Pending symbols have priority for settlement; new symbols rotate independently.
     Use an archived universe only for settlement if current discovery fails.
     """
     errors = {}
+    info = {}
+    def capture(url):
+        result=get(url)
+        for v,u in (("okx",OKX_INFO),("bitget",BITGET_INFO),("binance",BINANCE_INFO)):
+            if url==u and isinstance(result,dict):info[v]=result
+        return result
     try:
-        live = scan(get=get)
+        live = scan(get=capture)
         assets = live["assets"]
         universe_status = "CURRENT_MULTI_VENUE_DISCOVERY"
         errors.update(live["source_unavailable"])
@@ -95,6 +130,8 @@ def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=pu
         assets = {}
         universe_status = "LIVE_UNIVERSE_UNAVAILABLE"
         errors["universe"] = type(exc).__name__
+    raw_size=len(assets)
+    assets, excluded=classified_assets(assets,info)
     symbols, next_cursor = select_assets(assets, cursor, limit)
     preferred = {}
     for s in symbols:
@@ -139,9 +176,11 @@ def collect_crypto(previous, pending, *, asof, cursor, limit=MAX_SYMBOLS, get=pu
         if corroboration=="DIVERGENT":
             errors[s]="CROSS_VENUE_PRICE_DISAGREEMENT"
             continue
-        new_panels[("CRYPTO",s,venue)]={"bars":rows,"corroboration":corroboration,"asof_microstructure":assets[s][venue]}
+        new_panels[("CRYPTO",s,venue)]={"bars":rows,"corroboration":corroboration,"asof_microstructure":assets[s][venue],"cohort":COHORT,
+             "underlying_metadata":assets[s][venue]["underlying_metadata"]}
     settle={("CRYPTO",s,v):b for (s,v),b in data.items()}
-    return new_panels,settle,next_cursor,{"universe_status":universe_status,"universe_size":len(assets),
+    return new_panels,settle,next_cursor,{"universe_status":universe_status,"universe_size":raw_size,"verified_crypto_universe":len(assets),
+        "excluded_underlyings":excluded,"cohort":COHORT,
         "selected":len(symbols),"new_panels":len(new_panels),"settlement_requests":len(req),"errors":errors}
 
 def equity_panels(csv, quality, asof):
