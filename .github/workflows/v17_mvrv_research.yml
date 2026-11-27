@@ -1,6 +1,11 @@
 name: V17 Real MVRV research (NO TRADING)
 
 on:
+  pull_request:
+    paths:
+      - research_v4/onchain_mvrv.py
+      - tests/test_v17_mvrv.py
+      - .github/workflows/v17_mvrv_research.yml
   workflow_dispatch:
   schedule:
     - cron: '37 3 * * 1'
@@ -29,10 +34,17 @@ jobs:
       - name: Tests
         run: python -m unittest tests.test_v17_mvrv -v
       - name: Real MVRV research
+        if: github.event_name != 'pull_request'
         run: |
           python -m research_v4.onchain_mvrv --out out/v17_mvrv
           cat out/v17_mvrv/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Validate digest-bound evidence with Quant Superlab contract
+        if: github.event_name != 'pull_request'
+        run: |
+          git clone --depth 1 https://github.com/evsayar33-oss/quant_superlab.git "$RUNNER_TEMP/quant_superlab"
+          PYTHONPATH="$RUNNER_TEMP/quant_superlab" python -m research.portfolio_qualification.ear_mvrv out/v17_mvrv/btc.json out/v17_mvrv/eth.json --out out/v17_mvrv/superlab_receipts.json
       - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: v17-real-mvrv-${{ github.run_id }}
           path: out/v17_mvrv/
