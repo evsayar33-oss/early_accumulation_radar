@@ -1,5 +1,5 @@
 {
-  "asof_utc": "2026-11-26T13:15:40.615292+00:00",
+  "asof_utc": "2026-11-27T13:11:35.454904+00:00",
   "by_family": [
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
@@ -13,12 +13,12 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 2,
+      "distinct_symbols": 3,
       "family": "prebreakout_pressure",
       "hold_sessions": 5,
       "market": "BIST",
-      "mean_long_net_pct": -5.49732,
-      "n": 2,
+      "mean_long_net_pct": -5.70611,
+      "n": 3,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -33,12 +33,12 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 1,
+      "distinct_symbols": 2,
       "family": "quiet_base",
       "hold_sessions": 5,
       "market": "BIST",
-      "mean_long_net_pct": -12.625,
-      "n": 1,
+      "mean_long_net_pct": -9.37435,
+      "n": 2,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -53,12 +53,12 @@
     },
     {
       "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
-      "distinct_symbols": 2,
+      "distinct_symbols": 3,
       "family": "supply_absorption_risk",
       "hold_sessions": 5,
       "market": "BIST",
-      "mean_long_net_pct": -3.19925,
-      "n": 2,
+      "mean_long_net_pct": -1.92352,
+      "n": 3,
       "status": "RESEARCH_INSUFFICIENT"
     },
     {
@@ -125,7 +125,7 @@
   "code_sha256": "cdca45818d067c731ba30f6aeb3717a16138d5ad320e67e632e5abb731539d45",
   "historical_pit_verified": false,
   "new_settlements": 3,
-  "new_signals": 27,
+  "new_signals": 3,
   "notes": "No old signals backfilled; entry day strictly after first observation UTC date, with closed daily bars only. Old V5 ledger untouched.",
   "paper_approved": false,
   "pending": {
@@ -135,7 +135,7 @@
   "profitable_strategy_confirmed": false,
   "schema": "EAR.v7_forward_summary.v1",
   "short_execution_model": false,
-  "total_settlements": 25,
-  "total_signals": 114,
+  "total_settlements": 28,
+  "total_signals": 117,
   "trade_authorized": false
 }
