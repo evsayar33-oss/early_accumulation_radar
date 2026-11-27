@@ -1,6 +1,6 @@
 """V17 real on-chain MVRV research; standard-library only and NO TRADING."""
 from __future__ import annotations
-import argparse,json,math,statistics
+import argparse,hashlib,json,math,statistics
 from datetime import datetime,timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -80,14 +80,33 @@ def analyze(asset,source_rows):
            "mvrv_z_below_minus_1":[x["z"]<=-1 for x in rows]}
     results=[{"rule":name,"discovery":_score(rows,mask,0,boundary),
               "validation":_score(rows,mask,boundary,len(rows))} for name,mask in rules.items()]
-    return {"schema":"EAR.v17.real_mvrv_research.v1","asset":asset,
+    confirmations={
+      "price_30d_recovery":[i>=30 and rows[i]["price"]>rows[i-30]["price"] for i in range(len(rows))],
+      "price_7d_reversal":[i>=7 and rows[i]["price"]>rows[i-7]["price"] for i in range(len(rows))],
+      "drawdown_90d_ge_20pct":[i>=90 and rows[i]["price"]<=.8*max(x["price"] for x in rows[i-90:i+1]) for i in range(len(rows))],
+    }
+    combinations=[]
+    for rname,rmask in rules.items():
+      for cname,cmask in confirmations.items():
+        mask=[a and b for a,b in zip(rmask,cmask)]
+        combinations.append({"rule":rname+"+"+cname,"components":[rname,cname],
+          "discovery":_score(rows,mask,0,boundary),"validation":_score(rows,mask,boundary,len(rows))})
+    report={"schema":"EAR.v18.mvrv_combinations.v1","asset":asset,
       "source":"COIN_METRICS_COMMUNITY_ASSET_METRICS",
       "measurement":"REAL_MVRV_MARKET_CAP_DIVIDED_BY_REALIZED_CAP","proxy":False,
       "asof":rows[-1]["date"],"history":{"from":rows[0]["date"],"through":rows[-1]["date"],"observations":len(rows)},
       "split":{"discovery_end":rows[boundary-1]["date"],"validation_start":rows[boundary]["date"]},
       "thresholds_fit_on_discovery_only":{"q10":round(q10,6),"q20":round(q20,6)},"results":results,
+      "combination_results":combinations,"combination_count":len(combinations),
       "staged_entry_interpretation":"RESEARCH_ONLY_FIRST_THRESHOLD_IS_NOT_A_DIP_CALL",
       "paper_eligible":False,"trade_authorized":False,"requires_quant_superlab_validation":True}
+    canonical=json.dumps(report,sort_keys=True,separators=(",",":"),allow_nan=False)
+    report["superlab_evidence"]={"schema":"QS.external_research_evidence.v1",
+      "producer":"early_accumulation_radar","study":"real_mvrv_combinations",
+      "payload_sha256":hashlib.sha256(canonical.encode()).hexdigest(),
+      "producer_verdict":"RESEARCH_ONLY","quant_superlab_verdict":"NOT_EVALUATED",
+      "automatic_promotion":False}
+    return report
 
 def main():
     p=argparse.ArgumentParser();p.add_argument("--out",default="out/v17_mvrv")
