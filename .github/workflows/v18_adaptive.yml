@@ -1,0 +1,220 @@
+name: V18 Adaptive early-event discovery and learning (RESEARCH ONLY)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/v18_adaptive.yml'
+      - 'research_v4/v18_*.py'
+      - 'tests/test_v18_*.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v18_adaptive.yml'
+      - 'research_v4/v18_*.py'
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */2 * * *'
+  workflow_run:
+    workflows:
+      - V5 Autonomous three-market research and prospective evidence (NO TRADING)
+      - V8 all-symbol perpetual early-motion evidence (RESEARCH ONLY)
+    types: [completed]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ear-v18-adaptive-discovery
+  cancel-in-progress: false
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Load exact Eaverse and Quant Superlab code (read-only, immutable revision)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for item in 'eaverse 0dd1af9fbb545167d3e992d5bb7e021f805ef6ff' 'quant_superlab 82710369586fd0d65d172985d0a3570dffd3ac06'; do
+            read -r repo sha <<< "$item"
+            dest="$RUNNER_TEMP/$repo"
+            git init -q "$dest"
+            git -C "$dest" remote add origin "https://github.com/evsayar33-oss/$repo.git"
+            git -C "$dest" fetch -q --depth 1 origin "$sha"
+            git -C "$dest" checkout -q --detach FETCH_HEAD
+            test "$(git -C "$dest" rev-parse HEAD)" = "$sha"
+          done
+          echo "V18_EAVERSE_PIN=0dd1af9fbb545167d3e992d5bb7e021f805ef6ff" >> "$GITHUB_ENV"
+          echo "V18_SUPERLAB_PIN=82710369586fd0d65d172985d0a3570dffd3ac06" >> "$GITHUB_ENV"
+          echo "PYTHONPATH=$RUNNER_TEMP/eaverse:$RUNNER_TEMP/quant_superlab:$GITHUB_WORKSPACE" >> "$GITHUB_ENV"
+      - name: Install bounded research dependencies
+        run: python -m pip install 'numpy>=1.26,<2.5' 'pandas>=2.2,<3' 'scipy>=1.11,<2'
+      - name: Regression tests with the actual external research engines
+        run: |
+          python -m unittest discover -s tests -v
+          python "$RUNNER_TEMP/quant_superlab/tests/test_ear_adaptive.py" -v
+          python -m compileall -q research_v4 radar
+  research:
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository) ||
+      ((github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'schedule') &&
+       github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Load exact Eaverse and Quant Superlab code (read-only, immutable revision)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for item in 'eaverse 0dd1af9fbb545167d3e992d5bb7e021f805ef6ff' 'quant_superlab 82710369586fd0d65d172985d0a3570dffd3ac06'; do
+            read -r repo sha <<< "$item"
+            dest="$RUNNER_TEMP/$repo"
+            git init -q "$dest"
+            git -C "$dest" remote add origin "https://github.com/evsayar33-oss/$repo.git"
+            git -C "$dest" fetch -q --depth 1 origin "$sha"
+            git -C "$dest" checkout -q --detach FETCH_HEAD
+            test "$(git -C "$dest" rev-parse HEAD)" = "$sha"
+          done
+          echo "V18_EAVERSE_PIN=0dd1af9fbb545167d3e992d5bb7e021f805ef6ff" >> "$GITHUB_ENV"
+          echo "V18_SUPERLAB_PIN=82710369586fd0d65d172985d0a3570dffd3ac06" >> "$GITHUB_ENV"
+          echo "PYTHONPATH=$RUNNER_TEMP/eaverse:$RUNNER_TEMP/quant_superlab:$GITHUB_WORKSPACE" >> "$GITHUB_ENV"
+      - name: Install bounded research dependencies
+        run: python -m pip install 'numpy>=1.26,<2.5' 'pandas>=2.2,<3' 'scipy>=1.11,<2'
+      - name: Regression tests with the actual external research engines
+        run: |
+          python -m unittest discover -s tests -p 'test_v18_*.py' -v
+          python "$RUNNER_TEMP/quant_superlab/tests/test_ear_adaptive.py" -v
+          python -m compileall -q research_v4 radar
+      - name: Restore immutable adaptive evidence branch only
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          B='research/v18-adaptive-evidence'
+          ROOT="$RUNNER_TEMP/v18-state"
+          if git ls-remote --exit-code --heads origin "$B" >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin "$B"
+            git worktree add --detach "$ROOT" FETCH_HEAD
+            test -f "$ROOT/research_archive/v18/ledger/ledger-000000.jsonl"
+          else
+            git worktree add --detach "$ROOT" HEAD
+          fi
+          echo "V18_ROOT=$ROOT" >> "$GITHUB_ENV"
+      - name: Get exact successful V5 main input, if available
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p out/v18_input
+          RID=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/research_autonomous.yml/runs?branch=main&status=success&per_page=5" --jq '[.workflow_runs[] | select(.head_repository.full_name == .repository.full_name)][0].id // empty')
+          if [[ "$RID" =~ ^[0-9]+$ ]]; then
+            META=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RID")
+            if python - "$META" <<'PY'
+          import json,sys
+          from datetime import datetime,timezone,timedelta
+          r=json.loads(sys.argv[1]); t=datetime.fromisoformat(r["created_at"].replace("Z","+00:00"))
+          good=(r["name"]=="V5 Autonomous three-market research and prospective evidence (NO TRADING)" and r["conclusion"]=="success" and r["head_branch"]=="main" and r["head_repository"]["full_name"]==r["repository"]["full_name"] and timedelta(0)<=datetime.now(timezone.utc)-t<=timedelta(days=7))
+          raise SystemExit(0 if good else 1)
+          PY
+            then
+              if gh run download "$RID" --repo "$GITHUB_REPOSITORY" --name "v5-autonomous-research-$RID" --dir out/v18_input; then
+                echo "Trusted equity artifact: $RID"
+              else
+                echo "::warning::V5 input unavailable; cryptographic and equity outcomes remain separate"
+              fi
+            fi
+          fi
+      - name: Read current dated Global Capital Radar context without writing to it
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          mkdir -p out/v18_input
+          if git clone -q --depth 1 https://github.com/evsayar33-oss/global_capital_radar.git "$RUNNER_TEMP/gcr"; then
+            git -C "$RUNNER_TEMP/gcr" rev-parse HEAD > out/v18_input/macro_commit.txt
+            cp "$RUNNER_TEMP/gcr/history/rotation/latest.json" out/v18_input/macro.json
+          else
+            echo "::warning::Macro data unavailable; no proxy substituted"
+          fi
+      - name: Read verified original V8 snapshot ledger (no writes to V8)
+        if: github.event_name != 'pull_request'
+        run: |
+          if git fetch -q --depth 1 origin research/v8-perp-forward; then
+            git show FETCH_HEAD:observations/perp/snapshots.jsonl > out/v18_input/v8.jsonl
+          else
+            echo "::warning::V8 legacy recovery unavailable"
+          fi
+      - name: Observe native completed candles, settle old events and learn
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          ARGS=()
+          if test -f out/v18_input/data_quality/screened_prices.csv && test -f out/v18_input/data_quality/report.json; then
+            ARGS+=(--equity-csv out/v18_input/data_quality/screened_prices.csv --equity-quality out/v18_input/data_quality/report.json)
+          fi
+          if test -f out/v18_input/macro.json; then ARGS+=(--macro out/v18_input/macro.json); fi
+          if test -s out/v18_input/v8.jsonl; then ARGS+=(--v8-ledger out/v18_input/v8.jsonl); fi
+          python -m research_v4.v18_adaptive --state "$V18_ROOT/research_archive/v18/ledger" --out out/v18_adaptive "${ARGS[@]}"
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          r=json.load(open("out/v18_adaptive/report.json"))
+          print("# EAR V18 · Evidence-driven research")
+          for k in ("historical_observations","first_seen_observations","event_labels","settlement_statuses","unique_rules","total_actual_tests","new_tests","rule_statuses","official_gate"):
+              print(f"- **{k}**: {r[k]}")
+          PY
+      - name: Preserve all V18 new evidence before notification
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          ROOT="$V18_ROOT"
+          cp out/v18_adaptive/report.json "$ROOT/research_archive/v18/latest.json"
+          cp out/v18_adaptive/catalog.json "$ROOT/research_archive/v18/catalog.json"
+          git -C "$ROOT" config user.name 'github-actions[bot]'
+          git -C "$ROOT" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$ROOT" add research_archive/v18/
+          git -C "$ROOT" commit -m 'research(v18): sealed observations and experiment memory [skip ci]'
+          git -C "$ROOT" push origin HEAD:refs/heads/research/v18-adaptive-evidence
+      - name: Notify only verified new forward research milestones
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -euo pipefail
+          ROOT="$V18_ROOT"
+          python -m research_v4.v18_notify --report out/v18_adaptive/report.json \
+            --ledger "$ROOT/research_archive/v18/ledger" --receipts "$ROOT/research_archive/v18/notification_receipts.json"
+          if test -f "$ROOT/research_archive/v18/notification_receipts.json"; then
+            git -C "$ROOT" add research_archive/v18/notification_receipts.json
+            if ! git -C "$ROOT" diff --cached --quiet; then
+              git -C "$ROOT" commit -m 'research(v18): record notification receipts [skip ci]'
+              git -C "$ROOT" push origin HEAD:refs/heads/research/v18-adaptive-evidence
+            fi
+          fi
+      - name: Publish bounded evidence summary
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ear-v18-adaptive-${{ github.run_id }}
+          path: out/v18_adaptive/
+          retention-days: 30
+          if-no-files-found: warn

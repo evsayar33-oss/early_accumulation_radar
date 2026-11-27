@@ -42,3 +42,13 @@ Free source setup, transparent coverage limits and gate details: [V4 BIST/US res
 ## V17 gerçek MVRV araştırması
 
 Haftalık `V17 Real MVRV research (NO TRADING)` işi, Coin Metrics Community kaynağında hem piyasa değeri hem realized cap bulunan BTC ve ETH için gerçek MVRV’yi hesaplar. Fiyat tabanlı vekiller MVRV diye adlandırılmaz. `MVRV < 1`, yalnız keşif döneminde sabitlenen yüzdelikler ve expanding Z-score kuralları kronolojik doğrulama bölümünde, maliyet sonrası ve çakışmayan 90 günlük olaylarla ölçülür. İlk eşik teması dip veya alım sinyali değildir; sonuçlar Quant Superlab doğrulaması olmadan PAPER/Telegram işlem bildirimi üretemez.
+
+## V18: başarısızlıktan öğrenen erken olay araştırması
+
+[Yeni V18 adaptif araştırma hattı](docs/V18_ADAPTIVE_DISCOVERY_TR.md) V8/V13
+anlık veri boşluklarından bağımsız gerçek kapanmış borsa mumlarıyla olay
+sonuçlarını, kaçırılan hareketleri ve yanlış alarmları kaydeder. Eaverse
+göstergeleri, Quant Superlab bağımsız doğrulaması ve tarihli Global Capital
+Radar bağlamı kullanılır. Mevcut PAPER ve arşivlere dokunulmaz. Yeni
+araştırma dalı `research/v18-adaptive-evidence` yalnız kanıtlar içindir;
+gerçek emir veya resmi ACCEPT oluşturmaz.
