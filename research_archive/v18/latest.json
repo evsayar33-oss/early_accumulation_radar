@@ -1,6 +1,6 @@
 {
   "schema": "EAR.adaptive.v18.1",
-  "asof": "2026-11-27T19:02:44.763000+00:00",
+  "asof": "2026-11-27T20:13:58.546000+00:00",
   "source": {
     "CRYPTO": {
       "universe_status": "CURRENT_MULTI_VENUE_DISCOVERY",
@@ -471,13 +471,11 @@
       },
       "cohort": "VERIFIED_CRYPTO_UNDERLYING_V1",
       "selected": 32,
-      "new_panels": 31,
+      "priority_selected": 0,
+      "new_panels": 32,
       "settlement_requests": 0,
       "errors": {
-        "binance": "RuntimeError",
-        "ALLOUSDT:bitget": "RuntimeError",
-        "ALTUSDT:bitget": "RuntimeError",
-        "ANIMEUSDT:bitget": "RuntimeError"
+        "binance": "RuntimeError"
       }
     },
     "BIST": {
@@ -570,168 +568,152 @@
     "source_commit": "a16c5fe74362d4ef4bdd3b13bbe670c5a944ccce"
   },
   "indicator_errors": {},
-  "historical_observations": 2469,
-  "first_seen_observations": 76,
+  "historical_observations": 2853,
+  "first_seen_observations": 108,
   "settlement_statuses": {},
   "event_labels": {
-    "NONE": 2113,
-    "UP": 192,
+    "NONE": 2495,
+    "UP": 194,
     "DOWN": 163,
     "BOTH": 1
   },
-  "new_observations": 403,
+  "new_observations": 416,
   "new_settlements": 0,
   "quarantined_legacy_mixed_underlying": {
     "observations": 416,
-    "rules": 20,
+    "rules": 17,
     "locks": 0
   },
-  "unique_rules": 100,
-  "total_actual_tests": 120,
+  "unique_rules": 157,
+  "total_actual_tests": 180,
   "new_tests": 60,
   "test_lanes": {
-    "explore": 30,
+    "exploit": 24,
+    "explore": 22,
     "reverse": 6,
-    "exploit": 16,
     "missed": 8
   },
   "rule_statuses": {
-    "FALSE_ALARMS": 57,
-    "MISSED_EVENTS": 23,
-    "INSUFFICIENT_EVIDENCE": 20
+    "INSUFFICIENT_EVIDENCE": 37,
+    "FALSE_ALARMS": 85,
+    "MISSED_EVENTS": 35
   },
   "event_audits": [
     {
       "market": "CRYPTO",
       "direction": "UP",
-      "rule_id": "bc1b0e74cca36922361d1307e7f30a303677780718d1917fea8266840ffc7b13",
+      "rule_id": "fb6d7f3f3dbb2b38c2645d05847476888e616340d3340fca0157924f19c533c0",
       "counts": {
-        "UNKNOWN": 186,
-        "FALSE_ALARM": 101,
-        "LATE": 1,
-        "CORRECT": 1,
-        "MISSED": 1
+        "UNKNOWN": 598,
+        "FALSE_ALARM": 114,
+        "CORRECT": 1
       },
       "examples": {
         "UNKNOWN": [
           {
-            "symbol": "ARCUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "b076d86ebd73997bf9b5da1d3d6a099623022a898f51db747b77b3dc1ba05f40"
+            "symbol": "1INCHUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "db4c0d7c97c49d495372e0df8725d856fe696598e2e250231768a654f8bfe969"
           },
           {
-            "symbol": "ADAUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "b0bf8351ddf296af72da2a53dc308239710d3ce4b599ac9c41e27783db4df168"
+            "symbol": "AVNTUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "db8549422876dd9fbba61849d5fad715d4b396e9bf2eb4894cfe6d2275b117cc"
           },
           {
-            "symbol": "0GUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "c14ed85c522f237ba2726ecd8be6433f169fbf5deb0f328038e995cb8a3c7935"
+            "symbol": "APRUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "df1f802907816b5d8f1934b2dfdde7abdb1f28dc365597341cbe6e478992ff04"
           },
           {
-            "symbol": "1000BONKUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "c234a3feabdc4bc11caf996d20770d53cdd17aa4b9631416c9a41f3dbd46b5b5"
+            "symbol": "AUCTIONUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "e2e9bc3fd825190da8934cb879a107c7f0e0bb7d18cbc3bce5043c37a0a753d4"
           },
           {
-            "symbol": "AIXBTUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "db3c48d64de3b0744895af178e845f722a1e6aba35ecb27cef3b629497d9951f"
+            "symbol": "ARXUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "e9748f851924c5d9d9ab27f947f4ea32a5160c99e7fbca95cbbcc53095df3fc7"
           },
           {
-            "symbol": "ALLOUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "e13f49636d9147a9e97c0f3fda40f20934228041d474ddc39c368158e11a75d1"
+            "symbol": "AKEUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "eb9c37a8f5594cbca15d1ee9568940997d77f4016187c46039222d85ecf03cff"
+          },
+          {
+            "symbol": "AEROUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "ed081a75022b7a69f17c19fd237ddd715fe52e59721fc37f610874b9334a7987"
           },
           {
             "symbol": "1000SATSUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "eb9eda34bee98df889f0605ed8aaf0a112d0d90a06179539b14728a9344c97e9"
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "f03b6b04f69d29bbe9d04311dbbe86c0827f2ccda33fc651596fec5a59305899"
           },
           {
-            "symbol": "AEONUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "f4cc477fc5c7f4dccf31e65a7edf03920c598bb6ca122c891b2f70ca462e240f"
+            "symbol": "1000BONKUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "fa14e92bdc9f94b99514db3af8ecb242baef3c1ca07b6eef616e37f1cfeafef7"
           },
           {
-            "symbol": "1000RATSUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "f5126a8f896f0e587c2164e88d65df6e3f66138a887185162229a9c87312e376"
-          },
-          {
-            "symbol": "ACUUSDT",
-            "anchor": "2026-11-26T04:00:00+00:00",
-            "id": "fe9c406f9d1f5ffdb620e8db5a04ac40c4dadc7bc7d014586bbdc911bfc20ac0"
+            "symbol": "BCHUSDT",
+            "anchor": "2026-11-27T00:00:00+00:00",
+            "id": "febca03a26fe0970072fd1fde687f08d25da404ff9a000364fa7a56f6520ba62"
           }
         ],
         "FALSE_ALARM": [
           {
-            "symbol": "ACEUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "b0128e36cc4a37f970fc828f828df28271568c5aca879e3686b075939d2cd1ce"
+            "symbol": "BILLUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "a6f8f61118bf551fd350b35c654ce3cf9d503af40dc286f30af6f31c7cc4ef4a"
           },
           {
-            "symbol": "1MBABYDOGEUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "c4df903fad0a98ef6b0c011b5bc272a50dd4baea8ea1c59d91d96d1f8d4e036d"
+            "symbol": "ASTERUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "bc076c8c9d30a4c1b2f2541f229a72df84ed933f8210fa6929643ef3c09072c3"
           },
           {
-            "symbol": "AAVEUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "d587bd5921701c48c741ab00edf508c0f195b649b53a8d51180958021a673312"
+            "symbol": "BABYUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "c7f3a819b40fcc2970481f9a1ff017eff8a87e8a51b1a536b24fe599c359d764"
           },
           {
-            "symbol": "ALGOUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "d5b8707283534b827b91c8cdac777059a9830e9e0864db4c54b3b3c8ad8ceb51"
+            "symbol": "ATHUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "cff701c671fabf074700ddc5fb2f42f4034cf47524619a3121f52b273ce5544d"
           },
           {
-            "symbol": "1000RATSUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "dce9be19d7c919c2d190d7fe6d2f14fdccea35e020fe4e8c7284f046d9474707"
+            "symbol": "BERAUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "d890d8f384bea18e45bee65f743f411a3537efdd73ea740427c8ee5f16518b4a"
           },
           {
-            "symbol": "ARCUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "e89db480e716df71838788479ea20b8bdcc66272870084719a7d34ab3abb6279"
+            "symbol": "BASEDUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "dd4cc0058f58433dbc9531c0010d5aba2f44a99f16fc7856855a66dbe5fa81c4"
           },
           {
-            "symbol": "AEROUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "ec785bd11bbd0228c52406e96c207029a3fcad05460405791eddcf3424487587"
+            "symbol": "AVNTUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "e87d276b3a565dfbb8b82e3137552948535c929baf8dec6ec166604397603b5e"
           },
           {
-            "symbol": "APRUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "f2d274944145cf9b88c25c52ece35e671252ca4a1f9fc32c3b667a2cd9188222"
+            "symbol": "AUCTIONUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "f6a25faa01f243a3a20a06daa7ad63ab88f0f4b21cbc0f74c4ffc788e5229b63"
           },
           {
-            "symbol": "0GUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "f30d1b1178781e913c54b1eed4836a41f9507ebbf82f1e65e4e183137b3a83ca"
+            "symbol": "BANDUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "f8e905d440f9341789e336f27615cd480c2026b6e96223e40a57ba6edfbf8407"
           },
           {
-            "symbol": "AEVOUSDT",
-            "anchor": "2026-11-27T12:00:00+00:00",
-            "id": "fe1a159a2bec2733db603b560ef755e138b757c7fc81b3d38da9a5b3fe0e15e7"
-          }
-        ],
-        "LATE": [
-          {
-            "symbol": "AKEUSDT",
-            "anchor": "2026-11-26T16:00:00+00:00",
-            "id": "a2fac8296b2624bb7dd5c37755251e550cfbe8f74f31b54d8bb3707539412869"
+            "symbol": "AVAUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "ff29f23d6bd0c3be60351c7b67f9719246c0d08885c47e78538b90e59ddef25f"
           }
         ],
         "CORRECT": [
-          {
-            "symbol": "ACEUSDT",
-            "anchor": "2026-11-27T00:00:00+00:00",
-            "id": "2a6f0f70e8c6a6fa446d886083c9f5d246d263c9eaf9250b6452fbd5aa445aea"
-          }
-        ],
-        "MISSED": [
           {
             "symbol": "0GUSDT",
             "anchor": "2026-11-27T04:00:00+00:00",
@@ -745,36 +727,31 @@
       "direction": "DOWN",
       "rule_id": "11cac5f4cfb497db108dbd8686eb6f13bf76ee4c440af2aa34d76338efe1f450",
       "counts": {
-        "FALSE_ALARM": 37,
+        "FALSE_ALARM": 84,
         "MISSED": 1,
         "CORRECT": 1
       },
       "examples": {
         "FALSE_ALARM": [
           {
-            "symbol": "ADAUSDT",
-            "anchor": "2026-11-27T00:00:00+00:00",
-            "id": "7a2637ef02a1b395243a8734d0ddaa36c5d5bee526384d6f0ce42e8592a9694a"
+            "symbol": "AVAXUSDT",
+            "anchor": "2026-11-27T08:00:00+00:00",
+            "id": "576e119c19c75c8aec97687dfd0e1ec4e94c86a238d737a7e89375798aff09d6"
           },
           {
-            "symbol": "AGLDUSDT",
-            "anchor": "2026-11-27T00:00:00+00:00",
-            "id": "b489b94e2619b027dbb149bb0bf981b9a13eea96e9f7259040a0c88649ae2950"
+            "symbol": "BCHUSDT",
+            "anchor": "2026-11-27T08:00:00+00:00",
+            "id": "c0fc35d47d33cd2acf1d90eaac21c7531c9e701715e134fe81fec125b79e9cd2"
           },
           {
-            "symbol": "ACHUSDT",
-            "anchor": "2026-11-27T00:00:00+00:00",
-            "id": "c63ffb41b6a8f23ca80db6f06636c09ce529149d787d1e536140cd088e9f859d"
+            "symbol": "BATUSDT",
+            "anchor": "2026-11-27T08:00:00+00:00",
+            "id": "c3e6f5cd43aedf5482172d706dc957cfb65a5b88370890ac9f939c496e163ab2"
           },
           {
-            "symbol": "AIXBTUSDT",
-            "anchor": "2026-11-27T00:00:00+00:00",
-            "id": "ca27e1c9d3d8ad6a1f27662f744d966910696b3eecfc9d9cb0ebe463078a3499"
-          },
-          {
-            "symbol": "ALICEUSDT",
-            "anchor": "2026-11-27T04:00:00+00:00",
-            "id": "ded2e201517463076539915203bdf2f37a2591fe8959e0a1dfff2d0bad827dc4"
+            "symbol": "ARXUSDT",
+            "anchor": "2026-11-27T08:00:00+00:00",
+            "id": "ed45f195a8b119ab6648fdd4f8df7ff7a1c54b18cd4721c38162dd320c3a6078"
           },
           {
             "symbol": "1INCHUSDT",
@@ -800,6 +777,11 @@
             "symbol": "AEVOUSDT",
             "anchor": "2026-11-27T12:00:00+00:00",
             "id": "fe1a159a2bec2733db603b560ef755e138b757c7fc81b3d38da9a5b3fe0e15e7"
+          },
+          {
+            "symbol": "BERAUSDT",
+            "anchor": "2026-11-27T16:00:00+00:00",
+            "id": "d890d8f384bea18e45bee65f743f411a3537efdd73ea740427c8ee5f16518b4a"
           }
         ],
         "MISSED": [
@@ -904,39 +886,102 @@
     {
       "market": "BIST",
       "direction": "DOWN",
-      "rule_id": "0a2021b60ecc2aaec6dfedde1d4939af416baef76b14e86d1744a80044011421",
+      "rule_id": "335f8c41713388f10c9c3ec1dbdaa51c3a803b02c4ca4f2058fd29f2869a5c38",
       "counts": {
-        "FALSE_ALARM": 374,
-        "LATE": 13,
+        "UNKNOWN": 84,
+        "FALSE_ALARM": 302,
+        "LATE": 12,
         "CORRECT": 8,
         "MISSED": 29
       },
       "examples": {
+        "UNKNOWN": [
+          {
+            "symbol": "AHSGY",
+            "anchor": "2024-11-30T00:00:00+00:00",
+            "id": "ab0f3f178e2c32516acaa7a78868af0e40ce2f65f8ada93226b93457508576ee"
+          },
+          {
+            "symbol": "EFOR",
+            "anchor": "2024-12-07T00:00:00+00:00",
+            "id": "70a54ead88e74313de8037079ef48df662bc1ed2014d9af33376a317f896452d"
+          },
+          {
+            "symbol": "AHSGY",
+            "anchor": "2024-12-14T00:00:00+00:00",
+            "id": "e8311759b0c4b0c340298c7b75b7542fd02fe21aa5e819f87682f1fc860fe1eb"
+          },
+          {
+            "symbol": "EFOR",
+            "anchor": "2024-12-21T00:00:00+00:00",
+            "id": "6e5911213a6ded08e738ca2aff23422c6aaee59311fd996ee1654374a5758b58"
+          },
+          {
+            "symbol": "AHSGY",
+            "anchor": "2024-12-28T00:00:00+00:00",
+            "id": "ce710b82396fc500beb6a1f74c8c9bf6af85952633b1f09a0d025b6328a1533b"
+          },
+          {
+            "symbol": "EFOR",
+            "anchor": "2025-01-04T00:00:00+00:00",
+            "id": "0fda139d31c88557bfbe1a65c53bc31c33b71de615642fdb3440149aa18bb4a8"
+          },
+          {
+            "symbol": "AHSGY",
+            "anchor": "2025-01-11T00:00:00+00:00",
+            "id": "1b0a898be8c4a8e82a26f1339c26acbdc389212409b7748a5fd264ea33867daf"
+          },
+          {
+            "symbol": "AHSGY",
+            "anchor": "2025-01-25T00:00:00+00:00",
+            "id": "b6ad3fd7840d79cff2dd6bfdf61dd1862d80423556a3e16baa865f1cea87ea51"
+          },
+          {
+            "symbol": "AHSGY",
+            "anchor": "2025-02-08T00:00:00+00:00",
+            "id": "7bea738e232ec9ca0bfe123a1ebac7c86746f37807ba9438d838976d5f316046"
+          },
+          {
+            "symbol": "AHSGY",
+            "anchor": "2025-02-22T00:00:00+00:00",
+            "id": "787f00aeab93bf406b626432507e1c68763f8ef3d1f0350423f1bb703ee065ed"
+          }
+        ],
         "FALSE_ALARM": [
+          {
+            "symbol": "RYSAS",
+            "anchor": "2026-08-01T00:00:00+00:00",
+            "id": "f5b32b0af574a1772b82ae01dd02ff73befd13b2075652744ce9a7087fb798d8"
+          },
+          {
+            "symbol": "ARDYZ",
+            "anchor": "2026-08-01T00:00:00+00:00",
+            "id": "f7aa2c8f96284e46481b6574113db37fb1dcff0188e26d18dea86df02858419c"
+          },
+          {
+            "symbol": "RYSAS",
+            "anchor": "2026-09-05T00:00:00+00:00",
+            "id": "67f8098e33d20810bd4ec77d3076ed006f17c39d7ef808833d47affdae86fccf"
+          },
+          {
+            "symbol": "TGSAS",
+            "anchor": "2026-09-05T00:00:00+00:00",
+            "id": "bc2a254702ba349715d702e7773f5047db1266439cedd5ead06e97f65e737ebf"
+          },
           {
             "symbol": "ARDYZ",
             "anchor": "2026-09-05T00:00:00+00:00",
             "id": "f1630ed5531579f6559b9b7cf8670447f970a3b0fb25acd07a30c1dab7ef0f98"
           },
           {
-            "symbol": "INDES",
+            "symbol": "RYSAS",
             "anchor": "2026-10-10T00:00:00+00:00",
-            "id": "38555fe2d6a260f2c6527006ab9c5fef9fd971bb619e482099c72a8d42d05250"
+            "id": "192f9ff6e9b4464c3842bbbaac9255aadc0d5643f42ace11ad3634891ee3c0ee"
           },
           {
-            "symbol": "ATAGY",
-            "anchor": "2026-10-10T00:00:00+00:00",
-            "id": "3c4d6e044845b99a1f7866426aee782784d71d7bdf9717b20792f89bb39a4762"
-          },
-          {
-            "symbol": "RALYH",
+            "symbol": "KZBGY",
             "anchor": "2026-11-14T00:00:00+00:00",
-            "id": "22fad1d933303434b7655b08eb210915881c10a09940408b347d75c9b2b894ef"
-          },
-          {
-            "symbol": "AHSGY",
-            "anchor": "2026-11-14T00:00:00+00:00",
-            "id": "39cd4f425593eaa8f981c102abf5e0362ce5358c25793fbfb3c976773bedae04"
+            "id": "13bc8def9cc53ca6008d753372544f30de25e26cbc38cafb2f71f14e10595436"
           },
           {
             "symbol": "DGNMO",
@@ -944,24 +989,14 @@
             "id": "3a02d18097ce4c6e22043348fc8ca2546a5bacbe0d7642deeaffae411dde29ab"
           },
           {
+            "symbol": "RYSAS",
+            "anchor": "2026-11-14T00:00:00+00:00",
+            "id": "45669c01874647d6c65616bd9a2fdfe4be6c8842a01b1ec3876538a7dc139d30"
+          },
+          {
             "symbol": "OZRDN",
             "anchor": "2026-11-14T00:00:00+00:00",
             "id": "58a0e9e12003737acf55ddaaeb57bf0b21aaa1124671b8c69a10a962b58d669c"
-          },
-          {
-            "symbol": "SANFM",
-            "anchor": "2026-11-14T00:00:00+00:00",
-            "id": "a1217ebd59a8e486e20a164a558a0700737c6f288c192bfcca87dca62fed7a67"
-          },
-          {
-            "symbol": "PATEK",
-            "anchor": "2026-11-14T00:00:00+00:00",
-            "id": "bfc21a124ea9b40d687ec12b1783b2c96d22660855456bcdb70140fddccc73e2"
-          },
-          {
-            "symbol": "ATAGY",
-            "anchor": "2026-11-14T00:00:00+00:00",
-            "id": "e245381b7a575e91842664e22affb09c5d3cb9ad0f4494722ee13c67ba75d55d"
           }
         ],
         "LATE": [
@@ -969,11 +1004,6 @@
             "symbol": "INDES",
             "anchor": "2023-09-09T00:00:00+00:00",
             "id": "5741511ff83895521acc089bdd18d042133ed18722fc1b8d52efa5829e18864d"
-          },
-          {
-            "symbol": "ARDYZ",
-            "anchor": "2023-10-14T00:00:00+00:00",
-            "id": "0df3ff15f264dd3e262ad1a4eb6e3a2085abb9647d8215c10457e81609c76aaa"
           },
           {
             "symbol": "OZRDN",
@@ -991,9 +1021,24 @@
             "id": "6341ccdad23fda5d93738d92b196aa2f9c1dc4dd8faeb1cf0986cf3bd4de7e65"
           },
           {
-            "symbol": "AZTEK",
-            "anchor": "2025-04-26T00:00:00+00:00",
-            "id": "a306da3276a102def5ac952fd33813f4d071c4a0461425c1390dfbeb5bb40ce3"
+            "symbol": "PATEK",
+            "anchor": "2025-03-15T00:00:00+00:00",
+            "id": "a1062865a52d9cf8e1fa8c1288e5358eb71d6e4a07b19cc5ecf72581bff34c47"
+          },
+          {
+            "symbol": "PATEK",
+            "anchor": "2025-08-16T00:00:00+00:00",
+            "id": "dbf08d117d4dec596945bb9bbe35754e38991aa2eccb4297c7b27304b3e8c8c3"
+          },
+          {
+            "symbol": "PATEK",
+            "anchor": "2025-10-11T00:00:00+00:00",
+            "id": "d9fee47c1a94cba8221bade6d7320ffb41bd4218513d02619de04a9b17bea168"
+          },
+          {
+            "symbol": "KZBGY",
+            "anchor": "2025-11-08T00:00:00+00:00",
+            "id": "7a961c54c2786ce709d7817b42929e8d29fd095c67d9f90b75a3d3647cfd6908"
           },
           {
             "symbol": "AZTEK",
@@ -1001,19 +1046,9 @@
             "id": "c872150cb924a78177a014e2215034586982a60d0e0e80ad3e858c239f8c8aa9"
           },
           {
-            "symbol": "PATEK",
-            "anchor": "2026-07-04T00:00:00+00:00",
-            "id": "7456f6dbef84281ff9f4984c065b773269f949548d72d782c7b5dd43b49745f4"
-          },
-          {
-            "symbol": "AHSGY",
-            "anchor": "2026-09-12T00:00:00+00:00",
-            "id": "d5c604bb562d2b9441c702e5a03613fafe855457e9a92b70a110a337215a13ee"
-          },
-          {
-            "symbol": "PATEK",
-            "anchor": "2026-09-19T00:00:00+00:00",
-            "id": "38898b8e60c1e3cf82db4d16f74f6f864295170b5b3fd703dd6f809be1c6d7f7"
+            "symbol": "RALYH",
+            "anchor": "2026-05-16T00:00:00+00:00",
+            "id": "57901229f486db423aced93001bfc53fc85789a3e516569581350e2737ea2872"
           }
         ],
         "CORRECT": [
@@ -1023,9 +1058,9 @@
             "id": "2aaa40cf4916893bf8321ac2bcc9b811703917f09e9be1848f738644ba6225d3"
           },
           {
-            "symbol": "KZBGY",
-            "anchor": "2022-11-05T00:00:00+00:00",
-            "id": "4de90d04dcd1cf24b33019e0293ca0714a61d0492fbe141989d54a45b550c404"
+            "symbol": "RALYH",
+            "anchor": "2024-01-27T00:00:00+00:00",
+            "id": "06223db134368787f6b09945b1f3595cb9a5da5297ce2af7f5c1cbf0a27f78c8"
           },
           {
             "symbol": "SANFM",
@@ -1033,46 +1068,41 @@
             "id": "7c57e6e7247514e3cb0c7268744520484792f21399e874ccfaa898cc493abee5"
           },
           {
-            "symbol": "KZBGY",
-            "anchor": "2024-05-18T00:00:00+00:00",
-            "id": "aa12d35884b2aa5b7c63bb987a2f06dd0af618f20c34eaf218090d23bbf614bf"
+            "symbol": "MNDRS",
+            "anchor": "2024-06-22T00:00:00+00:00",
+            "id": "7576f636bb6aadfbb057b0830fbdba33392319b31862ac33426087caf81bf980"
+          },
+          {
+            "symbol": "RYSAS",
+            "anchor": "2025-01-25T00:00:00+00:00",
+            "id": "c5dd2060ad06130a944fd1faa3a02b6013c180fae013d3c30defe3a679c659d3"
           },
           {
             "symbol": "KNFRT",
-            "anchor": "2025-03-01T00:00:00+00:00",
-            "id": "bf790a68dd15732cb3c3aaa437d9c6d3ea8e339ab083a059b73573f19c883ba3"
+            "anchor": "2025-10-04T00:00:00+00:00",
+            "id": "753f4184a2ee0679c963e00424de6ca6abd272f5ba0dcea08ece6f4844896f89"
           },
           {
-            "symbol": "PATEK",
-            "anchor": "2025-12-27T00:00:00+00:00",
-            "id": "d22b4fed685987075cc1f4487627564a28fe0a3d31412e8df17baf694f81b73c"
-          },
-          {
-            "symbol": "TGSAS",
-            "anchor": "2026-10-10T00:00:00+00:00",
-            "id": "0e077ab86a2258d04047d958016d4a99a23c05973fca58df43df07300b1ccbbc"
-          },
-          {
-            "symbol": "OZRDN",
-            "anchor": "2026-10-10T00:00:00+00:00",
-            "id": "98b80becfe0c38dbbf487829645f53b7ad101b7fe6453ad25ea3d96b35290584"
-          }
-        ],
-        "MISSED": [
-          {
-            "symbol": "AHSGY",
-            "anchor": "2026-08-29T00:00:00+00:00",
-            "id": "06945d306d2d8198802acc9d8539b2c33a7e2a98d1865194fb9c1b1e017c069b"
+            "symbol": "ULUSE",
+            "anchor": "2026-06-27T00:00:00+00:00",
+            "id": "99e92be3f85d12bfad7aca99169017167d2a4a07be3fe93b6c5aacb2cfbbc6a5"
           },
           {
             "symbol": "BRLSM",
             "anchor": "2026-09-05T00:00:00+00:00",
             "id": "64a2f56b0d5cf7d3814dcec653b22ad7a6414deb786c58a881a340606c192934"
-          },
+          }
+        ],
+        "MISSED": [
           {
             "symbol": "AHSGY",
             "anchor": "2026-09-26T00:00:00+00:00",
             "id": "0cc1bc5a433e19dc35f90140c5000e8a6f8c3c37953daba76b09b58d1a1c4234"
+          },
+          {
+            "symbol": "TGSAS",
+            "anchor": "2026-10-10T00:00:00+00:00",
+            "id": "0e077ab86a2258d04047d958016d4a99a23c05973fca58df43df07300b1ccbbc"
           },
           {
             "symbol": "RALYH",
@@ -1083,6 +1113,11 @@
             "symbol": "KNFRT",
             "anchor": "2026-10-10T00:00:00+00:00",
             "id": "870e87db8084cbcae12044e6d3db5563711eddbd7184ec9d506b93b32bae0079"
+          },
+          {
+            "symbol": "OZRDN",
+            "anchor": "2026-10-10T00:00:00+00:00",
+            "id": "98b80becfe0c38dbbf487829645f53b7ad101b7fe6453ad25ea3d96b35290584"
           },
           {
             "symbol": "PATEK",
@@ -1536,7 +1571,7 @@
     }
   ],
   "v8_recovery_total": {
-    "COMPLETE_MARK_ONLY": 32
+    "COMPLETE_MARK_ONLY": 48
   },
   "new_locks": [],
   "new_decisions": [],
