@@ -1,11 +1,11 @@
 {
   "repository": "evsayar33-oss/early_accumulation_radar",
-  "observed_at": "2026-11-26T16:51:45.238953+00:00",
+  "observed_at": "2026-11-27T16:37:45.576485+00:00",
   "metrics": {
-    "repository_bytes": 8794112,
+    "repository_bytes": 9355264,
     "cache_bytes": 0,
-    "artifact_bytes": 77619633,
-    "artifact_count": 488,
+    "artifact_bytes": 85100820,
+    "artifact_count": 538,
     "release_count": 10,
     "release_asset_bytes": 41560
   },
@@ -77,6 +77,7 @@
     ".github/workflows/v14_equity_autonomy.yml": "active",
     ".github/workflows/v15_crypto_autonomy.yml": "active",
     ".github/workflows/v16_indicator_controls.yml": "active",
+    ".github/workflows/v17_mvrv_research.yml": "active",
     ".github/workflows/v3_historical.yml": "active",
     ".github/workflows/v3_loss_diagnostic.yml": "active",
     ".github/workflows/v3_paper.yml": "active",
@@ -92,6 +93,6 @@
     "checkpoint_uncompressed_bytes": 603979776
   },
   "large_files": [],
-  "default_branch_commit_age_days": 2,
+  "default_branch_commit_age_days": 0,
   "status": "ok"
 }
