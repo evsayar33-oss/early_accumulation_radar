@@ -1,6 +1,6 @@
 """V17 real on-chain MVRV research; standard-library only and NO TRADING."""
 from __future__ import annotations
-import argparse,hashlib,json,math,statistics
+import argparse,csv,hashlib,io,json,math,statistics
 from datetime import datetime,timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -20,7 +20,20 @@ def fetch(asset,start="2015-01-01"):
     params=urlencode({"assets":asset,"metrics":"PriceUSD,CapMrktCurUSD,CapRealUSD",
                       "frequency":"1d","start_time":start,"page_size":10000})
     req=Request(API+"?"+params,headers={"User-Agent":"early-accumulation-radar/17"})
-    with urlopen(req,timeout=40) as response: payload=json.load(response)
+    try:
+      with urlopen(req,timeout=40) as response: payload=json.load(response)
+    except Exception:
+      archive=f"https://raw.githubusercontent.com/coinmetrics/data/master/csv/{asset}.csv"
+      with urlopen(Request(archive,headers={"User-Agent":"early-accumulation-radar/18"}),timeout=40) as response:
+        text=response.read().decode("utf-8")
+      out=[]
+      for item in csv.DictReader(io.StringIO(text)):
+        if item.get("time","")<start or not all(item.get(k) for k in ("PriceUSD","CapMrktCurUSD","CapMVRVCur")): continue
+        price,market,mvrv=(float(item[k]) for k in ("PriceUSD","CapMrktCurUSD","CapMVRVCur"))
+        if all(math.isfinite(x) and x>0 for x in (price,market,mvrv)):
+          out.append({"date":item["time"],"price":price,"market_cap":market,"realized_cap":market/mvrv})
+      if len(out)<365: raise ValueError("COINMETRICS_ARCHIVE_REAL_MVRV_INVALID_HISTORY")
+      return out
     source=payload.get("data") if isinstance(payload,dict) else None
     if not isinstance(source,list) or not source: raise ValueError("COINMETRICS_REAL_MVRV_EMPTY")
     rows=[];seen=set()
