@@ -1,0 +1,39 @@
+name: V17 Real MVRV research (NO TRADING)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37 3 * * 1'
+  push:
+    paths:
+      - research_v4/onchain_mvrv.py
+      - tests/test_v17_mvrv.py
+      - .github/workflows/v17_mvrv_research.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ear-v17-real-mvrv-research
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tests
+        run: python -m unittest tests.test_v17_mvrv -v
+      - name: Real MVRV research
+        run: |
+          python -m research_v4.onchain_mvrv --out out/v17_mvrv
+          cat out/v17_mvrv/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v17-real-mvrv-${{ github.run_id }}
+          path: out/v17_mvrv/
+          retention-days: 30

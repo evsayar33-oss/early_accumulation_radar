@@ -38,3 +38,7 @@ V3's BTC/ETH/SOL-led historical study failed its performance screen and **does n
 * Neither BIST nor US **float percentage, ownership concentration, depth, point-in-time historical universe or splits/dividends** is verified by this free-source sampler. PIT historical profitability, new PAPER NAV and real trading remain explicitly **blocked**. The existing large-cap crypto research/PAPER state remains unchanged.
 
 Free source setup, transparent coverage limits and gate details: [V4 BIST/US research guide](docs/V4_EQUITIES_FREE_SOURCES_TR.md).
+
+## V17 gerçek MVRV araştırması
+
+Haftalık `V17 Real MVRV research (NO TRADING)` işi, Coin Metrics Community kaynağında hem piyasa değeri hem realized cap bulunan BTC ve ETH için gerçek MVRV’yi hesaplar. Fiyat tabanlı vekiller MVRV diye adlandırılmaz. `MVRV < 1`, yalnız keşif döneminde sabitlenen yüzdelikler ve expanding Z-score kuralları kronolojik doğrulama bölümünde, maliyet sonrası ve çakışmayan 90 günlük olaylarla ölçülür. İlk eşik teması dip veya alım sinyali değildir; sonuçlar Quant Superlab doğrulaması olmadan PAPER/Telegram işlem bildirimi üretemez.
