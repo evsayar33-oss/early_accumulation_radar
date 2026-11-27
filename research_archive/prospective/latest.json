@@ -1,13 +1,22 @@
 {
-  "all_settlements": 14,
+  "all_settlements": 16,
   "all_signals": 38,
-  "asof_utc": "2026-11-26T13:15:11.862581+00:00",
+  "asof_utc": "2026-11-27T13:11:14.036501+00:00",
   "by_family": [
     {
       "family": "baseline/pullback_rebound",
       "market": "BIST",
       "mean_excess_pct": -1.07919,
       "mean_net_pct": -8.35593,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
+    {
+      "family": "v4/overnight_gap_fade",
+      "market": "BIST",
+      "mean_excess_pct": 7.30913,
+      "mean_net_pct": 1.78843,
       "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
       "n": 1,
       "symbols": 1
@@ -35,6 +44,15 @@
       "market": "CRYPTO",
       "mean_excess_pct": -2.42564,
       "mean_net_pct": -7.60947,
+      "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
+      "n": 1,
+      "symbols": 1
+    },
+    {
+      "family": "v3/relative_strength_rotation",
+      "market": "CRYPTO",
+      "mean_excess_pct": -1.42459,
+      "mean_net_pct": 0.56279,
       "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
       "n": 1,
       "symbols": 1
@@ -85,11 +103,11 @@
       "symbols": 1
     }
   ],
-  "current_source_csv_sha256": "fa57eeb2af1d47d21d3d9f652f84e2655702d01983c326028c1b29d641cee73f",
+  "current_source_csv_sha256": "6ab6d89086e95c161472ae316d5f9fa8a868d09e5896198945c4e59af285b8b2",
   "historical_pit_verified": false,
   "methodology_sha256": "3445f7e4f81e35df008258ef75d0b2dc1a2a847dd7166d415dbe3e8c3f5e0cbc",
-  "new_settlements": 4,
-  "new_signals": 4,
+  "new_settlements": 2,
+  "new_signals": 0,
   "notes": "First-observed signals only; entry strictly AFTER observation UTC date. Survivorship and data-provider revisions unresolved.",
   "paper_approved": false,
   "profitable_strategy_confirmed": false,
@@ -98,6 +116,6 @@
   "schema": "EAR.prospective_research_ledger.v1",
   "trade_authorized": false,
   "unsettled_reasons": {
-    "AWAITING_FUTURE_CLOSED_BARS": 24
+    "AWAITING_FUTURE_CLOSED_BARS": 22
   }
 }
