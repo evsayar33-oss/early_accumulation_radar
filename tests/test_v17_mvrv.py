@@ -15,5 +15,8 @@ class MVRVResearchTests(unittest.TestCase):
         self.assertFalse(report["proxy"]);self.assertLess(report["split"]["discovery_end"],report["split"]["validation_start"])
         self.assertFalse(report["paper_eligible"]);self.assertFalse(report["trade_authorized"])
         self.assertEqual(len(report["results"]),4)
+        self.assertEqual(report["combination_count"],12)
+        self.assertEqual(report["superlab_evidence"]["quant_superlab_verdict"],"NOT_EVALUATED")
+        self.assertFalse(report["superlab_evidence"]["automatic_promotion"])
 
 if __name__=="__main__":unittest.main()
