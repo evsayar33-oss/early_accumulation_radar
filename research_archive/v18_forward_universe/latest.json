@@ -1,0 +1,102 @@
+{
+  "asof_ms": 1795810434847,
+  "asset_classes": {
+    "COMMODITY": 24,
+    "CRYPTO": 732,
+    "FX": 4,
+    "INDEX": 16,
+    "RWA_UNSPECIFIED": 437,
+    "STANDARD_PERP": 535,
+    "STOCK": 694,
+    "UNCLASSIFIED": 923
+  },
+  "coverage_totals": {
+    "binance": {
+      "observed_runs": 0,
+      "unavailable_runs": 1
+    },
+    "bingx": {
+      "observed_runs": 1,
+      "unavailable_runs": 0
+    },
+    "bitget": {
+      "observed_runs": 1,
+      "unavailable_runs": 0
+    },
+    "bybit": {
+      "observed_runs": 0,
+      "unavailable_runs": 1
+    },
+    "gate": {
+      "observed_runs": 1,
+      "unavailable_runs": 0
+    },
+    "okx": {
+      "observed_runs": 1,
+      "unavailable_runs": 0
+    }
+  },
+  "cumulative_by_venue_class": {},
+  "deep_research_priority": [],
+  "distinct_native_venue_symbols": 3365,
+  "distinct_normalized_symbol_strings_not_unique_assets": 1324,
+  "event_thresholds_pct": {
+    "BOND": 1.0,
+    "COMMODITY": 2.0,
+    "CRYPTO": 12.0,
+    "ETF": 2.5,
+    "FX": 0.75,
+    "INDEX": 1.5,
+    "OTHER_OR_UNCLASSIFIED": 12.0,
+    "STOCK": 3.0
+  },
+  "history_required": false,
+  "low_liquidity_contracts": 1513,
+  "new_forward_anchors": 3365,
+  "observed_contracts": 3365,
+  "official_gate": "NOT_RUN",
+  "paper_approved": false,
+  "pending": 3365,
+  "previous_state_sha256": "GENESIS",
+  "schema": "EAR.v18.forward_universe.v1",
+  "sequence": 1,
+  "settled_this_run": 0,
+  "settlement_statuses": {},
+  "sources": {
+    "binance": {
+      "error": "RuntimeError",
+      "status": "SOURCE_UNAVAILABLE"
+    },
+    "bingx": {
+      "active_or_ticker_eligible": 923,
+      "observed": 923,
+      "status": "OBSERVED"
+    },
+    "bitget": {
+      "active_or_ticker_eligible": 886,
+      "observed": 886,
+      "status": "OBSERVED"
+    },
+    "bybit": {
+      "error": "RuntimeError",
+      "status": "SOURCE_UNAVAILABLE"
+    },
+    "gate": {
+      "active_or_ticker_eligible": 1029,
+      "observed": 1024,
+      "status": "OBSERVED"
+    },
+    "okx": {
+      "active_or_ticker_eligible": 532,
+      "observed": 532,
+      "status": "OBSERVED"
+    }
+  },
+  "state_sha256": "b81f4c4e2e5da09933c78ce7562c89e47810c3c9b7e78532cbdd6f11fbca4649",
+  "study": "SAME_CONTRACT_4H_ENDPOINT_MARK_NOT_OHLC_OR_FILL",
+  "timestamp_bases": {
+    "EXCHANGE_AND_RECEIPT": 2341,
+    "RECEIPT_ONLY": 1024
+  },
+  "trade_authorized": false
+}
