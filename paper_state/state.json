@@ -1,12 +1,12 @@
 {
-  "cash": 8871.278606366708,
-  "closed_trades": 16,
+  "cash": 9878.139665260587,
+  "closed_trades": 17,
   "first_seen_ms": 1794855908001,
   "gross_losses": 232.0950030121237,
-  "gross_wins": 89.07123230847128,
-  "last_event_sha256": "168ff19b92cc3be3be56de698d44f80fc3325c40aeb0cb3919993ed538d65bb2",
+  "gross_wins": 110.23466827271614,
+  "last_event_sha256": "44b2edbdb194091851002aac9d4236b4104b44321d85285b4469bf132e4523fb",
   "last_exit_ms": {
-    "ADA": 1795291796334,
+    "ADA": 1795757178447,
     "BTC": 1795471247351,
     "DOGE": 1795471247351,
     "ETH": 1795021848555,
@@ -14,27 +14,18 @@
     "SUI": 1795243229187,
     "XRP": 1794976448180
   },
-  "last_liquidation_nav": 9852.968138788241,
-  "last_observed_ms": 1795752654112,
-  "last_status": "UNMARKED_OUTAGE",
-  "last_valid_mark_ms": 1795735356974,
+  "last_liquidation_nav": 9878.139665260587,
+  "last_observed_ms": 1795757178447,
+  "last_status": "MARKED",
+  "last_valid_mark_ms": 1795757178447,
   "max_drawdown_pct": 2.2453137758147155,
   "model_sha256": "239ac5299ce742d49e7fcb5e16c4e3fa5eaffff2c2fb199775bcfaf121d5cbe2",
   "model_version": "EAR-V3-FIXED-20261116",
   "outages": 20,
   "paper_start_ms": 1794855908001,
   "peak_liquidation_nav": 10031.354544400561,
-  "positions": {
-    "ADA": {
-      "cost_usdt": 985.6976229296342,
-      "entry_effective": 0.14840380999999997,
-      "entry_ms": 1795735356974,
-      "entry_reference": 0.1483,
-      "entry_venue": "binance",
-      "qty": 6635.361383374288
-    }
-  },
-  "realized_pnl": -143.02377070365242,
+  "positions": {},
+  "realized_pnl": -121.86033473940756,
   "schema": "EAR.paper.v1",
-  "winning_trades": 4
+  "winning_trades": 5
 }
