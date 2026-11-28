@@ -4,7 +4,7 @@
   "first_seen_ms": 1794855908001,
   "gross_losses": 232.0950030121237,
   "gross_wins": 110.23466827271614,
-  "last_event_sha256": "f60fa75a363158fc6e1e79b77dc0d33ba897aff315b5304d57a019a9ddd252c2",
+  "last_event_sha256": "9e12413bc632c8e048c83b0c1a430f05ce06bccb4094e96645f82e818f8f1610",
   "last_exit_ms": {
     "ADA": 1795757178447,
     "BTC": 1795471247351,
@@ -15,9 +15,9 @@
     "XRP": 1794976448180
   },
   "last_liquidation_nav": 9878.139665260587,
-  "last_observed_ms": 1795839290249,
+  "last_observed_ms": 1795842126141,
   "last_status": "MARKED",
-  "last_valid_mark_ms": 1795839290249,
+  "last_valid_mark_ms": 1795842126141,
   "max_drawdown_pct": 2.2453137758147155,
   "model_sha256": "239ac5299ce742d49e7fcb5e16c4e3fa5eaffff2c2fb199775bcfaf121d5cbe2",
   "model_version": "EAR-V3-FIXED-20261116",
