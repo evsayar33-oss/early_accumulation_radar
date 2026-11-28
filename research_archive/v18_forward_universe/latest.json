@@ -1,5 +1,5 @@
 {
-  "asof_ms": 1795810434847,
+  "asof_ms": 1795834060113,
   "asset_classes": {
     "COMMODITY": 24,
     "CRYPTO": 732,
@@ -8,38 +8,105 @@
     "RWA_UNSPECIFIED": 437,
     "STANDARD_PERP": 535,
     "STOCK": 694,
-    "UNCLASSIFIED": 923
+    "UNCLASSIFIED": 864
   },
   "coverage_totals": {
     "binance": {
       "observed_runs": 0,
-      "unavailable_runs": 1
+      "unavailable_runs": 2
     },
     "bingx": {
-      "observed_runs": 1,
+      "observed_runs": 2,
       "unavailable_runs": 0
     },
     "bitget": {
-      "observed_runs": 1,
+      "observed_runs": 2,
       "unavailable_runs": 0
     },
     "bybit": {
       "observed_runs": 0,
-      "unavailable_runs": 1
+      "unavailable_runs": 2
     },
     "gate": {
-      "observed_runs": 1,
+      "observed_runs": 2,
       "unavailable_runs": 0
     },
     "okx": {
-      "observed_runs": 1,
+      "observed_runs": 2,
       "unavailable_runs": 0
     }
   },
-  "cumulative_by_venue_class": {},
+  "cumulative_by_venue_class": {
+    "bingx|UNCLASSIFIED": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 923
+      }
+    },
+    "bitget|CRYPTO": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 449
+      }
+    },
+    "bitget|RWA_UNSPECIFIED": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 437
+      }
+    },
+    "gate|COMMODITY": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 15
+      }
+    },
+    "gate|FX": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 4
+      }
+    },
+    "gate|INDEX": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 16
+      }
+    },
+    "gate|STANDARD_PERP": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 535
+      }
+    },
+    "gate|STOCK": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 454
+      }
+    },
+    "okx|COMMODITY": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 9
+      }
+    },
+    "okx|CRYPTO": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 283
+      }
+    },
+    "okx|STOCK": {
+      "features": {},
+      "outcomes": {
+        "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 240
+      }
+    }
+  },
   "deep_research_priority": [],
-  "distinct_native_venue_symbols": 3365,
-  "distinct_normalized_symbol_strings_not_unique_assets": 1324,
+  "distinct_native_venue_symbols": 3306,
+  "distinct_normalized_symbol_strings_not_unique_assets": 1275,
   "event_thresholds_pct": {
     "BOND": 1.0,
     "COMMODITY": 2.0,
@@ -51,25 +118,27 @@
     "STOCK": 3.0
   },
   "history_required": false,
-  "low_liquidity_contracts": 1513,
-  "new_forward_anchors": 3365,
-  "observed_contracts": 3365,
+  "low_liquidity_contracts": 1502,
+  "new_forward_anchors": 3306,
+  "observed_contracts": 3306,
   "official_gate": "NOT_RUN",
   "paper_approved": false,
-  "pending": 3365,
-  "previous_state_sha256": "GENESIS",
+  "pending": 3306,
+  "previous_state_sha256": "b81f4c4e2e5da09933c78ce7562c89e47810c3c9b7e78532cbdd6f11fbca4649",
   "schema": "EAR.v18.forward_universe.v1",
-  "sequence": 1,
-  "settled_this_run": 0,
-  "settlement_statuses": {},
+  "sequence": 2,
+  "settled_this_run": 3365,
+  "settlement_statuses": {
+    "CENSORED_NO_TIMELY_SAME_CONTRACT_QUOTE": 3365
+  },
   "sources": {
     "binance": {
       "error": "RuntimeError",
       "status": "SOURCE_UNAVAILABLE"
     },
     "bingx": {
-      "active_or_ticker_eligible": 923,
-      "observed": 923,
+      "active_or_ticker_eligible": 864,
+      "observed": 864,
       "status": "OBSERVED"
     },
     "bitget": {
@@ -92,10 +161,10 @@
       "status": "OBSERVED"
     }
   },
-  "state_sha256": "b81f4c4e2e5da09933c78ce7562c89e47810c3c9b7e78532cbdd6f11fbca4649",
+  "state_sha256": "ef55e3f22eff69831f7f41a973ab8f89a945e58cf2b9af10f7cb3a60ced0db34",
   "study": "SAME_CONTRACT_4H_ENDPOINT_MARK_NOT_OHLC_OR_FILL",
   "timestamp_bases": {
-    "EXCHANGE_AND_RECEIPT": 2341,
+    "EXCHANGE_AND_RECEIPT": 2282,
     "RECEIPT_ONLY": 1024
   },
   "trade_authorized": false
